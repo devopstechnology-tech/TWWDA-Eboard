@@ -1,0 +1,16 @@
+{
+    "preset": "psr12",
+    "[php]": {
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "open-southeners.laravel-pint"
+    },
+    "rules": {
+        "class_attributes_separation": false,
+        "declare_strict_types": true,
+        "function_declaration": {
+            "closure_fn_spacing": "none"
+        },
+        "not_operator_with_successor_space": false,
+        "ordered_imports": true
+    }
+}

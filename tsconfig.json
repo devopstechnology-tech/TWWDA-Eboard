@@ -1,0 +1,25 @@
+{
+    "compilerOptions": {
+        "target": "ESNext",
+        "useDefineForClassFields": true,
+        "module": "ESNext",
+        "moduleResolution": "Node",
+        "strict": true,
+        "jsx": "preserve",
+        "sourceMap": true,
+        "allowJs": true,
+        "resolveJsonModule": true,
+        "isolatedModules": true,
+        "esModuleInterop": true,
+        "lib": ["ESNext", "DOM"],
+        "skipLibCheck": true,
+        "baseUrl": "./",
+        "paths": {
+            "@/*": ["resources/front/*"],
+            "@styles/*": ["resources/styles/*"],
+            "@assets/*": ["resources/assets/*"],
+        },
+    },
+    "include": ["resources/**/*.ts", "resources/**/*.d.ts", "resources/**/*.vue"],
+    "references": [{ "path": "./tsconfig.node.json" }]
+}

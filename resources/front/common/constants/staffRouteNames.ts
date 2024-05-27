@@ -1,0 +1,16 @@
+export const ALMANAC = Symbol('almanac');
+export const BOARDS = Symbol('boards');
+export const CALENDAR = Symbol('calendar');
+export const DASHBOARD = Symbol('dashboard');
+export const DISCUSSIONS = Symbol('discussions');
+export const MEETINGS = Symbol('meetings');
+export const NOTIFICATIONS = Symbol('notifications');
+export const CHANGE_PASSWORD = Symbol('change.password');
+export const FORGOT_PASSWORD = Symbol('forgot.password');
+export const LOGIN = Symbol('login');
+export const REGISTER = Symbol('register');
+export const TASKS = Symbol('tasks');
+export const USERS = Symbol('users');
+export const POLLS = Symbol('polls');
+export const AGENDAS = Symbol('agendas');
+export const SETTINGS = Symbol('settings');
