@@ -22,6 +22,9 @@ class CreatePasswordChangeRequest extends FormRequest
             'otp' => RuleSet::create()
                 ->required()
                 ->string(),
+            'token' => RuleSet::create()
+                ->required()
+                ->string(),
         ];
     }
 }

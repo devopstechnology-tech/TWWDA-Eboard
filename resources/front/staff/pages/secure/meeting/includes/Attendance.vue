@@ -32,6 +32,7 @@ const {
     membership: string|null;
     meeting: string|null;
     id:string;
+    invite_status:string|null;
     rsvp_status:string|null;
     attendance_status:string|null;
 
@@ -76,6 +77,7 @@ const onSubmit = handleSubmit(async (values, {resetForm}) => {
             membership_id: values.membership_id,
             membership: values.membership,
             meeting: values.meeting,
+            invite_status: null,
         };
         if (action.value === 'create') {
             await useCreateAttendanceRSVPRequest(payload, meetingId);
@@ -216,8 +218,7 @@ function handleMeetingUpdated(event) {
                                       class="text-muted">
                                 </span>
                             </td>
-                            <td class="invited lg:text-center">
-                               
+                            <td class="invited lg:text-center">                               
                                 <span class="text-sm"> 
                                     {{attendee.location}}
                                 </span>

@@ -66,6 +66,14 @@ export interface AuthenticateRequestPayload {
     password: string;
     remember: boolean;
 }
+export interface ForgotPasswordPayload {
+    email: string;
+}
+export interface ChangePasswordPayload {
+    otp: string;
+    password: string;
+    token: string;
+}
 export interface metaRouteDetails {
     permissions?: string[];
 }

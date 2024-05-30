@@ -15,6 +15,7 @@ class AttendanceResource extends BaseResource
         return [
             'id' => $this->resource->getRouteKey(),
             'location' => $this->resource->location,
+            'invite_status' => $this->resource->invite_status,
             'rsvp_status' => $this->resource->rsvp_status,
             'attendance_status' => $this->resource->attendance_status,
             'meeting_id' => $this->resource->meeting_id,

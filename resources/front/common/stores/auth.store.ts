@@ -3,42 +3,38 @@ import {computed, ref} from 'vue';
 import {RouteLocationNormalized} from 'vue-router';
 import useCurrentAuthRequest from '@/common/api/requests/useCurrentAuthRequest';
 import {LOGIN} from '@/common/constants/customerRouteNames';
-// import {STAFF_MAIN} from '@/common/constants/staffRouteNames';
-import {Permission} from '@/common/parsers/permissionParser';
+import {LOCAL_USER} from '@/common/constants/localStorageKeys';
 import {AuthenticatedUser} from '@/common/parsers/userParser';
 import {isError} from '@/common/utilities/isError';
-import {Role} from '../parsers/roleParser';
 
 const useAuthStore = defineStore('auth', () => {
     const checkController = ref<AbortController>();
     const initialized = ref(false);
     const intendedRoute = ref<RouteLocationNormalized>();
-    const user = ref<AuthenticatedUser >();
+    const user = ref<AuthenticatedUser>();
+
     const isAuthenticated = computed(() => !!user.value);
+
     const mainRoute = computed(() => {
-        //Todo:// redirect by role first then by permissions
-        // if (hasPermission('view staff dashboard')) {
-        //     return {name: STAFF_MAIN};
-        // }
         return {name: LOGIN};
     });
 
     function setUser(newUser?: AuthenticatedUser) {
         user.value = newUser;
+        if (newUser) {
+            localStorage.setItem(LOCAL_USER, JSON.stringify(newUser));
+        } else {
+            localStorage.removeItem(LOCAL_USER);
+        }
     }
+
     async function updateProfile() {
         checkController.value?.abort();
         checkController.value = new AbortController();
-        try {
-            const currentUser = await useCurrentAuthRequest({
-                signal: checkController.value?.signal,
-            });
-            setUser(currentUser);
-        } catch (err) {
-            if (!isError(err, 'AbortError')) {
-                setUser(undefined);
-            }
-        }
+        const currentUser = await useCurrentAuthRequest({
+            signal: checkController.value?.signal,
+        });
+        setUser(currentUser);
     }
 
     async function check() {
@@ -55,7 +51,7 @@ const useAuthStore = defineStore('auth', () => {
             return true;
         }
         if (Array.isArray(permissions)) {
-            return permissions.some(permission => 
+            return permissions.some(permission =>
                 user.value?.permissions?.some(p => p.name === permission),
             );
         }
@@ -72,7 +68,7 @@ const useAuthStore = defineStore('auth', () => {
         return roles === user.value?.role;
     }
 
-    function hasAllPermissions(permissions: Permission[]): boolean {
+    function hasAllPermissions(permissions: string[]): boolean {
         return permissions.every(permission => hasPermission(permission));
     }
 
@@ -81,7 +77,12 @@ const useAuthStore = defineStore('auth', () => {
             return;
         }
 
-        await check();
+        const storedUser = localStorage.getItem(LOCAL_USER);
+        if (storedUser) {
+            setUser(JSON.parse(storedUser));
+        } else {
+            await check();
+        }
 
         initialized.value = true;
     }

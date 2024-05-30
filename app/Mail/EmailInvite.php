@@ -22,8 +22,8 @@ class EmailInvite extends Mailable
 
     public function build()
     {
-        return $this->from('noreply@example.com', 'EBoard Pro Platform')
-                    ->subject('Your Invitation to Join')
-                    ->view('emails.invite', ['mailData' => $this->mailData]); // Ensure you use view if using HTML templates
+        return $this->from(config('mail.from.address.default'), 'EBoard Pro Platform')
+            ->subject('Your Invitation to Join')
+            ->view('emails.invite', ['mailData' => $this->mailData]); // Ensure you use view if using HTML templates
     }
 }

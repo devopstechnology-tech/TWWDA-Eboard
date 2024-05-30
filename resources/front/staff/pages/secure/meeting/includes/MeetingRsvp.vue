@@ -73,13 +73,13 @@ const toggleDropdown = () => {
 };
   
 const updateRsvp = (status: string) => {
-    emit('rsvp-updated', {attendeeId: props.attendee.id, status});
+    emit('rsvp-updated', {attendeeId: props.attendee?.id, status});
     dropdownOpen.value = false;
 };
   
-const rsvpText = computed(() => props.attendee.rsvp_status || 'RSVP');
+const rsvpText = computed(() => props.attendee?.rsvp_status || 'RSVP');
 const rsvpClass = computed(() => {
-    switch (props.attendee.rsvp_status) {
+    switch (props.attendee?.rsvp_status) {
         case 'Yes':
             return 'bg-success text-white';
         case 'No':
@@ -95,7 +95,7 @@ const rsvpClass = computed(() => {
     }
 });
 const rsvpIcon = computed(() => {
-    switch (props.attendee.rsvp_status) {
+    switch (props.attendee?.rsvp_status) {
         case 'Yes':
             return 'far fa-check-circle';
         case 'No':

@@ -12,7 +12,7 @@ import {DASHBOARD,
     LOGIN,
 } from '@/common/constants/staffRouteNames';
 import ValidationError from '@/common/errors/ValidationError';
-import {AuthenticatedUser} from '@/common/parsers/userParser';
+// import {AuthenticatedUser} from '@/common/parsers/userParser';
 import useAuthStore from '@/common/stores/auth.store';
 import {AuthenticateRequestPayload} from '@/common/types/types';
 

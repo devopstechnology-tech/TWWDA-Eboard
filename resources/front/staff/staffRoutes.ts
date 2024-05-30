@@ -41,6 +41,9 @@ const staffRoutes: RouteRecordRaw[] = [
                 name: CHANGE_PASSWORD,
                 path: 'change-password',
                 meta: {title: 'Change Password'},
+                props: (route) => (
+                    {token: route.query.token}
+                ),
             },
             {
                 beforeEnter: requireStaffGuest,
@@ -179,14 +182,14 @@ const staffRoutes: RouteRecordRaw[] = [
                 },
                 {
                     beforeEnter: requireStaffAuthentication,
-                    component: () => import('@/staff/pages/secure/discussion/Discussions.vue'),
+                    component: () => import('@/staff/pages/secure/discussion/discussions.vue'),
                     name: DISCUSSIONS,
                     path: 'discussions',
                     meta: {title: 'Discussions'},
                 },
                 {
                     beforeEnter: requireStaffAuthentication,
-                    component: () => import('@/staff/pages/secure/discussion/DiscussionsDetails.vue'),
+                    component: () => import('@/staff/pages/secure/discussion/discussionDetails.vue'),
                     // Ensure this component is created
                     name: 'DiscussionDetails', // A unique name for the route
                     path: '/discussion/:id', // Dynamic segment to capture the board ID

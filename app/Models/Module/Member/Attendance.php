@@ -6,6 +6,7 @@ namespace App\Models\Module\Member;
 
 use App\Traits\Uuids;
 use App\Enums\RSVPEnum;
+use App\Enums\InviteEnum;
 use App\Models\BaseModel;
 use App\Enums\AttendanceEnum;
 use App\Models\Module\Meeting\Meeting;
@@ -24,10 +25,12 @@ class Attendance extends BaseModel
         'location',
         'meeting_id',
         'membership_id',
+        'invite_status',
         'rsvp_status',
         'attendance_status',
     ];
     protected $casts = [
+        'invite_status' => InviteEnum::class,
         'rsvp_status' => RSVPEnum::class,
         'attendance_status' => AttendanceEnum::class,
     ];
