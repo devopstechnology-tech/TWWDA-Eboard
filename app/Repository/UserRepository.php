@@ -27,7 +27,7 @@ class UserRepository extends BaseRepository implements UserInterface
             'roles.permissions',
             'membs.board',
             'membs.committee',
-            ];
+        ];
     }
     public function register($payload): User
     {
@@ -55,7 +55,7 @@ class UserRepository extends BaseRepository implements UserInterface
             // 'board_id' => $board,
             'with' => $this->relationships(),
             'orderBy' => ['field' => 'created_at', 'direction' => 'asc']
-            ];
+        ];
         return $this->indexResource(User::class, UsersResource::class, $filters);
     }
 
@@ -86,9 +86,9 @@ class UserRepository extends BaseRepository implements UserInterface
         return $user->delete();
     }
 
-    public function forgotPassword(array $payload): Model
+    public function forgotPassword(array $payload)
     {
-        $user = User::where('id_number', $payload['id_number'])
+        $user = User::where('email', $payload['email'])
             ->firstOrFail();
         $otp = $this->generateOTP($user);
         customLog(User::class, $user, 'password reset request');
@@ -106,7 +106,7 @@ class UserRepository extends BaseRepository implements UserInterface
         ]);
     }
 
-    public function changePassword(array $payload): UserResource
+    public function changePassword(array $payload)
     {
         $changeRequest = $this->otpIsValid($payload['otp']);
         $user = $changeRequest->otpable;
@@ -123,8 +123,9 @@ class UserRepository extends BaseRepository implements UserInterface
             ]
         );
         customLog(User::class, $user, 'password reset');
-
-        return UserResource::make($user);
+        $updateOtp = $this->updateOTP($payload['token']);
+        $credentials = new Credentials($user->email, $payload['password']);
+        return $this->login($credentials);
     }
 
     private function otpIsValid(string $otp): Otp|Model
@@ -137,6 +138,13 @@ class UserRepository extends BaseRepository implements UserInterface
         }
 
         return $changeRequest;
+    }
+    public function updateOTP($token)
+    {
+        $updateToken = Otp::where('token', $token)->first();
+        $updateToken->usage_attempts += 1;
+        $updateToken->status = 'inactive';
+        $updateToken->save();
     }
 
     public function update(User|string $user, $payload): User|string

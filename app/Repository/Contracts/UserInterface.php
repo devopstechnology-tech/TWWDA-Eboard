@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace App\Repository\Contracts;
 
-use App\Data\Credentials;
 use App\Models\User;
+use App\Data\Credentials;
 use Illuminate\Http\Request;
+use App\Http\Resources\UserResource;
 
 interface UserInterface
 {
@@ -19,6 +20,10 @@ interface UserInterface
     public function login(Credentials $credentials);
 
     public function logout(Request $request);
+
+    public function forgotPassword(array $payload);
+
+    public function changePassword(array $payload);
 
     public function get(User|string $user);
 

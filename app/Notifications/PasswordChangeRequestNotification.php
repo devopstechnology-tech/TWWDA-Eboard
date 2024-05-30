@@ -30,19 +30,23 @@ class PasswordChangeRequestNotification extends Notification implements ShouldQu
 
     public function via(object $notifiable): array
     {
-        return ['mail', SmsChannel::class];
+        // return ['mail', SmsChannel::class];
+        return ['mail'];
     }
 
     public function toMail(object $notifiable): MailMessage
     {
         $mailFromAddress = config('mail.from.address');
         $mailFromName = config('mail.from.name');
+
+        $fullUrl = config('app.url');
+        $appName = env('APP_NAME');
         return (new MailMessage())
             ->subject('🗝️ Password Reset OTP')
             ->from($mailFromAddress, $mailFromName)
             ->line("Here is your OTP {$this->otp->otp}")
-            ->action('Reset Password', "https://erev.co.ke/change-password?token={$this->otp->token}")
-            ->line('Thank you for using EREV systems.');
+            ->action('Reset Password', $fullUrl . "/change-password?token={$this->otp->token}")
+            ->line('Thank you for using the' .  $appName);
     }
 
     public function toSms(object $notifiable): SmsMessage

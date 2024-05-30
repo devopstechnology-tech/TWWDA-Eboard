@@ -31,9 +31,9 @@ class UserObserver
                 'message' => 'You are invited to join our platform.'
             ];
 
-            // dispatch(new EmailInviteJob($email, $mailData));
-            // $emailInstance = new EmailInvite($mailData);
-            // Mail::to($email)->send($emailInstance);
+            dispatch(new EmailInviteJob($email, $mailData));
+            $emailInstance = new EmailInvite($mailData);
+            Mail::to($email)->send($emailInstance);
         }
     }
 

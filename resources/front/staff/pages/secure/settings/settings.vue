@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import {a} from '@fullcalendar/core/internal-common';
 import {useQuery} from '@tanstack/vue-query';
 // import Multiselect from '@vueform/multiselect';
 import PSPDFKit from 'pspdfkit';

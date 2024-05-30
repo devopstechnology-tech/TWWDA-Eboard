@@ -2,9 +2,12 @@
 
 namespace App\Repository;
 
+use App\Enums\RSVPEnum;
+use App\Enums\AttendanceEnum;
 use App\Repository\BaseRepository;
-use App\Http\Resources\AttendanceResource;
 use App\Models\Module\Member\Attendance;
+use App\Models\Module\Member\Membership;
+use App\Http\Resources\AttendanceResource;
 use App\Repository\Contracts\AttendanceInterface;
 
 class AttendanceRepository extends BaseRepository implements AttendanceInterface
@@ -45,17 +48,25 @@ class AttendanceRepository extends BaseRepository implements AttendanceInterface
         ];
         return $this->indexResource(Attendance::class, AttendanceResource::class, $filters);
     }
-    public function createAttendance($meeting, array $payload)
+    public function create(Membership | string $membership)
     {
+        $attendance = new Attendance();
+        $attendance->meeting_id        = $membership->meeting_id;
+        $attendance->membership_id     = $membership->id;
+        $attendance->rsvp_status       = RSVPEnum::Default->value;
+        $attendance->attendance_status = AttendanceEnum::Default->value;
+        $attendance->save();
+        return $attendance;
     }
-    public function updateAttendance(Attendance | string $attendance, array $payload)
+    public function update(Membership | string $membership)
     {
-        // if (!($attendance instanceof Attendance)) {
-        //     $attendance = Attendance::findOrFail($attendance);
-        // }
-        // $attendance->rsvp_status = $payload['rsvp_status'];
-        // $attendance->save();
-        // return $attendance;
+        $attendance = new Attendance();
+        $attendance->meeting_id        = $membership->meeting_id;
+        $attendance->membership_id     = $membership->id;
+        $attendance->rsvp_status       = RSVPEnum::Default->value;
+        $attendance->attendance_status = AttendanceEnum::Default->value;
+        $attendance->save();
+        return $attendance;
     }
     public function createRSVP(Attendance | string $attendance, array $payload)
     {
@@ -78,6 +89,10 @@ class AttendanceRepository extends BaseRepository implements AttendanceInterface
         $attendance->attendance_status = $payload['attendance_status'];
         $attendance->save();
         return $attendance;
+    }
+    public function destroyAttendances(array $oldMembershipIds)
+    {
+        return Attendance::whereIn('membership_id', $oldMembershipIds)->forceDelete();
     }
     public function destroyMeetingAttendance(Attendance | string $attendance)
     {

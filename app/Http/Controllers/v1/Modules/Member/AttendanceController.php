@@ -35,13 +35,13 @@ class AttendanceController extends Controller
 
     public function store(CreateAttendanceRequest $request, Meeting $meeting): JsonResponse
     {
-        $attendance = $this->attendanceRepository->createAttendance($meeting, $request->validated());
+        $attendance = $this->attendanceRepository->creatersvp($meeting, $request->validated());
 
         return $this->response(Response::HTTP_OK, __('messages.records-fetched'), $attendance, Attendance::class);
     }
     public function update(UpdateAttendanceRequest $request, Attendance $attendance): JsonResponse
     {
-        $attendance = $this->attendanceRepository->updateAttendance($attendance, $request->validated());
+        $attendance = $this->attendanceRepository->update($attendance, $request->validated());
 
         return $this->response(Response::HTTP_OK, __('messages.records-fetched'), $attendance, Attendance::class);
     }

@@ -2,10 +2,9 @@ import {array, object, output, string} from 'zod';
 import {profileParser} from '@/common/parsers//profileParser';
 import {permissionParser} from '@/common/parsers/permissionParser';
 import {Setting} from '@/common/parsers/settingsParser';
-import { membershipRequestParser } from './membershipParser';
+import {membershipRequestParser} from './membershipParser';
 
 export const authenticatedUserParser = object({
-    // created_at: string(),
     email: string(),
     first: string(),
     full_name: string(),
@@ -17,7 +16,7 @@ export const authenticatedUserParser = object({
     type: string(),
     profile: object({
         id: string(),
-        avatar: string().nullable(),
+        avatar: string(),
         ethnicity: string().nullable(),
         phone: string(),
         idpassportnumber: string(),
@@ -103,7 +102,12 @@ export interface nonPaginateResponse {
     data: User[],
     message: string
 }
-
+//profile upates
+export interface SingleUserResponse {
+    code: number,
+    data: AuthenticatedUser,
+    message: string
+}
 export interface singleresponse {
     code: number,
     data: User,

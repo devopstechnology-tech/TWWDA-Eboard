@@ -33,24 +33,23 @@ const authStore = useAuthStore();
                      style="opacity: .8"> -->
                 <span class="brand-text font-weight-light">Eboard</span>
             </router-link>
-            {{ authStore.user?.profile.avatar }}
 
             <!-- Sidebar -->
             <div class="sidebar">
                 <!-- Sidebar user (optional) -->
-                <div class="user-panel mt-3 pb-3 mb-3 d-flex" v-if="authStore?.user">
+                <div class="user-panel mt-3 pb-3 mb-3 d-flex" v-if="authStore.user">
                     <div class="image">
-                        <img :src="loadAvatar(authStore.user.profile.avatar)" class="img-circle elevation-2"
+                        <img :src="loadAvatar(authStore.user.profile?.avatar)" class="img-circle elevation-2"
                              alt="User Image">
                     </div>
                     <div class="info">
                         <router-link :to="{
                             name: 'ProfileDetails',
                             params:{
-                                userId: authStore.user.id,
-                                profileId: authStore.user.profile.id,
+                                userId: authStore?.user?.id,
+                                profileId: authStore.user.profile?.id,
                             } }" class="d-block">
-                            {{ authStore.user?.full_name }}
+                            {{ authStore.user.full_name }}
                         </router-link>
                     </div>
                 </div>

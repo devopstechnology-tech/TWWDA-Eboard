@@ -71,12 +71,7 @@ class UserController extends Controller
         return $this->response(Response::HTTP_OK, __('messages.record-fetched'), $user, User::class);
     }
 
-    public function changePassword(CreatePasswordChangeRequest $request): JsonResponse
-    {
-        $user = $this->userRepository->changePassword($request->validated());
 
-        return $this->response(Response::HTTP_OK, __('messages.password-changed'), $user);
-    }
 
     public function update(UpdateUserRequest $request, User $user): JsonResponse
     {
@@ -88,9 +83,16 @@ class UserController extends Controller
 
     public function forgotPassword(CreatePasswordResetRequest $request): JsonResponse
     {
+        // dd($request);
         $this->userRepository->forgotPassword($request->validated());
 
-        return $this->response(Response::HTTP_OK, __('messages.password-forgot'), 'Forget password initiated', User::class);
+        return $this->response(Response::HTTP_OK, __('messages.password-forgot'), 'Forget password initiated');
+    }
+    public function changePassword(CreatePasswordChangeRequest $request): JsonResponse
+    {
+        $user = $this->userRepository->changePassword($request->validated());
+
+        return $this->response(Response::HTTP_OK, __('messages.password-changed'), $user);
     }
 
     public function destroy(User $user): JsonResponse

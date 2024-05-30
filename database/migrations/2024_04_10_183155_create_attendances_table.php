@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use App\Enums\RSVPEnum;
-use App\Enums\StatusEnum;
+use App\Enums\InviteEnum;
 use App\Enums\AttendanceEnum;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
@@ -19,10 +19,10 @@ return new class() extends Migration
         Schema::create('attendances', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->string('location')->nullable();
-            $table->string('meeting_id')->nullable();
             $table->string('membership_id')->nullable();
+            $table->string('invite_status')->default(InviteEnum::Default->value); //accept reject  invited
             $table->string('rsvp_status')->default(RSVPEnum::Default->value); //signed or unsigned
-            $table->string('attendance_status')->default(AttendanceEnum::Default->value);
+            $table->string('attendance_status')->default(AttendanceEnum::Default->value); //mark attendance
             $table->softDeletes();
             $table->timestamps();
         });
