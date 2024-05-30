@@ -2989,3 +2989,155 @@ Stack trace:
 #33 D:\\SystemsApps\\revboard\\artisan(35): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
 #34 {main}
 "} 
+[2024-05-30 13:30:30] production.DEBUG: D:\SystemsApps\revboard\public\build/manifest.json  
+[2024-05-30 13:34:44] production.DEBUG: D:\SystemsApps\revboard\public\build/manifest.json  
+[2024-05-30 13:34:58] production.DEBUG: D:\SystemsApps\revboard\public\build/manifest.json  
+[2024-05-30 13:35:20] production.DEBUG: D:\SystemsApps\revboard\public\build/manifest.json  
+[2024-05-30 13:35:23] production.DEBUG: D:\SystemsApps\revboard\public\build/manifest.json  
+[2024-05-30 13:35:28] production.DEBUG: D:\SystemsApps\revboard\public\build/manifest.json  
+[2024-05-30 13:35:35] production.DEBUG: D:\SystemsApps\revboard\public\build/manifest.json  
+[2024-05-30 13:36:00] production.DEBUG: D:\SystemsApps\revboard\public\build/manifest.json  
+[2024-05-30 13:36:02] production.DEBUG: D:\SystemsApps\revboard\public\build/manifest.json  
+[2024-05-30 13:47:11] production.DEBUG: D:\SystemsApps\revboard\public\build/manifest.json  
+[2024-05-30 13:47:12] production.DEBUG: D:\SystemsApps\revboard\public\build/manifest.json  
+[2024-05-30 13:47:15] production.DEBUG: D:\SystemsApps\revboard\public\build/manifest.json  
+[2024-05-30 13:47:23] production.DEBUG: D:\SystemsApps\revboard\public\build/manifest.json  
+[2024-05-30 13:47:26] production.DEBUG: D:\SystemsApps\revboard\public\build/manifest.json  
+[2024-05-30 13:47:32] production.ERROR: The use statement with non-compound name 'Mail' has no effect {"exception":"[object] (ErrorException(code: 0): The use statement with non-compound name 'Mail' has no effect at D:\\SystemsApps\\revboard\\routes\\web.php:5)
+[stacktrace]
+#0 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Bootstrap\\HandleExceptions.php(255): Illuminate\\Foundation\\Bootstrap\\HandleExceptions->handleError(2, 'The use stateme...', 'D:\\\\SystemsApps\\\\...', 5)
+#1 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\RouteFileRegistrar.php(35): Illuminate\\Foundation\\Bootstrap\\HandleExceptions->Illuminate\\Foundation\\Bootstrap\\{closure}(2, 'The use stateme...', 'D:\\\\SystemsApps\\\\...', 5)
+#2 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\RouteFileRegistrar.php(35): require('D:\\\\SystemsApps\\\\...')
+#3 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Router.php(511): Illuminate\\Routing\\RouteFileRegistrar->register('D:\\\\SystemsApps\\\\...')
+#4 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Router.php(465): Illuminate\\Routing\\Router->loadRoutes('D:\\\\SystemsApps\\\\...')
+#5 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\RouteRegistrar.php(194): Illuminate\\Routing\\Router->group(Array, 'D:\\\\SystemsApps\\\\...')
+#6 D:\\SystemsApps\\revboard\\app\\Providers\\RouteServiceProvider.php(39): Illuminate\\Routing\\RouteRegistrar->group('D:\\\\SystemsApps\\\\...')
+#7 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\BoundMethod.php(36): App\\Providers\\RouteServiceProvider->App\\Providers\\{closure}()
+#8 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Util.php(41): Illuminate\\Container\\BoundMethod::Illuminate\\Container\\{closure}()
+#9 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\BoundMethod.php(81): Illuminate\\Container\\Util::unwrapIfClosure(Object(Closure))
+#10 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\BoundMethod.php(35): Illuminate\\Container\\BoundMethod::callBoundMethod(Object(Illuminate\\Foundation\\Application), Object(Closure), Object(Closure))
+#11 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Container.php(662): Illuminate\\Container\\BoundMethod::call(Object(Illuminate\\Foundation\\Application), Object(Closure), Array, NULL)
+#12 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Support\\Providers\\RouteServiceProvider.php(120): Illuminate\\Container\\Container->call(Object(Closure))
+#13 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Support\\Providers\\RouteServiceProvider.php(45): Illuminate\\Foundation\\Support\\Providers\\RouteServiceProvider->loadRoutes()
+#14 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\BoundMethod.php(36): Illuminate\\Foundation\\Support\\Providers\\RouteServiceProvider->Illuminate\\Foundation\\Support\\Providers\\{closure}()
+#15 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Util.php(41): Illuminate\\Container\\BoundMethod::Illuminate\\Container\\{closure}()
+#16 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\BoundMethod.php(81): Illuminate\\Container\\Util::unwrapIfClosure(Object(Closure))
+#17 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\BoundMethod.php(35): Illuminate\\Container\\BoundMethod::callBoundMethod(Object(Illuminate\\Foundation\\Application), Object(Closure), Object(Closure))
+#18 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Container.php(662): Illuminate\\Container\\BoundMethod::call(Object(Illuminate\\Foundation\\Application), Object(Closure), Array, NULL)
+#19 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Support\\ServiceProvider.php(119): Illuminate\\Container\\Container->call(Object(Closure))
+#20 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(1037): Illuminate\\Support\\ServiceProvider->callBootedCallbacks()
+#21 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(1015): Illuminate\\Foundation\\Application->bootProvider(Object(App\\Providers\\RouteServiceProvider))
+#22 [internal function]: Illuminate\\Foundation\\Application->Illuminate\\Foundation\\{closure}(Object(App\\Providers\\RouteServiceProvider), 37)
+#23 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(1014): array_walk(Array, Object(Closure))
+#24 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Bootstrap\\BootProviders.php(17): Illuminate\\Foundation\\Application->boot()
+#25 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(263): Illuminate\\Foundation\\Bootstrap\\BootProviders->bootstrap(Object(Illuminate\\Foundation\\Application))
+#26 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Kernel.php(186): Illuminate\\Foundation\\Application->bootstrapWith(Array)
+#27 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Kernel.php(170): Illuminate\\Foundation\\Http\\Kernel->bootstrap()
+#28 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Kernel.php(144): Illuminate\\Foundation\\Http\\Kernel->sendRequestThroughRouter(Object(Illuminate\\Http\\Request))
+#29 D:\\SystemsApps\\revboard\\public\\index.php(53): Illuminate\\Foundation\\Http\\Kernel->handle(Object(Illuminate\\Http\\Request))
+#30 {main}
+"} 
+[2024-05-30 13:47:39] production.ERROR: The use statement with non-compound name 'Mail' has no effect {"exception":"[object] (ErrorException(code: 0): The use statement with non-compound name 'Mail' has no effect at D:\\SystemsApps\\revboard\\routes\\web.php:5)
+[stacktrace]
+#0 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Bootstrap\\HandleExceptions.php(255): Illuminate\\Foundation\\Bootstrap\\HandleExceptions->handleError(2, 'The use stateme...', 'D:\\\\SystemsApps\\\\...', 5)
+#1 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\RouteFileRegistrar.php(35): Illuminate\\Foundation\\Bootstrap\\HandleExceptions->Illuminate\\Foundation\\Bootstrap\\{closure}(2, 'The use stateme...', 'D:\\\\SystemsApps\\\\...', 5)
+#2 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\RouteFileRegistrar.php(35): require('D:\\\\SystemsApps\\\\...')
+#3 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Router.php(511): Illuminate\\Routing\\RouteFileRegistrar->register('D:\\\\SystemsApps\\\\...')
+#4 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Router.php(465): Illuminate\\Routing\\Router->loadRoutes('D:\\\\SystemsApps\\\\...')
+#5 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\RouteRegistrar.php(194): Illuminate\\Routing\\Router->group(Array, 'D:\\\\SystemsApps\\\\...')
+#6 D:\\SystemsApps\\revboard\\app\\Providers\\RouteServiceProvider.php(39): Illuminate\\Routing\\RouteRegistrar->group('D:\\\\SystemsApps\\\\...')
+#7 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\BoundMethod.php(36): App\\Providers\\RouteServiceProvider->App\\Providers\\{closure}()
+#8 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Util.php(41): Illuminate\\Container\\BoundMethod::Illuminate\\Container\\{closure}()
+#9 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\BoundMethod.php(81): Illuminate\\Container\\Util::unwrapIfClosure(Object(Closure))
+#10 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\BoundMethod.php(35): Illuminate\\Container\\BoundMethod::callBoundMethod(Object(Illuminate\\Foundation\\Application), Object(Closure), Object(Closure))
+#11 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Container.php(662): Illuminate\\Container\\BoundMethod::call(Object(Illuminate\\Foundation\\Application), Object(Closure), Array, NULL)
+#12 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Support\\Providers\\RouteServiceProvider.php(120): Illuminate\\Container\\Container->call(Object(Closure))
+#13 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Support\\Providers\\RouteServiceProvider.php(45): Illuminate\\Foundation\\Support\\Providers\\RouteServiceProvider->loadRoutes()
+#14 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\BoundMethod.php(36): Illuminate\\Foundation\\Support\\Providers\\RouteServiceProvider->Illuminate\\Foundation\\Support\\Providers\\{closure}()
+#15 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Util.php(41): Illuminate\\Container\\BoundMethod::Illuminate\\Container\\{closure}()
+#16 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\BoundMethod.php(81): Illuminate\\Container\\Util::unwrapIfClosure(Object(Closure))
+#17 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\BoundMethod.php(35): Illuminate\\Container\\BoundMethod::callBoundMethod(Object(Illuminate\\Foundation\\Application), Object(Closure), Object(Closure))
+#18 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Container.php(662): Illuminate\\Container\\BoundMethod::call(Object(Illuminate\\Foundation\\Application), Object(Closure), Array, NULL)
+#19 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Support\\ServiceProvider.php(119): Illuminate\\Container\\Container->call(Object(Closure))
+#20 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(1037): Illuminate\\Support\\ServiceProvider->callBootedCallbacks()
+#21 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(1015): Illuminate\\Foundation\\Application->bootProvider(Object(App\\Providers\\RouteServiceProvider))
+#22 [internal function]: Illuminate\\Foundation\\Application->Illuminate\\Foundation\\{closure}(Object(App\\Providers\\RouteServiceProvider), 37)
+#23 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(1014): array_walk(Array, Object(Closure))
+#24 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Bootstrap\\BootProviders.php(17): Illuminate\\Foundation\\Application->boot()
+#25 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(263): Illuminate\\Foundation\\Bootstrap\\BootProviders->bootstrap(Object(Illuminate\\Foundation\\Application))
+#26 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Kernel.php(186): Illuminate\\Foundation\\Application->bootstrapWith(Array)
+#27 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Kernel.php(170): Illuminate\\Foundation\\Http\\Kernel->bootstrap()
+#28 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Kernel.php(144): Illuminate\\Foundation\\Http\\Kernel->sendRequestThroughRouter(Object(Illuminate\\Http\\Request))
+#29 D:\\SystemsApps\\revboard\\public\\index.php(53): Illuminate\\Foundation\\Http\\Kernel->handle(Object(Illuminate\\Http\\Request))
+#30 {main}
+"} 
+[2024-05-30 13:47:48] production.ERROR: The use statement with non-compound name 'Mail' has no effect {"exception":"[object] (ErrorException(code: 0): The use statement with non-compound name 'Mail' has no effect at D:\\SystemsApps\\revboard\\routes\\web.php:5)
+[stacktrace]
+#0 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Bootstrap\\HandleExceptions.php(255): Illuminate\\Foundation\\Bootstrap\\HandleExceptions->handleError(2, 'The use stateme...', 'D:\\\\SystemsApps\\\\...', 5)
+#1 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\RouteFileRegistrar.php(35): Illuminate\\Foundation\\Bootstrap\\HandleExceptions->Illuminate\\Foundation\\Bootstrap\\{closure}(2, 'The use stateme...', 'D:\\\\SystemsApps\\\\...', 5)
+#2 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\RouteFileRegistrar.php(35): require('D:\\\\SystemsApps\\\\...')
+#3 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Router.php(511): Illuminate\\Routing\\RouteFileRegistrar->register('D:\\\\SystemsApps\\\\...')
+#4 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Router.php(465): Illuminate\\Routing\\Router->loadRoutes('D:\\\\SystemsApps\\\\...')
+#5 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\RouteRegistrar.php(194): Illuminate\\Routing\\Router->group(Array, 'D:\\\\SystemsApps\\\\...')
+#6 D:\\SystemsApps\\revboard\\app\\Providers\\RouteServiceProvider.php(39): Illuminate\\Routing\\RouteRegistrar->group('D:\\\\SystemsApps\\\\...')
+#7 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\BoundMethod.php(36): App\\Providers\\RouteServiceProvider->App\\Providers\\{closure}()
+#8 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Util.php(41): Illuminate\\Container\\BoundMethod::Illuminate\\Container\\{closure}()
+#9 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\BoundMethod.php(81): Illuminate\\Container\\Util::unwrapIfClosure(Object(Closure))
+#10 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\BoundMethod.php(35): Illuminate\\Container\\BoundMethod::callBoundMethod(Object(Illuminate\\Foundation\\Application), Object(Closure), Object(Closure))
+#11 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Container.php(662): Illuminate\\Container\\BoundMethod::call(Object(Illuminate\\Foundation\\Application), Object(Closure), Array, NULL)
+#12 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Support\\Providers\\RouteServiceProvider.php(120): Illuminate\\Container\\Container->call(Object(Closure))
+#13 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Support\\Providers\\RouteServiceProvider.php(45): Illuminate\\Foundation\\Support\\Providers\\RouteServiceProvider->loadRoutes()
+#14 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\BoundMethod.php(36): Illuminate\\Foundation\\Support\\Providers\\RouteServiceProvider->Illuminate\\Foundation\\Support\\Providers\\{closure}()
+#15 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Util.php(41): Illuminate\\Container\\BoundMethod::Illuminate\\Container\\{closure}()
+#16 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\BoundMethod.php(81): Illuminate\\Container\\Util::unwrapIfClosure(Object(Closure))
+#17 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\BoundMethod.php(35): Illuminate\\Container\\BoundMethod::callBoundMethod(Object(Illuminate\\Foundation\\Application), Object(Closure), Object(Closure))
+#18 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Container.php(662): Illuminate\\Container\\BoundMethod::call(Object(Illuminate\\Foundation\\Application), Object(Closure), Array, NULL)
+#19 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Support\\ServiceProvider.php(119): Illuminate\\Container\\Container->call(Object(Closure))
+#20 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(1037): Illuminate\\Support\\ServiceProvider->callBootedCallbacks()
+#21 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(1015): Illuminate\\Foundation\\Application->bootProvider(Object(App\\Providers\\RouteServiceProvider))
+#22 [internal function]: Illuminate\\Foundation\\Application->Illuminate\\Foundation\\{closure}(Object(App\\Providers\\RouteServiceProvider), 37)
+#23 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(1014): array_walk(Array, Object(Closure))
+#24 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Bootstrap\\BootProviders.php(17): Illuminate\\Foundation\\Application->boot()
+#25 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(263): Illuminate\\Foundation\\Bootstrap\\BootProviders->bootstrap(Object(Illuminate\\Foundation\\Application))
+#26 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Kernel.php(186): Illuminate\\Foundation\\Application->bootstrapWith(Array)
+#27 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Kernel.php(170): Illuminate\\Foundation\\Http\\Kernel->bootstrap()
+#28 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Kernel.php(144): Illuminate\\Foundation\\Http\\Kernel->sendRequestThroughRouter(Object(Illuminate\\Http\\Request))
+#29 D:\\SystemsApps\\revboard\\public\\index.php(53): Illuminate\\Foundation\\Http\\Kernel->handle(Object(Illuminate\\Http\\Request))
+#30 {main}
+"} 
+[2024-05-30 13:48:23] production.ERROR: The use statement with non-compound name 'Mail' has no effect {"exception":"[object] (ErrorException(code: 0): The use statement with non-compound name 'Mail' has no effect at D:\\SystemsApps\\revboard\\routes\\web.php:5)
+[stacktrace]
+#0 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Bootstrap\\HandleExceptions.php(255): Illuminate\\Foundation\\Bootstrap\\HandleExceptions->handleError(2, 'The use stateme...', 'D:\\\\SystemsApps\\\\...', 5)
+#1 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\RouteFileRegistrar.php(35): Illuminate\\Foundation\\Bootstrap\\HandleExceptions->Illuminate\\Foundation\\Bootstrap\\{closure}(2, 'The use stateme...', 'D:\\\\SystemsApps\\\\...', 5)
+#2 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\RouteFileRegistrar.php(35): require('D:\\\\SystemsApps\\\\...')
+#3 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Router.php(511): Illuminate\\Routing\\RouteFileRegistrar->register('D:\\\\SystemsApps\\\\...')
+#4 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Router.php(465): Illuminate\\Routing\\Router->loadRoutes('D:\\\\SystemsApps\\\\...')
+#5 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\RouteRegistrar.php(194): Illuminate\\Routing\\Router->group(Array, 'D:\\\\SystemsApps\\\\...')
+#6 D:\\SystemsApps\\revboard\\app\\Providers\\RouteServiceProvider.php(39): Illuminate\\Routing\\RouteRegistrar->group('D:\\\\SystemsApps\\\\...')
+#7 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\BoundMethod.php(36): App\\Providers\\RouteServiceProvider->App\\Providers\\{closure}()
+#8 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Util.php(41): Illuminate\\Container\\BoundMethod::Illuminate\\Container\\{closure}()
+#9 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\BoundMethod.php(81): Illuminate\\Container\\Util::unwrapIfClosure(Object(Closure))
+#10 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\BoundMethod.php(35): Illuminate\\Container\\BoundMethod::callBoundMethod(Object(Illuminate\\Foundation\\Application), Object(Closure), Object(Closure))
+#11 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Container.php(662): Illuminate\\Container\\BoundMethod::call(Object(Illuminate\\Foundation\\Application), Object(Closure), Array, NULL)
+#12 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Support\\Providers\\RouteServiceProvider.php(120): Illuminate\\Container\\Container->call(Object(Closure))
+#13 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Support\\Providers\\RouteServiceProvider.php(45): Illuminate\\Foundation\\Support\\Providers\\RouteServiceProvider->loadRoutes()
+#14 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\BoundMethod.php(36): Illuminate\\Foundation\\Support\\Providers\\RouteServiceProvider->Illuminate\\Foundation\\Support\\Providers\\{closure}()
+#15 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Util.php(41): Illuminate\\Container\\BoundMethod::Illuminate\\Container\\{closure}()
+#16 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\BoundMethod.php(81): Illuminate\\Container\\Util::unwrapIfClosure(Object(Closure))
+#17 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\BoundMethod.php(35): Illuminate\\Container\\BoundMethod::callBoundMethod(Object(Illuminate\\Foundation\\Application), Object(Closure), Object(Closure))
+#18 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Container.php(662): Illuminate\\Container\\BoundMethod::call(Object(Illuminate\\Foundation\\Application), Object(Closure), Array, NULL)
+#19 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Support\\ServiceProvider.php(119): Illuminate\\Container\\Container->call(Object(Closure))
+#20 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(1037): Illuminate\\Support\\ServiceProvider->callBootedCallbacks()
+#21 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(1015): Illuminate\\Foundation\\Application->bootProvider(Object(App\\Providers\\RouteServiceProvider))
+#22 [internal function]: Illuminate\\Foundation\\Application->Illuminate\\Foundation\\{closure}(Object(App\\Providers\\RouteServiceProvider), 37)
+#23 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(1014): array_walk(Array, Object(Closure))
+#24 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Bootstrap\\BootProviders.php(17): Illuminate\\Foundation\\Application->boot()
+#25 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(263): Illuminate\\Foundation\\Bootstrap\\BootProviders->bootstrap(Object(Illuminate\\Foundation\\Application))
+#26 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Kernel.php(186): Illuminate\\Foundation\\Application->bootstrapWith(Array)
+#27 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Kernel.php(170): Illuminate\\Foundation\\Http\\Kernel->bootstrap()
+#28 D:\\SystemsApps\\revboard\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Kernel.php(144): Illuminate\\Foundation\\Http\\Kernel->sendRequestThroughRouter(Object(Illuminate\\Http\\Request))
+#29 D:\\SystemsApps\\revboard\\public\\index.php(53): Illuminate\\Foundation\\Http\\Kernel->handle(Object(Illuminate\\Http\\Request))
+#30 {main}
+"} 
+[2024-05-30 13:49:11] production.DEBUG: D:\SystemsApps\revboard\public\build/manifest.json  
+[2024-05-30 13:49:20] production.DEBUG: D:\SystemsApps\revboard\public\build/manifest.json  
