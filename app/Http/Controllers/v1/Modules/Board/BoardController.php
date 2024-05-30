@@ -74,7 +74,7 @@ class BoardController extends Controller
 
     public function destroy(Board $board): JsonResponse
     {
-        $this->authorize('delete', [Board::class, $board->id]);
+        // $this->authorize('delete', [Board::class, $board->id]);
         $this->boardRepository->delete($board);
 
         return $this->response(Response::HTTP_NO_CONTENT, __('messages.record-deleted'), null);

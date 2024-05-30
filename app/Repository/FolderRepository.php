@@ -81,8 +81,8 @@ class FolderRepository extends BaseRepository implements FolderInterface
         $parentfolder = $this->getParentFolder($payload['parent_id']);
         $folder                    = new Folder();
         $folder->parent_id         = $parentfolder->id;
-        $folder->folderable_id   = $parentfolder->id;
-        $folder->folderable_type = Folder::class;
+        $folder->folderable_id     = $parentfolder->id;
+        $folder->folderable_type   = Folder::class;
         $folder->name              = $payload['name'];
         $folder->type              = $payload['type'];
         $folder->save();
@@ -94,12 +94,98 @@ class FolderRepository extends BaseRepository implements FolderInterface
         $folder = Folder::find($payload['folder_id']);
         // $folder->parent_id         = $parentfolder->id;
         // $folder->folderable_id   = $parentfolder->id;
-        $folder->folderable_type = Folder::class;
+        $folder->folderable_type    = Folder::class;
         $folder->name              = $payload['name'];
         $folder->type              = $payload['type'];
         $folder->save();
         return $folder;
     }
+    public function deleteBoardFolders($board)
+    {
+        $folders = Folder::where('folderable_id', $board->id)
+            ->where('folderable_type', Board::class)
+            ->get();
+
+        foreach ($folders as $folder) {
+            $this->deleteFolderRecursively($folder);
+        }
+    }
+
+    private function deleteFolderRecursively($folder)
+    {
+        // Recursively delete child folders
+        // Recursively delete child folders
+        foreach ($folder->children as $child) {
+            $this->deleteFolderRecursively($child);
+        }
+
+        // Handle deletion based on folder type
+        if ($folder->type === 'file') {
+            // Retrieve or create the 'Board Archives' folder
+            $archiveFolder = $this->archiveFolder($folder);
+
+            // Move all media items to the archive folder
+            $mediaItems = $folder->getMedia();
+            foreach ($mediaItems as $mediaItem) {
+                $mediaItem->move($archiveFolder, 'file');
+            }
+
+            // Optionally, mark the original folder as archived or update status
+            // $folder->name = $folder->name . " (Archived)";
+            // $folder->save();
+        } else {
+            // Delete the folder itself after all children have been deleted
+            $folder->delete();
+        }
+    }
+    private function archiveFolder($folder)
+    {
+        // Assuming folderable_id refers to the parent entity (like Board)
+        // and that 'Board Archives' is directly under this entity
+        $archiveFolder = Folder::firstOrCreate(
+            [
+                'folderable_id'   => $folder->folderable_id,
+                'folderable_type' => $folder->folderable_type,
+                'name'            => 'Board Archives'
+            ],
+            [
+                'type'            => 'file' // Make sure the type and other necessary attributes are set
+            ]
+        );
+
+        return $archiveFolder;
+    }
+
+    public function forcedeleteBoardFolder($board)
+    {
+        $folders = Folder::where('folderable_id', $board->id)
+            ->where('folderable_type', Board::class)
+            ->get();
+
+        foreach ($folders as $folder) {
+            $this->forceDeleteFolderRecursively($folder);
+        }
+    }
+    private function forceDeleteFolderRecursively($folder)
+    {
+        // Recursively delete all child folders first
+        foreach ($folder->children as $child) {
+            $this->forceDeleteFolderRecursively($child);
+        }
+
+        // Conditionally force delete all associated media files
+        // Only if the folder type is NOT 'file'
+        if ($folder->type === 'file') {
+            $folder->media()->each(function ($media) {
+                $media->forceDelete(); // Force delete media
+            });
+        }
+
+        // Finally, force delete the folder itself
+        // This happens regardless of the type
+        $folder->forceDelete();
+    }
+
     public function createBoardFileFolder($board, array $payload): Folder
     {
         // dd($payload);
@@ -255,6 +341,95 @@ class FolderRepository extends BaseRepository implements FolderInterface
         }
         return $folder;
     }
+
+
+    public function deleteMeetingFolder($meeting)
+    {
+        $folders = Folder::where('folderable_id', $meeting->id)
+            ->where('folderable_type', Meeting::class)
+            ->get();
+
+        foreach ($folders as $folder) {
+            $this->deleteMeetingFolderRecursively($folder);
+        }
+    }
+
+    private function deleteMeetingFolderRecursively($folder)
+    {
+        // Recursively delete child folders
+        // Recursively delete child folders
+        foreach ($folder->children as $child) {
+            $this->deleteFolderRecursively($child);
+        }
+
+        // Handle deletion based on folder type
+        if ($folder->type === 'file') {
+            // Retrieve or create the 'Meeting Archives' folder
+            $archiveFolder = $this->archiveMeetingFolder($folder);
+
+            // Move all media items to the archive folder
+            $mediaItems = $folder->getMedia();
+            foreach ($mediaItems as $mediaItem) {
+                $mediaItem->move($archiveFolder, 'file');
+            }
+
+            // Optionally, mark the original folder as archived or update status
+            // $folder->name = $folder->name . " (Archived)";
+            // $folder->save();
+        } else {
+            // Delete the folder itself after all children have been deleted
+            $folder->delete();
+        }
+    }
+    private function archiveMeetingFolder($folder)
+    {
+        // Assuming folderable_id refers to the parent entity (like Meeting)
+        // and that 'Meeting Archive' is directly under this entity
+        $archiveFolder = Folder::firstOrCreate(
+            [
+                'folderable_id'   => $folder->folderable_id,
+                'folderable_type' => $folder->folderable_type,
+                'name'            => 'Meeting Archive'
+            ],
+            [
+                'type'            => 'file' // Make sure the type and other necessary attributes are set
+            ]
+        );
+
+        return $archiveFolder;
+    }
+
+    public function forcedeleteMeetingFolder($meeting)
+    {
+        $folders = Folder::where('folderable_id', $meeting->id)
+            ->where('folderable_type', Meeting::class)
+            ->get();
+
+        foreach ($folders as $folder) {
+            $this->forceDeleteMeetingFolderRecursively($folder);
+        }
+    }
+    private function forceDeleteMeetingFolderRecursively($folder)
+    {
+        // Recursively delete all child folders first
+        foreach ($folder->children as $child) {
+            $this->forceDeleteFolderRecursively($child);
+        }
+
+        // Conditionally force delete all associated media files
+        // Only if the folder type is NOT 'file'
+        if ($folder->type === 'file') {
+            $folder->media()->each(function ($media) {
+                $media->forceDelete(); // Force delete media
+            });
+        }
+
+        // Finally, force delete the folder itself
+        // This happens regardless of the type
+        $folder->forceDelete();
+    }
+
+
 
     public function replaceMedia(Folder $folder, UploadedFile $newFile)
     {

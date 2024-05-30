@@ -180,12 +180,18 @@ class BoardRepository extends BaseRepository implements BoardInterface
         return $board;
     }
 
-    public function delete(Board|string $board): bool
+    public function delete(Board|string $board)
     {
         if (!($board instanceof Board)) {
             $board = Board::findOrFail($board);
         }
-
+        $previousIconFileName = $board->icon;
+        $previousCoverFileName = $board->cover;
+        $iconfolderLocation = '/images/icon/';
+        $coverfolderLocation = '/images/cover/';
+        $deletedicon = make(ImageAction::class)->deleteImage($iconfolderLocation, $previousIconFileName);
+        $deletecover = make(ImageAction::class)->deleteImage($coverfolderLocation, $previousCoverFileName);
+        $this->folderRepository->deleteBoardFolders($board);
         return $board->delete();
     } // Implement the methods
 

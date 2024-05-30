@@ -99,6 +99,8 @@ const onSubmit = handleSubmit(async (values, {resetForm}) => {
         await fetchMemberships();
         reset();
         membershipsmodal.value?.close();
+        // Dispatch a global custom event
+        window.dispatchEvent(new CustomEvent('membershipsUpdated', {detail: {meetingId, boardId}}));
     } catch (err) {
         if (err instanceof ValidationError) {
             setErrors(err.messages);

@@ -7,6 +7,7 @@ import {computed,onMounted,ref} from 'vue';
 import * as yup from 'yup';
 import {
     useCreateBoardRequest,
+    useDeleteBoardRequest,
     useGetBoardsRequest,
     useUpdateBoardMembersRequest,
     useUpdateBoardRequest} from '@/common/api/requests/modules/board/useBoardRequest';
@@ -167,8 +168,8 @@ const {handleSubmit, setErrors, setFieldValue, values} = useForm<{
     },
 });
 
-const deleteBoard = async (e: string) => {
-    await useDeleteBoardRequest(e);
+const deleteBoard = async (board: Board) => {
+    await useDeleteBoardRequest(board.id);
     await fetchBoards();
 };
 
@@ -299,6 +300,11 @@ const {isLoading, data, refetch: fetchBoards} = getBoards();
                                                class="text-blue-500 hover:text-blue-700
                                                 transition duration-150 ease-in-out">
                                                 <i class="far fa-edit"></i>
+                                            </a>
+                                            <a href="" @click.prevent="deleteBoard(board)"
+                                               class="text-blue-500 hover:text-blue-700
+                                                transition duration-150 ease-in-out">
+                                                <i class="fas fa-trash-alt"></i>
                                             </a>
                                             <!-- View Button/Link -->
                                             <router-link :to="{ name: 'BoardDetails', params: { boardId: board.id } }"

@@ -80,8 +80,8 @@ class MembershipRepository extends BaseRepository implements MembershipInterface
             ->where('user_id', '!=', $meetingObject->owner_id)
             ->get();
 
-        $oldMembershipIds = $oldMemberships->pluck('id');
-        if ($oldMembershipIds->isNotEmpty()) {
+        $oldMembershipIds = $oldMemberships->pluck('id')->toArray();
+        if (!empty($oldMembershipIds)) {
             $this->attendanceRepository->destroyAttendances($oldMembershipIds);
         }
 

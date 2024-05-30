@@ -17,22 +17,26 @@ interface FolderInterface
     public function getFile($folder, $file);
     //be aupdated from board or meeting file view
     public function updateFile($folder, $file, array $payload);
-   //board
+    //board
     public function getBoardFolders($board);
     public function createBoardFolder($board, array $payload): Folder;
     public function updateBoardFolder($board, $folder, array $payload): Folder;
+    public function deleteBoardFolders($board);
+    public function forceDeleteBoardFolder($board);
     public function createBoardFileFolder($board, array $payload): Folder;
     public function updateBoardFileFolder($board, $folder, array $payload): Folder;
 
 
 
 
-//meeting
+    //meeting
     public function getMeetingFolders($meeting);
     public function createMeetingFolder(Meeting|string $meeting, Board|string $board, array $payload): Folder;
     public function updateMeetingFolder(Meeting|string $meeting, Board|string $board, array $payload): Folder;
     public function createMeetingFileFolder(Meeting|string $meeting, Board|string $board, array $payload): Folder;
     public function updateMeetingFileFolder(Meeting|string $meeting, Board|string $board, array $payload): Folder;
+    public function deleteMeetingFolder($board);
+    public function forcedeleteMeetingFolder($board);
 
     // default
     public function createBoardDefaultFolder(Board|string $board, array $DefaultfolderNames): void;
