@@ -67,10 +67,17 @@ export async function useGetSingleBoardRequest(id: string): Promise<singlerespon
     const data: singleresponse = await client.get(boardRoute() + '/' + id).json();
     return data;
 }
+
 export async function useUpdateBoardMembersRequest(payload: BoardMembersRequestPayload, id: string) {
     const client = useClient();
 
     await client.post(boardMemberRoute() + '/' + id, {
         json: payload,
     }).json();
+}
+
+export async function useDeleteBoardRequest(id: string){
+    // console.log('id', id);
+    const client = useClient();
+    return await client.delete(boardRoute() + '/' + id).json();
 }

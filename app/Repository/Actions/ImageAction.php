@@ -95,4 +95,16 @@ class ImageAction
 
         return $image;
     }
+    public function deleteImage($folderLocation, $previousFileName)
+    {
+        $path = public_path() . $folderLocation;
+        if ($previousFileName !== null) {
+            $oldImage = $path . '/' . $previousFileName;
+            if (file_exists($oldImage)) {
+                unlink($oldImage);
+            }
+        }
+
+        return true;
+    }
 }

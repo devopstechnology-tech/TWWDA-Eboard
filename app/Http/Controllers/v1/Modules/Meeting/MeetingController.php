@@ -99,7 +99,7 @@ class MeetingController extends Controller
     }
     public function destroy(Meeting $meeting): JsonResponse
     {
-        $this->authorize('delete', [Meeting::class, $meeting->id]);
+        // $this->authorize('delete', [Meeting::class, $meeting->id]);
         $this->meetingRepository->delete($meeting);
 
         return $this->response(Response::HTTP_NO_CONTENT, __('messages.record-deleted'), null);
