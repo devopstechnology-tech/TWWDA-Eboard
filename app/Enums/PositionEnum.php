@@ -9,10 +9,16 @@ use App\Enums\BaseEnumTrait;
 enum PositionEnum: string
 {
     use BaseEnumTrait;
-    case BoardDirector = 'Board Director';
-    case Chairman = 'Chairman';
-    case Secretary = 'Secretary';
-    case Guest = 'Guest';
-    case Owner = 'Owner';
-    case Default = 'Member';
+
+    case System           = 'system';
+    case Admin            = 'admin';
+    case CEO              = 'ceo';
+    case CompanyChairman  = 'company chairman';
+    case CompanySecretary = 'company secretary';
+    case Chairperson      = 'chairperson';
+    case Secretary        = 'secretary';
+    case Member           = 'member';
+    case Guest            = 'guest';
+    case Owner            = 'owner';
+    case Default          = 'observer';
 }

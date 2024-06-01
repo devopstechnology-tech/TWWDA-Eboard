@@ -3,6 +3,7 @@ import {profileParser} from '@/common/parsers//profileParser';
 import {permissionParser} from '@/common/parsers/permissionParser';
 import {Setting} from '@/common/parsers/settingsParser';
 import {membershipRequestParser} from './membershipParser';
+import { roleParser } from './roleParser';
 
 export const authenticatedUserParser = object({
     email: string(),
@@ -67,8 +68,9 @@ export const userparser = object({//can be used from profile side import
     id: string(),
     last: string(),
     other_names: string().nullable(),
-    permissions: array(permissionParser).nullable(),
+    permissions: array(permissionParser),
     role: string(),
+    roles: array(roleParser),
     type: string(),
 });
 
@@ -114,7 +116,7 @@ export interface singleresponse {
     message: string
 }
 
-export type User = output<typeof userRequestParser>;
+export type User = output<typeof userparser>;
 
 export type AuthenticatedUser = output<typeof authenticatedUserParser>;
 

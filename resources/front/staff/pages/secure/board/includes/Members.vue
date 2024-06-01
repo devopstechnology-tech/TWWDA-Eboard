@@ -11,7 +11,8 @@ import * as yup from 'yup';
 import {
     useCreateMemberRequest,
     useGetBoardMembersRequest,
-    useUpdateMemberRequest} from '@/common/api/requests/modules/member/useMemberRequest';
+    useUpdateMemberRequest,
+    useUpdateMemberRoleRequest} from '@/common/api/requests/modules/member/useMemberRequest';
 import{useGetStaffsRequest}from '@/common/api/requests/staff/useStaffRequest';
 import FormDateInput from '@/common/components/FormDateInput.vue';
 import FormDateTimeInput from '@/common/components/FormDateTimeInput.vue';
@@ -24,10 +25,11 @@ import SimpleTable from '@/common/components/Tables/SimpleTable.vue';
 import useUnexpectedErrorHandler from '@/common/composables/useUnexpectedErrorHandler';
 import {formattedDate,loadImage,test,truncateDescription} from '@/common/customisation/Breadcrumb';
 import ValidationError from '@/common/errors/ValidationError';
-import {Member, MemberEditParams,MemberRequestPayload,SelectedResult} from '@/common/parsers/memberParser';
+import {Member, MemberEditParams,MemberRequestPayload,MemberRoleRequestPayload,SelectedResult} from '@/common/parsers/memberParser';
+import {User} from '@/common/parsers/userParser';
 import {Meta} from '@/common/types/types';
+import MemberRole from '@/staff/pages/secure/board/includes/MemberRole.vue';
 import Multiselect from '@@/@vueform/multiselect';
-
 
 //constants
 const handleUnexpectedError = useUnexpectedErrorHandler();
@@ -42,8 +44,10 @@ const allUsers = ref<User[]>([]);
 const {errorMessage} = useField('assignees');
 
 const memberschema = yup.object({
+    id: yup.string().nullable(),
+    role: yup.string().nullable(),
     board_id: yup.mixed().required(),
-    members: yup.array().of(yup.string()).required('Members selection is required.'),
+    members: yup.array().of(yup.string()).nullable(),
 });
 const {
     handleSubmit,
@@ -51,12 +55,15 @@ const {
     setFieldValue,
     values,
 } = useForm<{
+    id: string;
+    role: string;
     board_id: string;
     members: string[];
 
 }>({
     validationSchema: memberschema,
     initialValues: {
+        id: '',//member id for update user role
         board_id: boardId,
         members: [],
     },
@@ -76,6 +83,15 @@ const openEditMembersModal = (params: MemberEditParams) => {
     membersmodal.value?.showModal();
 };
 
+const handleRoleUpdated = (event: { userId: string; role: string }) => {
+    reset();
+    action.value = 'role';
+    setFieldValue('id', event.userId);
+    setFieldValue('role', event.role);
+    onSubmit();
+};
+
+
 
 
 const onSubmit = handleSubmit(async (values, {resetForm}) => {
@@ -87,8 +103,14 @@ const onSubmit = handleSubmit(async (values, {resetForm}) => {
         };
         if (action.value === 'create') {
             await useCreateMemberRequest(payload, boardId);
-        } else {
+        } else if(action.value === 'edit') {
             await useUpdateMemberRequest(payload, boardId);
+        } else if(action.value === 'role') {
+            const payload: MemberRoleRequestPayload = {
+                id: values.id,
+                role: values.role,
+            };
+            await useUpdateMemberRoleRequest(payload, boardId);
         }
         await fetchBoardMembers();
         reset();
@@ -110,15 +132,23 @@ const reset = () => {
     setFieldValue('members', []);
 };
 
-const getBoardMembers = () => {
-    return useQuery({
-        queryKey: ['getBoardMembersKey', boardId],
-        queryFn: async () => {
-            const response = await useGetBoardMembersRequest(boardId, {paginate: 'false'});
-            return response.data;
-        },
-    });
+const getIconForPosition = (position: string) => {
+    const iconMap: Record<string, string> = {
+        member: 'fa fa-user',
+        system: 'fa fa-cogs',
+        admin: 'fa fa-user-shield',
+        ceo: 'fa fa-user-tie',
+        'company chairman': 'fa fa-chess-king',
+        'company secretary': 'fa fa-user-secret',
+        chairperson: 'fa fa-users',
+        secretary: 'fa fa-user-circle',
+        guest: 'fa fa-user-tag',
+        observer: 'fa fa-binoculars',
+        owner: 'fa fa-crown',  // Adding the icon for Owner
+    };
+    return iconMap[position.toLowerCase()] || 'fa fa-user';
 };
+
 
 
 const Users = computed(() => {
@@ -142,6 +172,16 @@ onMounted(async () => {
     window.dispatchEvent(new CustomEvent('updateTitle', {detail: 'Members'}));
     getUsers();
 });
+const getBoardMembers = () => {
+    return useQuery({
+        queryKey: ['getBoardMembersKey', boardId],
+        queryFn: async () => {
+            const response = await useGetBoardMembersRequest(boardId, {paginate: 'false'});
+            // console.log('response.data', response.data);
+            return response.data;
+        },
+    });
+};
 const {isLoading, data: Members, refetch: fetchBoardMembers} = getBoardMembers();
 
 </script>
@@ -171,8 +211,8 @@ const {isLoading, data: Members, refetch: fetchBoardMembers} = getBoardMembers()
                             <th scope="col">
                                 <button class="btn btn-link btn-sm list-sort" data-sort="board-role">Board Role</button>
                             </th>
-                            <th scope="col" class="text-center">
-                                <button class="btn btn-link btn-sm list-sort" data-sort="admin">Group Admin</button>
+                            <th scope="col" class="text-justify">
+                                <button class="btn btn-link btn-sm list-sort" data-sort="admin">Board Position</button>
                             </th>
                         </tr>
                     </thead>
@@ -188,21 +228,30 @@ const {isLoading, data: Members, refetch: fetchBoardMembers} = getBoardMembers()
                                         />
                                     </div>
                                     <h3 class="m-2">
-                                        {{ member.user.full_name }}
+                                        {{ member.user.full_name}}
                                     </h3>
                                 </div>
                             </td>
-
-                            <td class="board-role">
-                                {{ member.position }}
+                            <td class="role lg:text-center">
+                                <div class="flex justify">
+                                    <MemberRole
+                                        :user="member.user"
+                                        :disableRemoteRole="0"
+                                        @role-updated="handleRoleUpdated"
+                                    />
+                                </div>
                             </td>
-                            <td class="admin text-center" data-admin="0">
-                                <p class="my-0 leading-none p-2 mx-auto" v-if="member.position === 'Owner'">
+
+
+                            <td class="admin text-justify" data-admin="0">
+                                <!-- <p class="my-0 leading-none p-2 mx-auto" v-if="member.position === 'Owner'">
                                     Group Owner
                                 </p>
                                 <p class="my-0 leading-none p-2 mx-auto" v-else>
-                                    <i class="fa fa-check"></i>
-                                </p>
+                                    {{ member.position }}
+                                </p> -->
+                                <i :class="getIconForPosition(member.position)"></i>
+                                {{ member.position }}
                             </td>
                         </tr>
                     </tbody>

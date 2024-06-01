@@ -64,6 +64,7 @@ class UserRolePermSeeder extends Seeder
             'Company Secretary',
             'Chairperson',
             'Secretary',
+            'Member',
             'Guest',
             'Observer',
         ];

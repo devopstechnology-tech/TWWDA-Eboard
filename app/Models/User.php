@@ -126,7 +126,7 @@ class User extends BaseModel implements AuthenticatableContract, AuthorizableCon
         return $this->role === 'Super Admin'
             || $this->roles()
             ->where('name', 'Super Admin')
-            ->where('type', self::$type_admin)
+            ->where('type', self::$type_system)
             ->exists();
     }
 

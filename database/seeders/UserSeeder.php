@@ -91,13 +91,13 @@ class UserSeeder extends Seeder
                 'password' => '123456789',
             ],
             [
-                'first' => 'Guest',
-                'last' => 'Guest',
-                'email' => 'guest@gmail.com',
-                'phone' => '0700000007',
-                'idpassportnumber' => '30000007',
-                'type' => User::$type_guest,
-                'role' => 'Guest',
+                'first' => 'Member',
+                'last' => 'Member',
+                'email' => 'member@gmail.com',
+                'phone' => '0700000058',
+                'idpassportnumber' => '300000708',
+                'type' => User::$type_member,
+                'role' => 'Member',
                 'status' => '1',
                 'password' => '123456789',
             ],
@@ -112,6 +112,18 @@ class UserSeeder extends Seeder
                 'status' => '1',
                 'password' => '123456789',
             ],
+            [
+                'first' => 'Guest',
+                'last' => 'Guest',
+                'email' => 'guest@gmail.com',
+                'phone' => '0700000007',
+                'idpassportnumber' => '30000007',
+                'type' => User::$type_guest,
+                'role' => 'Guest',
+                'status' => '1',
+                'password' => '123456789',
+            ],
+
         ];
         foreach ($data as $user) {
             $newuser = User::withoutApproval()->firstOrCreate([

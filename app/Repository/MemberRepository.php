@@ -50,6 +50,10 @@ class MemberRepository extends BaseRepository implements MemberInterface
     {
         return $this->boardRepository->updateMembers($board, $payload);
     }
+    public function updateMemberRole(Board|string $board, array $payload): Board
+    {
+        return $this->boardRepository->updateMemberRole($board, $payload);
+    }
 
     // public function get(Member|string $member): Member
     // {
