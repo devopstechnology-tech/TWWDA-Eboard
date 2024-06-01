@@ -179,6 +179,19 @@ class BoardRepository extends BaseRepository implements BoardInterface
         $board->touch();
         return $board;
     }
+    public function updateMemberRole(Board|string $board, array $payload): Board
+    {
+        if (!($board instanceof Board)) {
+            $board = Board::findOrFail($board);
+        }
+
+        $board->tempMemberUserId = $payload['id'];
+        $board->tempMemberRole   = $payload['role'];
+        // dd($board->tempMemberUpdates);
+        $board->save();
+        $board->touch();
+        return $board;
+    }
 
     public function delete(Board|string $board)
     {

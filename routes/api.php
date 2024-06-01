@@ -85,6 +85,7 @@ Route::group(['prefix' => 'v1'], function () {
             // members
             Route::get('members/board/{board}', [MemberController::class, 'getboardmembers']);
             Route::post('members/board/update/members/{board}', [MemberController::class, 'updateboardmembers']);
+            Route::post('members/board/update/member/role/{board}', [MemberController::class, 'updateboardmemberrole']);
 
             //////////////////////////// Committee/////////////////
             Route::apiResource('committees', CommitteeController::class);

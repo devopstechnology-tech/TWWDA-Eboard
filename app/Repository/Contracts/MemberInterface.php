@@ -14,6 +14,7 @@ interface MemberInterface
     public function getAll();
     public function getBoardMembers($member);
     public function updateMembers(Board|string $board, array $payload): Board;
+    public function updateMemberRole(Board|string $board, array $payload): Board;
     // public function get(Member|string $member): Member;
     // public function boardMeeting(Member|string $member): Member;
     // public function committeeMeeting(Member|string $member): Member;

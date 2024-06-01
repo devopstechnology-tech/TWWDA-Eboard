@@ -211,7 +211,7 @@ function handleMeetingUpdated(event) {
                             <td data-role="meetingOwner" class="role">
                                 <span class="text-sm"> {{attendee.membership.member.position}}</span>
                             </td>
-                            <td class="invited lg:text-center">9999999
+                            <td class="invited lg:text-center">
                                 <span class="cell-label">Invited</span> 
                                 <span data-bs-toggle="tooltip" 
                                       title="" data-bs-original-title="User was invited by email"

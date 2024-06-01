@@ -8,12 +8,20 @@ export const roleParser = object({
     users_count: string(),
     type: string(),
     permissions: array(permissionParser),
-    id: number(),
+    id: string(),
 });
 
-export type Role = output<typeof roleParser>;
+
 
 export interface RoleRequestPayload {
     name: string,
-    id?: number,
+    id?: string,
 }
+
+export interface nonPaginateResponse {
+    code: number,
+    data: Role[],
+    message: string
+}
+
+export type Role = output<typeof roleParser>;
