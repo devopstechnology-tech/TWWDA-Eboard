@@ -42,7 +42,7 @@ class UserController extends Controller
         return $this->response(Response::HTTP_CREATED, __('messages.registration-successful'), $user);
     }
 
-    public function trylogin(LoginRequest $request): JsonResponse
+    public function login(LoginRequest $request): JsonResponse
     {
         $user = make(AuthenticateAction::class)
             ->execute($request->credentials(), new User(), UserResource::class, UserResource::LOGIN)
