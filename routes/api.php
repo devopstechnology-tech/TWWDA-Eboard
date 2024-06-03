@@ -45,7 +45,7 @@ Route::group(['prefix' => 'v1'], function () {
         // Route::post('login', function () {
         //     dd('Route is working');
         // });
-        Route::post('login', [UserController::class, 'trylogin']);
+        Route::post('login', [UserController::class, 'login']);
         Route::post('reset-password', [UserController::class, 'forgotPassword'])->name('reset-password');
         Route::post('change-password', [UserController::class, 'changePassword'])->name('change-password');
         Route::get('email/verify/{id}', [VerificationController::class, 'verify'])->name('verification.verify');

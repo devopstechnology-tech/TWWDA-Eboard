@@ -43,9 +43,9 @@ export default defineConfig({
     },
     server: {
         http: env === "production",
-        // hmr: {
-        //     host: "revboard.test",
-        // },
+        hmr: {
+            host: "revboard.test",
+        },
         host: "0.0.0.0",
         port: 5178,
     },
