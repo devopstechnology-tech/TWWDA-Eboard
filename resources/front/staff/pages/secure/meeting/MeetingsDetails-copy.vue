@@ -26,29 +26,12 @@ import MeetingRsvp from './includes/MeetingRsvp.vue';
 import Members from './includes/Members.vue';
 import Minutes from './includes/Minute.vue';
 import TaskPolls from './includes/TaskPolls.vue';
-import { defineEmits } from 'vue';
-
 // Get the route instance
 const route = useRoute();
 const router = useRouter();
 const authStore = useAuthStore();
 
-const currentTab = ref('home');
 
-const tabs = [
-    {id: 'home', name: 'Meeting Details', component: HomeDashBoard},
-    {id: 'agenda', name: 'Agenda', component: AgendaComponent},
-    {id: 'minutes', name: 'Minutes', component: Minutes},
-    {id: 'documents', name: 'Documents', component: Documents},
-    {id: 'tasks', name: 'Task & Polls', component: TaskPolls},
-    {id: 'members', name: 'Members', component: Members},
-    {id: 'conflict-of-interest', name: 'Conflict of Interest', component: ConflictofInterest},
-    {id: 'attendance', name: 'Attendance', component: Attendance},
-];
-
-const setActiveTab = (tabId:string) => {
-    currentTab.value = tabId;
-};
 function goBack() {
     router.back();
 }
@@ -270,11 +253,30 @@ console.log('Agendas', Agendas);
                            aria-label="Edit meeting" data-bs-original-title="Edit meeting">
                             <i class="fas fa-edit"></i>
                         </a>
+                        <!-- <button class="btn btn-secondary" type="button" data-bs-toggle="modal"
+                                data-bs-target="#take-minutes">
+                            Minutes
+                        </button> -->
                         <button class="btn btn-secondary"
                                 @click.prevent="openMinuteTemplateSelectionModal()">
                             Minutes
                         </button>
                     </div>
+                    <!-- <div action="" class="rsvp-select">
+                        <div class="dropdown">
+                            <button class="nav-link dropdown-toggle btn whitespace-nowrap btn-secondary"
+                                    href="#" id="navbarDropdown"
+                                    type="button" role="button" data-toggle="dropdown" aria-haspopup="true"
+                                    aria-expanded="false">
+                                RSVP
+                            </button>
+                            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                <a class="dropdown-item" href="#">Yes - Remote</a>
+                                <a class="dropdown-item" href="#"> Maybe</a>
+                                <a class="dropdown-item" href="#"> No</a>
+                            </div>
+                        </div>
+                    </div> -->
                     <div class="flex justify-center btn-sm">
                         <MeetingRsvp
                             :attendee="Attendee"
@@ -287,28 +289,100 @@ console.log('Agendas', Agendas);
             <div class="card-outline card-outline-tabs">
                 <div class="card-header p-0 border-bottom-0">
                     <ul class="nav nav-tabs" id="custom-tabs-four-tab" role="tablist">
-                        <li class="nav-item" v-for="tab in tabs" :key="tab.id">
-                            <a class="nav-link" 
-                               :class="{ 'active': currentTab === tab.id }" 
-                               @click="setActiveTab(tab.id)">
-                                {{ tab.name }}
+                        <li class="nav-item">
+                            <a class="nav-link active" id="custom-tabs-four-home-tab" data-toggle="pill"
+                               href="#custom-tabs-four-home" role="tab"
+                               aria-controls="custom-tabs-four-home" aria-selected="true">Meeting Details</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="custom-tabs-four-agenda-tab" data-toggle="pill"
+                               href="#custom-tabs-four-agenda" role="tab"
+                               aria-controls="custom-tabs-four-agenda" aria-selected="false">
+                                Agenda
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="custom-tabs-four-minutes-tab" data-toggle="pill"
+                               href="#custom-tabs-four-minutes" role="tab"
+                               aria-controls="custom-tabs-four-minutes" aria-selected="false">
+                                Minutes
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="custom-tabs-four-documents-tab" data-toggle="pill"
+                               href="#custom-tabs-four-documents" role="tab"
+                               aria-controls="custom-tabs-four-documents" aria-selected="false">
+                                Documents
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="custom-tabs-four-tasks-tab" data-toggle="pill"
+                               href="#custom-tabs-four-tasks" role="tab"
+                               aria-controls="custom-tabs-four-tasks" aria-selected="false">
+                                Task & Polls
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="custom-tabs-four-members-tab" data-toggle="pill"
+                               href="#custom-tabs-four-members" role="tab"
+                               aria-controls="custom-tabs-four-members" aria-selected="false">
+                                Members
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="custom-tabs-four-conflict-of-interest-tab" data-toggle="pill"
+                               href="#custom-tabs-four-conflict-of-interest" role="tab"
+                               aria-controls="custom-tabs-four-conflict-of-interest" aria-selected="false">
+                                Conflict of Interest
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="custom-tabs-four-attendance-tab" data-toggle="pill"
+                               href="#custom-tabs-four-attendance" role="tab"
+                               aria-controls="custom-tabs-four-attendance" aria-selected="false">
+                                Attendance
                             </a>
                         </li>
                     </ul>
                 </div>
                 <div class="card-body">
                     <div class="tab-content" id="custom-tabs-four-tabContent">
-                        <div v-for="tab in tabs" 
-                             :key="tab.id" class="tab-pane fade" 
-                             :class="{ 'show active': currentTab === tab.id }" 
-                             :id="tab.id" role="tabpanel">
-                            <component :is="tab.component" 
-                                       @change-tab="setActiveTab"  />
+                        <div class="tab-pane fade active show" id="custom-tabs-four-home"
+                             role="tabpanel" aria-labelledby="custom-tabs-four-home-tab">
+                            <HomeDashBoard/>
+                        </div>
+                        <div class="tab-pane fade" id="custom-tabs-four-agenda"
+                             role="tabpanel" aria-labelledby="custom-tabs-four-agenda-tab">
+                            <AgendaComponent/>
+                        </div>
+                        <div class="tab-pane fade" id="custom-tabs-four-minutes"
+                             role="tabpanel" aria-labelledby="custom-tabs-four-minutes-tab">
+                            <Minutes/>
+                        </div>
+                        <div class="tab-pane fade" id="custom-tabs-four-documents"
+                             role="tabpanel" aria-labelledby="custom-tabs-four-documents-tab">
+                            <Documents/>
+                        </div>
+                        <div class="tab-pane fade" id="custom-tabs-four-tasks"
+                             role="tabpanel" aria-labelledby="custom-tabs-four-tasks-tab">
+                            <TaskPolls/>
+                        </div>
+                        <div class="tab-pane fade" id="custom-tabs-four-members"
+                             role="tabpanel" aria-labelledby="custom-tabs-four-members-tab">
+                            <Members/>
+                        </div>
+                        <div class="tab-pane fade" id="custom-tabs-four-conflict-of-interest"
+                             role="tabpanel" aria-labelledby="custom-tabs-four-conflict-of-interest-tab">
+                            <ConflictofInterest/>
+                        </div>
+                        <div class="tab-pane fade" id="custom-tabs-four-attendance"
+                             role="tabpanel" aria-labelledby="custom-tabs-four-attendance-tab">
+                            <Attendance/>
                         </div>
                     </div>
                 </div>
+                <!-- /.card -->
             </div>
-
         </div>
         <div class="flex justify-center col-md-6">
             <dialog id="minutetemplateselectionmodal" class="modal" ref="MinuteTemplateSelectionmodal">
@@ -355,7 +429,6 @@ console.log('Agendas', Agendas);
                                                          query:
                                                              {
                                                                  defaultMinutes: 'true'
-
                                                              }
                                                      }"
                                                  class="btn btn-secondary h-auto !p-0 p-0 mb-0 card flex-1">

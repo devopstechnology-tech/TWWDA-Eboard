@@ -1,13 +1,18 @@
 
 <script lang="ts" setup>
+import {notify} from '@kyvg/vue3-notification';
 import {useQuery} from '@tanstack/vue-query';
 import {useField, useForm} from 'vee-validate';
-import {computed, onMounted, Ref,ref} from 'vue';
-import {useRoute,useRouter} from 'vue-router';
+import {computed, defineEmits,defineProps,inject,onMounted, ref} from 'vue';
+import {useRoute} from 'vue-router';
 import * as yup from 'yup';
 import {
+    agendasSaveImportedMeetingAgendas,
+    fetchlatestMeetingAgendas,
     useCreateAgendaRequest,
     useCreateSubAgendaRequest,
+    useDeleteAgendaRequest,
+    useDeleteSubAgendaRequest,
     useGetMeetingAgendasRequest,
     useUpdateAgendaRequest,
     useUpdateSubAgendaRequest,
@@ -33,15 +38,26 @@ import {Membership} from '@/common/parsers/membershipParser';
 import Multiselect from '@@/@vueform/multiselect';
 
 
+const emit = defineEmits(['change-tab']);
+// Example function that emits an event
+const goToMembers = (tabId:string) => {
+    emit('change-tab', tabId);
+};
+const fetchFunction = ref('default');
+
 const handleUnexpectedError = useUnexpectedErrorHandler();
 const route = useRoute();
 const action = ref('create');
+const agendaction = ref('');
+const actionitem = ref('');
 const boardId = route.params.boardId as string;
 const meetingId = route.params.meetingId as string;
+const importedAgendaMeetingId = ref('');
 const agendaId = ref<string | null>(null);
 const selectedMembershipIds = ref<string[]>([]);
 const allMemberships = ref<Membership[]>([]);
 const selectedAgenda = ref<Agenda | null>(null);
+const SaveAgendasModal = ref<HTMLDialogElement | null>(null);//constants
 
 const items = ref([]);
 const is_editing = ref(false);
@@ -117,7 +133,7 @@ const enableAddingChild = (pIndex, parentid:string) => {
     action.value = 'create';
 };
 
-const enableEditing = (pIndex, cIndex, agenda:Agenda) => {
+const enableEditing = (pIndex, cIndex, agenda:Agenda, item:string) => {
     selectedAgenda.value = agenda;
     agendaId.value = agenda.id;
 
@@ -128,6 +144,7 @@ const enableEditing = (pIndex, cIndex, agenda:Agenda) => {
     editingParentIndex.value = pIndex;
     editingChildIndex.value = cIndex;
     action.value = 'edit';
+    actionitem.value = item;
 
     // defaultpopulation
     setFieldValue('title',  agenda.title);
@@ -216,6 +233,8 @@ const onSubmit = handleSubmit(async (values, {resetForm}) => {
 });
 const cancelEditing = () => {
     action.value = 'create';
+    agendaction.value = '';
+    actionitem.value = '';
     is_editing.value = false;
     isAddingNewParent.value = false;
     addingChild.value = false;
@@ -282,15 +301,7 @@ const DurationOptions = computed(() => {
     return durationOptions;
 });
 
-const getMeetingAgendas = () => {
-    return useQuery({
-        queryKey: ['getMeetingAgendasKey', meetingId],
-        queryFn: async () => {
-            const response = await useGetMeetingAgendasRequest(meetingId, {paginate: 'false'});
-            return response.data;
-        },
-    });
-};
+
 
 const selectedUsers = () => {
     setFieldValue('assignees', selectedMembershipIds.value);
@@ -323,16 +334,92 @@ onMounted(async () => {
     getmemberships();
 });
 
+const deleteAgenda = async () => {
+    const id = selectedAgenda.value?.id as string;
+    if(actionitem.value ==='agenda'){
+        await useDeleteAgendaRequest(id);
+    }else{
+        await useDeleteSubAgendaRequest(id);
+    }  
+    await fetchMeetingAgendas();
+    cancelEditing();
+};
+
+const startAgenda = async (val:string) => {     
+    if(val ==='scratch'){
+        agendaction.value = val;
+    }else if(val ==='previous'){        
+        fetchFunction.value = 'custom';
+        agendaction.value = val;
+        await fetchMeetingAgendas();
+    }
+};
 
 
+const resetAgendaStartChoice = async () => { 
+    if(agendaction.value ==='previous'){
+        fetchFunction.value = 'default';
+        await fetchMeetingAgendas();
+    }
+    agendaction.value = ''; 
+};
+const SaveImportedAgendas = async () => {
+    const meeting_id = importedAgendaMeetingId.value; 
+    fetchFunction.value ==='default';
+    resetAgendaStartChoice();
+    await agendasSaveImportedMeetingAgendas(meeting_id, meetingId);
+    SaveAgendasModal.value?.close();
+    importedAgendaMeetingId.value = '';   
+    await fetchMeetingAgendas();
+};
+
+const getMeetingAgendas = () => {
+    return useQuery({
+        queryKey: ['getMeetingAgendasKey', meetingId],
+        queryFn: async () => {
+            let response;
+            if(fetchFunction.value ==='default'){
+                response = await useGetMeetingAgendasRequest(meetingId, {paginate: 'false'});
+            }else if(fetchFunction.value ==='custom'){
+                response = await fetchlatestMeetingAgendas({paginate: 'false'});
+                if (!response.data.length) {
+                    // startAgenda('scratch');
+                    notify({
+                        title: 'Notice',
+                        text: 'No agendas found in the database. Please create an agenda from scratch.',
+                        type: 'warning',
+                    });
+                } else{
+                    importedAgendaMeetingId.value = response.data[0].meeting_id;
+                    SaveAgendasModal.value?.showModal();                    
+                }
+            }
+            fetchFunction.value ==='default';            
+            return response.data;                    
+        },
+    });
+};
 
 const {isLoading, data: Agendas, refetch: fetchMeetingAgendas} = getMeetingAgendas();
+
 </script>
 
 <template>
-    <div class="flex gap-5">
+    <div v-if="agendaction === 'scratch' || agendaction === 'previous'"  class="card-header flex items-center">
+        <div class="flex items-center flex-1 w-full">
+        </div>
+        <div class="flex items-center space-x-2">
+            <button type="submit" @click.prevent="resetAgendaStartChoice" class="btn btn-tool">
+                <span class="text-danger">Reset Agenda Start Choice</span>
+            </button>
+        </div>
+    </div>
+    <div v-if="agendaction === 'scratch' || 
+             agendaction === 'previous' || 
+             Agendas && Agendas.length" 
+         class="flex gap-5">
         <div class="flex-1">
-            <div class="card" style="min-height: 384px">
+            <div class="card card-outline card-danger" style="min-height: 384px">
                 <div class="card-body">
                     <div class="flex w-full">
                         <div class="flex-1">
@@ -345,7 +432,8 @@ const {isLoading, data: Agendas, refetch: fetchMeetingAgendas} = getMeetingAgend
                                         text-center py-0.5 text-gray-700 z-10 border-gray-200 bg-gray-200 px-2">
                                             10:30pm
                                         </div> -->
-                                        <div class="flex gap-2 items-start" @click="enableEditing(pIndex, -1, agenda)">
+                                        <div class="flex gap-2 items-start" 
+                                             @click="enableEditing(pIndex, -1, agenda, 'agenda')">
                                             <div class="font-medium flex-1"> {{ formatAgendaEntry(pIndex)}}.{{ agenda.title }}
                                                 <div class="text-sm text-gray-800 font-normal">
                                                     <p>{{ truncateDescription(agenda.description, 40) }}</p>
@@ -359,8 +447,8 @@ const {isLoading, data: Agendas, refetch: fetchMeetingAgendas} = getMeetingAgend
                                             <div>
                                                 <ul class="list-none" v-if="agenda.assignees">
                                                     <li class="text-sm text-primary"
-                                                        v-for="assignee in agenda.assignees" :key="assignee">
-                                                        {{assignee.user?.full_name  }}
+                                                        v-for="(assignee, idx) in agenda.assignees" :key="idx">
+                                                        {{idx+1 }}. {{assignee.user?.full_name  }}
                                                     </li>
                                                 </ul>
                                             </div>
@@ -388,7 +476,7 @@ const {isLoading, data: Agendas, refetch: fetchMeetingAgendas} = getMeetingAgend
                                         </div>
                                         <button v-if="editingParentIndex !== pIndex &&!addingChild"
                                                 @click="enableAddingChild(pIndex, agenda.id)" class="ml-4 mt-2">
-                                            + Add sub item
+                                            + Add sub Agenda
                                         </button>
                                     </div>
                                     <ol class="min-h-6 border-l border-blue">
@@ -403,7 +491,7 @@ const {isLoading, data: Agendas, refetch: fetchMeetingAgendas} = getMeetingAgend
                                                     10:30pm
                                                 </div>
                                                 <div class="flex gap-2 items-start" @click="
-                                                    enableEditing(pIndex,cIndex,child)">
+                                                    enableEditing(pIndex,cIndex,child, 'subagenda')">
                                                     <div class="font-medium flex-1">
                                                         {{ formatAgendaEntry(pIndex, cIndex) }}. {{ child.title }}
                                                         <div class="text-sm text-gray-800 font-normal">
@@ -418,9 +506,10 @@ const {isLoading, data: Agendas, refetch: fetchMeetingAgendas} = getMeetingAgend
                                                     <div>
                                                         <ul class="list-none" v-if="child.assignees">
                                                             <li class="text-sm text-primary"
-                                                                v-for="childassignee in child.assignees"
-                                                                :key="childassignee">
-                                                                {{childassignee.user?.full_name  }}
+                                                                v-for="(childassignee, idx) in child.assignees"
+                                                                :key="idx">
+                                                                {{idx+1}}. {{ childassignee.user.full_name }}
+                                                                <!-- {{childassignee.user?.full_name  }} -->
                                                             </li>
                                                         </ul>
                                                     </div>
@@ -453,7 +542,7 @@ const {isLoading, data: Agendas, refetch: fetchMeetingAgendas} = getMeetingAgend
                                     </div>
                                     <!-- <button class="btn btn-secondary block w-full">Add agenda item</button> -->
                                     <button @click="enableAddingNewParent" class="btn btn-secondary block w-full mb-4">
-                                        Add Parent Item
+                                        Add Agenda
                                     </button>
                                 </div>
                             </div>
@@ -474,13 +563,13 @@ const {isLoading, data: Agendas, refetch: fetchMeetingAgendas} = getMeetingAgend
                         </div>
                     </div>
                 </div>
-            <!---->
+                <!---->
             </div>
         </div>
         <div :class="{    hidden: !is_editing,    'md:block': true,    'w-[350px]': true,}">
             <div class="w-[350px] relative">
                 <div class="w-[350px]">
-                    <div class="card mb-0">
+                    <div class="card card-outline card-danger mb-0">
                         <form novalidate @submit.prevent="onSubmit">
                             <div class="card-body">
                                 <FormInput
@@ -530,11 +619,16 @@ const {isLoading, data: Agendas, refetch: fetchMeetingAgendas} = getMeetingAgend
                                             ]" @select="selectedUsers()" @deselect="removeselectedUsers()" />
                                         <div v-if="errorMessage" class="message"> {{ errorMessage }} </div>
                                     </div>
+                                    <button @click.prevent="goToMembers('members')" class="btn btn-info mt-2">
+                                        Manage Members
+                                    </button>
                                 </div>
                                 <div class="flex justify-between">
-                                    <button @click.prevent="cancelEditing" class="btn btn-link btn-sm text-danger h-7"> Delete </button>
+                                    <button @click.prevent="deleteAgenda()" 
+                                            class="btn btn-link btn-sm text-danger h-7"> Delete </button>
                                     <div>
-                                        <button @click.prevent="cancelEditing" class="btn btn-secondary btn-sm ml-1 mr-1"> Cancel </button>
+                                        <button @click.prevent="cancelEditing"
+                                                class="btn btn-secondary btn-sm ml-1 mr-1"> Cancel </button>
                                         <button type="submit" class="btn btn-sm btn-primary ml-1 mr-1"> Save </button>
                                     </div>
                                 </div>
@@ -546,13 +640,14 @@ const {isLoading, data: Agendas, refetch: fetchMeetingAgendas} = getMeetingAgend
         </div>
         <div :class="{ hidden: is_editing, 'md:block': true, 'w-[350px]': true }">
             <div class="w-[350px] relative">
-                <div class="w-[350px]">
+                <div class="w-[350px] card card-outline card-danger">
                     <div class="bg-gray-200 rounded-lg h-96 flex items-center justify-center">
                         <div class="text-center text-gray-700"> Select an agenda item to edit
                             <br role="presentation" data-uw-rm-sr="" />
-                            <div class="text-xl mt-1"> <svg class="svg-inline--fa fa-turn-down-left" aria-hidden="true" focusable="false" data-prefix="far" data-icon="turn-down-left" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="">
-                                <path fill="currentColor" d="M6.5 271.6c-8.7 9.2-8.7 23.7 0 32.9l121.4 129c8.8 9.3 21 14.6 33.7 14.6c25.6 0 46.3-20.7 46.3-46.3l0-41.7 144 0c88.4 0 160-71.6 160-160l0-112c0-30.9-25.1-56-56-56l-32 0c-30.9 0-56 25.1-56 56l0 120c0 4.4-3.6 8-8 8l-152 0 0-41.7c0-25.6-20.7-46.3-46.3-46.3c-12.8 0-25 5.3-33.7 14.6L6.5 271.6zm153.5-93l0 61.5c0 13.3 10.7 24 24 24l176 0c30.9 0 56-25.1 56-56l0-120c0-4.4 3.6-8 8-8l32 0c4.4 0 8 3.6 8 8l0 112c0 61.9-50.1 112-112 112l-168 0c-13.3 0-24 10.7-24 24l0 61.5L57 288 160 178.5z"></path>
-                            </svg> <!-- <i class="fa-regular fa-turn-down-left"></i> -->
+                            <div class="text-xl mt-1"> 
+                                <svg class="svg-inline--fa fa-turn-down-left" aria-hidden="true" focusable="false" data-prefix="far" data-icon="turn-down-left" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="">
+                                    <path fill="currentColor" d="M6.5 271.6c-8.7 9.2-8.7 23.7 0 32.9l121.4 129c8.8 9.3 21 14.6 33.7 14.6c25.6 0 46.3-20.7 46.3-46.3l0-41.7 144 0c88.4 0 160-71.6 160-160l0-112c0-30.9-25.1-56-56-56l-32 0c-30.9 0-56 25.1-56 56l0 120c0 4.4-3.6 8-8 8l-152 0 0-41.7c0-25.6-20.7-46.3-46.3-46.3c-12.8 0-25 5.3-33.7 14.6L6.5 271.6zm153.5-93l0 61.5c0 13.3 10.7 24 24 24l176 0c30.9 0 56-25.1 56-56l0-120c0-4.4 3.6-8 8-8l32 0c4.4 0 8 3.6 8 8l0 112c0 61.9-50.1 112-112 112l-168 0c-13.3 0-24 10.7-24 24l0 61.5L57 288 160 178.5z"></path>
+                                </svg> <!-- <i class="fa-regular fa-turn-down-left"></i> -->
                             </div>
                         </div>
                     </div>
@@ -560,8 +655,69 @@ const {isLoading, data: Agendas, refetch: fetchMeetingAgendas} = getMeetingAgend
             </div>
         </div>
     </div>
+    <div v-else-if="agendaction === ''" class="card card-outline card-danger">
+        <div class="card-header text-center justify-center bg-gradient-info">
+            <h3 class="text-center font-bold text-lg">
+                Choose Your Starting Point
+            </h3>
+        </div>
+        <div class="card-body">
+            <div class="flex justify-center space-x-4 py-6">
+                <a @click.prevent="startAgenda('scratch')"
+                   class="btn btn-primary h-auto !p-0 p-0 mb-0 card flex-1">
+                    <div class="text-center card-body">
+                        <div class="flex items-center justify-center mx-auto mb-1 -mt-12
+                                    bg-gradient-success rounded-full shadow w-11 h-11">
+                            <i class="fa fa-list text-white"></i>
+                        </div>
+                        <h4 class="mb-0 text-gray-900">Start From Scratch</h4>
+                    </div>
+                </a>
+                <!-- Start from the Agenda -->
+                <a @click.prevent="startAgenda('previous')"
+                   class="btn btn-primary h-auto !p-0 p-0 mb-0 card flex-1">
+                    <div class="text-center card-body">
+                        <div class="flex items-center justify-center mx-auto mb-1 -mt-12
+                                    bg-gradient-warning rounded-full shadow w-11 h-11">
+                            <i class="far fa-file text-white"></i>
+                        </div>
+                        <h4 class="mb-0 text-gray-900">Start From the Agenda</h4>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="flex justify-center col-md-6">
+        <dialog id="SaveAgendasModal" class="modal modal-primary" ref="SaveAgendasModal">
+            <form method="dialog" class="modal-box rounded-xl">
+                <h3 class="font-bold text-lg justify-center flex text-white">
+                    save the Imported AGendas from Previous Meeting
+                </h3>
+                <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+                <div class="w-full mt-6 p-2">
+                    <div class="font-thin text-sm flex flex-col items-center gap-6">
+                        <form class="w-full rounded-xl mx-auto p-1 custom-modal">
+                            <h3 class="text-center text-base font-bold text-primary">
+                                Make use of the imported Agendas
+                            </h3>
+                            <div class="flex justify-center mt-4">
+                                <button type="submit" 
+                                        @click.prevent="SaveImportedAgendas" class="btn btn-lg btn-success">
+                                    Save Imported Agendas
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </form>
+        </dialog>
+    </div>
+
+
+
 </template>
 
 <style scoped>
 
 </style>
+    

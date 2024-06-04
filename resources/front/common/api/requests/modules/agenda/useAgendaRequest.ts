@@ -7,6 +7,17 @@ import {Meta} from '@/common/types/types';
 
 
 
+export async function fetchlatestMeetingAgendas(options?: object):Promise<nonPaginateResponse>{
+    const client = useClient();
+    const cn = Qs.stringify(options, {arrayFormat: 'brackets'});
+    return await client.get(meetingAgendasRoute()+ '/previous/'+ '?' + cn).json();
+}
+export async function agendasSaveImportedMeetingAgendas(
+    oldmeetingid:string, newmeetingid:string):Promise<nonPaginateResponse>{
+    const client = useClient();
+    return await client.get(meetingAgendasRoute()+ '/previous/accept/'
+    + oldmeetingid + '/'+ newmeetingid).json();
+}
 export async function useGetMeetingAgendasRequest(id:string, options?: object):Promise<nonPaginateResponse>{
     const client = useClient();
 
@@ -44,58 +55,13 @@ export async function useUpdateSubAgendaRequest(payload: AgendaRequestPayload, i
         json: payload,
     }).json();
 }
-// export async function useCreateAgendaRequest(
-//     payload: AgendaRequestPayload) {
-//     const client = useClient();
-//     const data = new FormData();
-//     data.append('name', payload.name);
-//     data.append('description', payload.description);
-//     data.append('icon', payload.icon);
-//     data.append('cover', payload.cover);
+export async function useDeleteSubAgendaRequest(id: string) {
+    const client = useClient();
 
-//     console.log('we are here payload', data, payload);
-//     const response = await client.post(agendaRoute(),{
-//         body: data,
-//     });
-//     return response.json();
-// }
+    await client.post(meetingAgendasRoute() + '/delete/agenda/subagenda/' + id).json();
+}
+export async function useDeleteAgendaRequest(id: string) {
+    const client = useClient();
 
-// export async function useGetAgendasRequest(options?: object): Promise<response> {
-//     const client = useClient();
-//     return await client.get(agendaRoute()).json();
-// }
-
-// export async function useUpdateAgendaRequest(
-//     payload: AgendaRequestPayload, id: string){
-//     console.log('payload',payload);
-//     const client = useClient();
-//     const updatedata = new FormData();
-//     updatedata.append('name', payload.name);
-//     updatedata.append('description', payload.description);
-//     updatedata.append('icon', payload.icon);
-//     updatedata.append('cover', payload.cover);
-
-//     console.log('updatedata',updatedata);
-//     const response = await client.post(agendaRoute() + '/update/' + id,{
-//         body: updatedata,
-//     });
-//     return response.json();
-// }
-
-// //
-
-// export async function useGetSingleAgendaRequest(id: string): Promise<singleresponse> {
-//     // console.log('id', id);
-//     const client = useClient();
-//     const data: singleresponse = await client.get(agendaRoute() + '/' + id).json();
-//     return data;
-// }
-// export async function useUpdateAgendaMembersRequest(payload: AgendaMembersRequestPayload, id: string) {
-//     const client = useClient();
-
-//     await client.post(agendaMemberRoute() + '/' + id, {
-//         json: payload,
-//     }).json();
-// }
-
-
+    await client.post(meetingAgendasRoute() + '/delete/agenda/' + id).json();
+}
