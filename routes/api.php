@@ -95,11 +95,15 @@ Route::group(['prefix' => 'v1'], function () {
 
             ///////////////////////////////board meeting//////////////////
             Route::apiResource('agendas', AgendaController::class);
+            Route::get('agendas/meeting/previous', [AgendaController::class, 'latestmeetingagendas']); //ageands for specific meeting
+            Route::get('agendas/meeting/previous/accept/{oldmeeting}/{newmeeting}', [AgendaController::class, 'acceptlatestmeetingagendas']); //ageands for specific meeting
             Route::get('agendas/meeting/{meeting}', [AgendaController::class, 'meetingagendas']); //ageands for specific meeting
             Route::post('agendas/meeting/create/{meeting}', [AgendaController::class, 'store']); //ageands for specific meeting
             Route::post('agendas/meeting/create/subagenda/{meeting}', [AgendaController::class, 'createsubagenda']); //ageands for specific meeting
             Route::post('agendas/meeting/update/agenda/{meeting}', [AgendaController::class, 'update']); //ageands for specific meeting
             Route::post('agendas/meeting/update/agenda/subagenda/{meeting}', [AgendaController::class, 'updatesubagenda']); //ageands for specific meeting
+            Route::post('agendas/meeting/delete/agenda/subagenda/{subagenda}', [AgendaController::class, 'deletesubagenda']); //ageands for specific meeting
+            Route::post('agendas/meeting/delete/agenda/{agenda}', [AgendaController::class, 'deleteagenda']); //ageands for specific meeting
 
             ///////////////////////////////meeting Minutes//////////////////
             Route::apiResource('minutes', MinuteController::class);
@@ -225,7 +229,11 @@ Route::group(['prefix' => 'v1'], function () {
 
 
 // php artisan make:model Module/Member/Attendance -m
-// php artisan make:request Attendance -u
-// php artisan make:controller v1/Modules/Member/AttendanceController
-// php artisan make:Repository Attendance
-// php artisan make:resource Attendance
+// php artisan make:request SubAgendaAssignee -u
+// php artisan make:controller v1/Modules/Agenda/SubAgendaAssigneeController
+// php artisan make:Repository SubAgendaAssignee
+// php artisan make:resource SubAgendaAssignee
+// php artisan make:request AgendaAssignee -u
+// php artisan make:controller v1/Modules/Agenda/AgendaAssigneeController
+// php artisan make:Repository AgendaAssignee
+// php artisan make:resource AgendaAssignee

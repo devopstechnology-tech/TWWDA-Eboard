@@ -61,6 +61,7 @@ use App\Repository\ConflictRepository;
 use App\Repository\ScheduleRepository;
 use App\Models\Module\Meeting\Schedule;
 use App\Repository\CommitteeRepository;
+use App\Services\SMS\AfricasTalkingSMS;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\ServiceProvider;
 use App\Models\Module\Conflict\Conflict;
@@ -90,6 +91,7 @@ use App\Repository\Contracts\UserInterface;
 use App\Repository\MeetingMemberRepository;
 use App\Models\Module\Meeting\MeetingMember;
 use App\Models\Module\Task\Sub\AssigneeTask;
+use App\Repository\AgendaAssigneeRepository;
 use App\Repository\Contracts\BoardInterface;
 use App\Repository\Contracts\StaffInterface;
 use App\Repository\Contracts\UsersInterface;
@@ -107,6 +109,7 @@ use App\Models\Module\Committe\CommitteeMember;
 use App\Models\Module\Meeting\Agenda\SubAgenda;
 use App\Repository\Contracts\ConflictInterface;
 use App\Repository\Contracts\ScheduleInterface;
+use App\Repository\SubAgendaAssigneeRepository;
 use App\Repository\Contracts\CommitteeInterface;
 use App\Repository\Contracts\AttendanceInterface;
 use App\Repository\Contracts\DiscussionInterface;
@@ -121,10 +124,13 @@ use App\Repository\Contracts\MeetingGuestInterface;
 use App\Repository\Contracts\MinuteReviewInterface;
 use App\Repository\Contracts\ModificationInterface;
 use App\Repository\Contracts\NotificationInterface;
+use App\Models\Module\Meeting\Agenda\AgendaAssignee;
 use App\Repository\Contracts\MeetingMemberInterface;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use App\Models\Module\Meeting\Minute\SubDetailMinute;
+use App\Repository\Contracts\AgendaAssigneeInterface;
 use App\Repository\Contracts\CommitteeMemberInterface;
+use App\Repository\Contracts\SubAgendaAssigneeInterface;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -155,7 +161,9 @@ class AppServiceProvider extends ServiceProvider
             'membership' => Membership::class,
             'committeemember' => CommitteeMember::class,
             'agenda' => Agenda::class,
+            'agendaassignee' => AgendaAssignee::class,
             'subagenda' => SubAgenda::class,
+            'agendaassignee' => AgendaAssignee::class,
             'discussion' => Discussion::class,
             'meetingguest' => MeetingGuest::class,
             'meetingmember' => MeetingMember::class,
@@ -209,6 +217,8 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(CommitteeInterface::class, CommitteeRepository::class);
         $this->app->singleton(CommitteeMemberInterface::class, CommitteeMemberRepository::class);
         $this->app->singleton(AgendaInterface::class, AgendaRepository::class);
+        $this->app->singleton(AgendaAssigneeInterface::class, AgendaAssigneeRepository::class);
+        $this->app->singleton(SubAgendaAssigneeInterface::class, SubAgendaAssigneeRepository::class);
         $this->app->singleton(DiscussionInterface::class, DiscussionRepository::class);
         $this->app->singleton(MeetingGuestInterface::class, MeetingGuestRepository::class);
         $this->app->singleton(MeetingMemberInterface::class, MeetingMemberRepository::class);

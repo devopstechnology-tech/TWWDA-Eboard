@@ -5,7 +5,7 @@ import {useQuery} from '@tanstack/vue-query';
 import VueDatePicker from '@vuepic/vue-datepicker';
 import {formatISO,parseISO} from 'date-fns';
 import {useField, useForm} from 'vee-validate';
-import {computed,onMounted,ref} from 'vue';
+import {computed,defineEmits,inject,onMounted,ref} from 'vue';
 import {useRoute} from 'vue-router';
 import * as yup from 'yup';
 import {
@@ -99,7 +99,11 @@ const onSubmit = handleSubmit(async (values, {resetForm}) => {
         await fetchMemberships();
         reset();
         membershipsmodal.value?.close();
-        // Dispatch a global custom event
+        // if (props.previousTab === 'agenda') {
+        //     emit('change-tab', 'agenda');
+        // } else {
+        //     emit('change-tab', props.currentTab); // Stay on the current tab
+        // }
         window.dispatchEvent(new CustomEvent('membershipsUpdated', {detail: {meetingId, boardId}}));
     } catch (err) {
         if (err instanceof ValidationError) {
@@ -302,5 +306,4 @@ img, svg {
     vertical-align: middle;
 }
 </style>
-
 

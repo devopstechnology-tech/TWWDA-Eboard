@@ -4,15 +4,16 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\v1\Modules\Meeting;
 
-use App\Http\Controllers\Controller;
-use App\Http\Requests\CreateAgendaRequest;
-use App\Http\Requests\CreateSubAgendaRequest;
-use App\Http\Requests\UpdateAgendaRequest;
-use App\Http\Requests\UpdateSubAgendaRequest;
-use App\Models\Module\Meeting\Agenda;
-use App\Repository\Contracts\AgendaInterface;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
+use Illuminate\Http\JsonResponse;
+use App\Http\Controllers\Controller;
+use App\Models\Module\Meeting\Agenda;
+use App\Http\Requests\CreateAgendaRequest;
+use App\Http\Requests\UpdateAgendaRequest;
+use App\Http\Requests\CreateSubAgendaRequest;
+use App\Http\Requests\UpdateSubAgendaRequest;
+use App\Repository\Contracts\AgendaInterface;
+use App\Models\Module\Meeting\Agenda\SubAgenda;
 
 class AgendaController extends Controller
 {
@@ -25,6 +26,20 @@ class AgendaController extends Controller
         $agenda = $this->agendaRepository->getAll();
 
         return $this->response(Response::HTTP_OK, __('messages.records-fetched'), $agenda, Agenda::class);
+    }
+    public function latestmeetingagendas(): JsonResponse
+    {
+        // $this->authorize('viewAny', Agenda::class);
+        $agendas = $this->agendaRepository->getlatestMeetingAgendas();
+
+        return $this->response(Response::HTTP_OK, __('messages.records-fetched'), $agendas, Agenda::class);
+    }
+    public function acceptlatestmeetingagendas($oldmeeting, $newmeeting): JsonResponse
+    {
+        // $this->authorize('viewAny', Agenda::class);
+        $agendas = $this->agendaRepository->AcceptLatestMeetingAgendas($oldmeeting, $newmeeting);
+
+        return $this->response(Response::HTTP_OK, __('messages.records-fetched'), $agendas, Agenda::class);
     }
     public function meetingagendas($meeting): JsonResponse
     {
@@ -81,6 +96,16 @@ class AgendaController extends Controller
 
         return $this->response(Response::HTTP_NO_CONTENT, __('messages.record-deleted'), null);
     }
+    public function deleteagenda(Agenda $agenda): JsonResponse
+    {
+        $this->agendaRepository->deleteagenda($agenda);
 
+        return $this->response(Response::HTTP_NO_CONTENT, __('messages.record-deleted'), null);
+    }
+    public function deletesubagenda(SubAgenda $subagenda): JsonResponse
+    {
+        $this->agendaRepository->deletesubagenda($subagenda);
 
+        return $this->response(Response::HTTP_NO_CONTENT, __('messages.record-deleted'), null);
+    }
 }

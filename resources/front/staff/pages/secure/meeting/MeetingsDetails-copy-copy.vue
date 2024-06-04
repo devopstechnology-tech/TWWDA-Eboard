@@ -26,27 +26,25 @@ import MeetingRsvp from './includes/MeetingRsvp.vue';
 import Members from './includes/Members.vue';
 import Minutes from './includes/Minute.vue';
 import TaskPolls from './includes/TaskPolls.vue';
-import { defineEmits } from 'vue';
-
 // Get the route instance
 const route = useRoute();
 const router = useRouter();
 const authStore = useAuthStore();
 
-const currentTab = ref('home');
+const currentTab = ref('custom-tabs-four-home');
 
 const tabs = [
-    {id: 'home', name: 'Meeting Details', component: HomeDashBoard},
-    {id: 'agenda', name: 'Agenda', component: AgendaComponent},
-    {id: 'minutes', name: 'Minutes', component: Minutes},
-    {id: 'documents', name: 'Documents', component: Documents},
-    {id: 'tasks', name: 'Task & Polls', component: TaskPolls},
-    {id: 'members', name: 'Members', component: Members},
-    {id: 'conflict-of-interest', name: 'Conflict of Interest', component: ConflictofInterest},
-    {id: 'attendance', name: 'Attendance', component: Attendance},
+    {id: 'custom-tabs-four-home', name: 'Meeting Details', component: HomeDashBoard},
+    {id: 'custom-tabs-four-agenda', name: 'Agenda', component: AgendaComponent},
+    {id: 'custom-tabs-four-minutes', name: 'Minutes', component: Minutes},
+    {id: 'custom-tabs-four-documents', name: 'Documents', component: Documents},
+    {id: 'custom-tabs-four-tasks', name: 'Task & Polls', component: TaskPolls},
+    {id: 'custom-tabs-four-members', name: 'Members', component: Members},
+    {id: 'custom-tabs-four-conflict-of-interest', name: 'Conflict of Interest', component: ConflictofInterest},
+    {id: 'custom-tabs-four-attendance', name: 'Attendance', component: Attendance},
 ];
 
-const setActiveTab = (tabId:string) => {
+const setActiveTab = (tabId) => {
     currentTab.value = tabId;
 };
 function goBack() {
@@ -302,8 +300,7 @@ console.log('Agendas', Agendas);
                              :key="tab.id" class="tab-pane fade" 
                              :class="{ 'show active': currentTab === tab.id }" 
                              :id="tab.id" role="tabpanel">
-                            <component :is="tab.component" 
-                                       @change-tab="setActiveTab"  />
+                            <component :is="tab.component" />
                         </div>
                     </div>
                 </div>
