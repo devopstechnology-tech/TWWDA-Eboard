@@ -103,9 +103,9 @@ class Meeting extends BaseModel
 
         return null; // Return null if the meetingable type is not a Board
     }
-    public function schedule()
+    public function schedules()
     {
-        return $this->hasOne(Schedule::class, 'meeting_id');
+        return $this->hasMany(Schedule::class, 'meeting_id');
     }
 
     public function meetingable()

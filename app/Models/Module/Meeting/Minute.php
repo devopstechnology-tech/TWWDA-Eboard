@@ -50,11 +50,9 @@ class Minute extends BaseModel
     public function detailminutes(): HasMany
     {
         return $this->hasMany(DetailMinute::class, 'minute_id')->orderBy('created_at', 'asc');
-
     }
     public function minuteReviews()
     {
         return $this->hasMany(MinuteReview::class, 'minute_id')->orderBy('created_at', 'asc');
-
     }
 }

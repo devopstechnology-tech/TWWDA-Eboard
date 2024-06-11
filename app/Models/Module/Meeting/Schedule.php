@@ -14,6 +14,13 @@ class Schedule extends BaseModel
     use HasFactory;
     use SoftDeletes;
     use Uuids;
-
+    protected $fillable = [
+        'status',
+        'heldstatus',
+        'date',
+        'start_time',
+        'end_time',
+        'meeting_id',
+    ];
     protected $dates = ['deleted_at'];
 }

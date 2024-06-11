@@ -249,7 +249,7 @@ const getMeetingTasks = () => {
 };
 const {isLoading:isLoadingMeetingTasks, data: Tasks, refetch: fetchMeetingTasks} = getMeetingTasks();
 onMounted(async () => {
-    window.dispatchEvent(new CustomEvent('updateTitle', {detail: 'Meeting Tasks'}));
+    // window.dispatchEvent(new CustomEvent('updateTitle', {detail: 'Meeting Tasks'}));
     fetchMemberships();
     fetchMeetingTasks();
 });

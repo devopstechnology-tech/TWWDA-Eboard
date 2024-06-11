@@ -21,7 +21,7 @@ export const usePSPDFStore = defineStore({
                         container,
                         document: this.pdfFile,
                         baseUrl: appUrl +'/js/',
-                        licenseKey: 'TH8Qp7q9KPBLFnAItdIZ3lz9ihiqZxTUUuPhZhug2mGh7YkhmCqgMgi8gICcWSCNeCbti4-ZqzplTuKzRcYCBiPNFB6Ey_tnSVxl9tCDGkE5ZNrTMK8yXZ0nF8ykUnCrb7oVefIUwnxFdY51cDRAo2eXH2bvmGRyGbq66UWlepqciwqoqauW9oznmiUdWtna4dXMn6OLamI4g9d9',
+                        licenseKey: 'hAdDDq6qP4-NhrrzYinXA5Z2_LbgdXehQlveuQR78LR8FbZOiYsDT71uK_EpZ8dznX5UIlKVishLMON2TeEGB7EnEjoRJpO-RJiSyufdWDrgYX5kgr8mHn77AYVwcdidHtqXrAlze5iPE3gXFY1sny3TE3YDqqwd_3aQH9gP8GhuIQkfdh5hLfFk6oLHY_kv1lbTUqBQjqCqVYP6',
                         // toolbarItems: PSPDFKit.defaultToolbarItems.concat([
                         //     {
                         //         type: 'custom',
@@ -42,10 +42,10 @@ export const usePSPDFStore = defineStore({
             const annotation = new PSPDFKit.Annotations.TextAnnotation({
                 creatorName: userName,
                 pageIndex: 0, // Specify the page number for the annotation.
-                text: {
-                    format: 'plain',
-                    value: 'Welcome to PSPDFKit', // Text to embed.
-                },
+                // text: {
+                //     format: 'plain',
+                //     value: 'Welcome to PSPDFKit', // Text to embed.
+                // },
                 font: 'Helvetica',
                 isBold: true,
                 horizontalAlign: 'left', // Align the annotation to the center of the bounding box.

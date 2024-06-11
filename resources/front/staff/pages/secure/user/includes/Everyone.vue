@@ -239,10 +239,10 @@ const {isLoading, data: Users, refetch: fetchUsers} = getUsers();
                     </button>
                 </h3>
                 <div class="inline icons !items-start mb-2">
-                    <div class="flex flex-wrap gap-1">
+                    <div class="flex flex-wrap gap-1" v-if="user.membs">
                         <i class="fa fa-users mr-2"></i>
-                        <span v-for="memmberin in user.membs" :key="memmberin.id">
-                            <router-link :to="{ name: 'BoardDetails', params: { boardId: memmberin.board.id } }"
+                        <span v-for="memmberin in user.membs" :key="memmberin.id" v-if="memmberin?.board">
+                            <router-link :to="{ name: 'BoardDetails', params: { boardId: memmberin?.board.id } }"
                                          class="rounded-[9px] flex items-center justify-center
                                 px-2 text-sm w-fit bg-gray-200 text-bold text-info">
                                 {{ memmberin.board.name }}

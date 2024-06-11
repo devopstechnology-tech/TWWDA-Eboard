@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace App\Repository;
 
+use App\Enums\HeldEnum;
+use App\Enums\StatusEnum;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 use App\Models\Module\Meeting\Meeting;
 use App\Models\Module\Meeting\Schedule;
 use App\Repository\Contracts\ScheduleInterface;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
 
 class ScheduleRepository extends BaseRepository implements ScheduleInterface
 {
@@ -20,7 +22,7 @@ class ScheduleRepository extends BaseRepository implements ScheduleInterface
         $filters = [
             'user_id' => Auth::user()->id,
             'orderBy' => ['field' => 'id', 'direction' => 'asc']
-    ];
+        ];
         return $this->indexResource(Schedule::class, $filters);
     }
 
@@ -34,24 +36,44 @@ class ScheduleRepository extends BaseRepository implements ScheduleInterface
     }
     public function createSchedule(Meeting|string $meeting, array $payload): void
     {
-        $schedule = new Schedule();
-        $schedule->type = $payload['type'];
-        $schedule->timezone = $payload['timezone'];
-        $schedule->start_time = $payload['start_time'];
-        $schedule->end_time = $payload['end_time'];
-        $schedule->meeting_id = $meeting->id;
-        $schedule->save();
+        $schedules = $payload['schedules'];
+        foreach ($schedules as $scheduleData) {
+            $schedule = new Schedule();
+            $schedule->status     = StatusEnum::Inactive->value;
+            $schedule->heldstatus = HeldEnum::Default->value;
+            $schedule->date       = $scheduleData['date'];
+            $schedule->start_time = $scheduleData['start_time'];
+            $schedule->end_time   = $scheduleData['end_time'];
+            $schedule->meeting_id = is_string($meeting) ? $meeting : $meeting->id; // Handle both string and object
+            $schedule->save();
+        }
     }
 
     public function updateSchedule(Meeting|string $meeting, array $payload): void
     {
-        $schedule = Schedule::where('meeting_id', $meeting->id)->first();
-        $schedule->type = $payload['type'];
-        $schedule->timezone = $payload['timezone'];
-        $schedule->start_time = $payload['start_time'];
-        $schedule->end_time = $payload['end_time'];
-        $schedule->meeting_id = $meeting->id;
-        $schedule->save();
+        $schedules = $payload['schedules'];
+        foreach ($schedules as $scheduleData) {
+            // Check if a schedule with the provided ID exists
+            $schedule = Schedule::find($scheduleData['id']);
+            if ($schedule) {
+                // If found, create a new instance of the Schedule model
+                $schedule->status      = $scheduleData['status'];
+                $schedule->heldstatus  = $scheduleData['heldstatus'];
+            }
+
+
+            if (!$schedule) {
+                // If not found, create a new instance of the Schedule model
+                $schedule = new Schedule();
+                $schedule->status  = StatusEnum::Inactive->value;
+                $schedule->heldstatus  = HeldEnum::Default->value;
+            }
+            $schedule->date       = $scheduleData['date'];
+            $schedule->start_time = $scheduleData['start_time'];
+            $schedule->end_time   = $scheduleData['end_time'];
+            $schedule->meeting_id = is_string($meeting) ? $meeting : $meeting->id; // Handle both string and object
+            $schedule->save();
+        }
     }
     public function update(Schedule|string $schedule, array $payload): Schedule
     {

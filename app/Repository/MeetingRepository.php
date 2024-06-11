@@ -7,6 +7,7 @@ namespace App\Repository;
 use stdClass;
 use App\Models\User;
 use App\Enums\PublishEnum;
+use App\Enums\ScheduletypeEnum;
 use App\Models\Module\Board\Board;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Module\Meeting\Meeting;
@@ -36,7 +37,7 @@ class MeetingRepository extends BaseRepository implements MeetingInterface
         return [
             'attendances.membership',
             'owner',
-            'schedule',
+            'schedules',
             'meetingable', // Add this to handle polymorphic relation
             'agendas',      // Assuming you want to load agendas associated with the meetings
             'folders',      // Assuming you want to load agendas associated with the meetings
@@ -119,11 +120,12 @@ class MeetingRepository extends BaseRepository implements MeetingInterface
         $meeting = new Meeting();
         $meeting->title       = $payload['title'];
         $meeting->conference  = $payload['conference'];
+        $meeting->status      = PublishEnum::Default->value;
+        $meeting->type        = ScheduletypeEnum::Default->value;
         if (!empty($payload['link'])) {
             $meeting->link        = $payload['link'];
         }
         $meeting->location    = $payload['location'];
-        $meeting->status      = PublishEnum::Default->value;
         $meeting->description = $payload['description'];
         $meeting->owner_id    = Auth::user()->id;
 
@@ -182,10 +184,12 @@ class MeetingRepository extends BaseRepository implements MeetingInterface
         $meeting->title       = $payload['title'];
         $meeting->conference  = $payload['conference'];
         $meeting->location    = $payload['location'];
+        $meeting->status      = $payload['status'];
+        $meeting->type        = $payload['type'];
+
         if (!empty($payload['link'])) {
             $meeting->link        = $payload['link'];
         }
-        $meeting->status      = PublishEnum::Default->value;
         $meeting->description = $payload['description'];
         $meeting->owner_id    = Auth::user()->id;
         // dd($meeting);

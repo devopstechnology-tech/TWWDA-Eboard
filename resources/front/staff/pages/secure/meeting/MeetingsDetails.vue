@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import {useForm} from 'vee-validate';
 import {computed, onMounted,ref, watchEffect} from 'vue';
+import {defineEmits} from 'vue';
 import {useRoute,useRouter} from 'vue-router';
 import * as yup from 'yup';
 import {useGetMeetingAgendasRequest} from '@/common/api/requests/modules/agenda/useAgendaRequest';
@@ -26,14 +27,15 @@ import MeetingRsvp from './includes/MeetingRsvp.vue';
 import Members from './includes/Members.vue';
 import Minutes from './includes/Minute.vue';
 import TaskPolls from './includes/TaskPolls.vue';
-import { defineEmits } from 'vue';
 
 // Get the route instance
 const route = useRoute();
 const router = useRouter();
 const authStore = useAuthStore();
 
+// Initialize refs and router
 const currentTab = ref('home');
+const previousTab = ref('');
 
 const tabs = [
     {id: 'home', name: 'Meeting Details', component: HomeDashBoard},
@@ -46,11 +48,36 @@ const tabs = [
     {id: 'attendance', name: 'Attendance', component: Attendance},
 ];
 
-const setActiveTab = (tabId:string) => {
+const setActiveTab = (tabId: string) => {
+    previousTab.value = currentTab.value; // Store the current tab in previousTab before updating currentTab
     currentTab.value = tabId;
+    // router.push({query: {...route.query, previousTab: previousTab.value, currentTab: currentTab.value}});
 };
+
+const handleMembershipsUpdated = () => {
+    if (previousTab.value === 'agenda') {
+        setActiveTab('agenda');
+        window.dispatchEvent(new CustomEvent('refetchMemberships'));
+    }
+};
+
+// Watch for changes in the query params to handle tab changes
+watchEffect(() => {
+    if (route.query.previousTab) {
+        previousTab.value = route.query.previousTab as string;
+    }
+    if (route.query.currentTab) {
+        currentTab.value = route.query.currentTab as string;
+    }
+});
+
 function goBack() {
-    router.back();
+    router.push({
+        name: 'BoardDetails',
+        params: {
+            boardId,
+        },
+    });
 }
 // Define a reactive reference for storing meeting data
 const boardId = route.params.boardId as string;
@@ -143,12 +170,27 @@ watchEffect(() => {
     filteredAttendances.value = attendances.filter(attendance => attendance.meeting_id === meetingId);
 });
 
+watchEffect(() => {
+    if (route.query.previousTab) {
+        currentTab.value = route.query.previousTab as string;
+    }
+});
 const Attendee = computed(() => {
     return filteredAttendances.value ? filteredAttendances.value[0] : null;
 });
 
 const openMinuteTemplateSelectionModal = () => {
-    MinuteTemplateSelectionmodal.value?.showModal();
+    // MinuteTemplateSelectionmodal.value?.showModal();
+    router.push({
+        name: 'BoardMeetingMinutes',
+        params: {
+            boardId,
+            meetingId,
+        },
+        query: {
+            defaultMinutes: 'true',
+        },
+    });
 };
 // Fetch single meeting data when the component is mounted
 onMounted(async () => {
@@ -157,8 +199,7 @@ onMounted(async () => {
         const data = await useGetSingleBoadMeetingRequest(meetingId);
         // Update the meeting data with the fetched data
         const meetingdata = data.data;
-        meeting.value = meetingdata;
-        // window.dispatchEvent(new CustomEvent('updateTitle', {detail: meetingdata}));
+        meeting.value = meetingdata;        
     } catch (error) {
         console.error('Error fetching meeting data:', error);
     }
@@ -220,12 +261,12 @@ console.log('Agendas', Agendas);
                 <div class="lg:inline-flex p-3 mr-4rounded-lg custom-size">
                     <div class="calendar-icon w-full flex flex-col items-center 
                                         justify-center mt-1 calendaheight">
-                        <div class="month customonth">{{getMonthAbbreviation(meeting.schedule.start_time)}}</div>
+                        <div class="month customonth">{{getMonthAbbreviation(meeting?.schedules[0]?.date)}}</div>
                         <div class="day font-medium customday">
-                            <span>{{getDayFromDate(meeting.schedule.start_time)}}</span>
+                            <span>{{getDayFromDate(meeting?.schedules[0]?.date)}}</span>
                         </div>
                         <div class="year font-medium customyear">
-                            <span>{{getYearFromDate(meeting.schedule.start_time)}}</span>
+                            <span>{{getYearFromDate(meeting?.schedules[0]?.date)}}</span>
                         </div>
                     </div>
                 </div>
@@ -302,8 +343,11 @@ console.log('Agendas', Agendas);
                              :key="tab.id" class="tab-pane fade" 
                              :class="{ 'show active': currentTab === tab.id }" 
                              :id="tab.id" role="tabpanel">
-                            <component :is="tab.component" 
-                                       @change-tab="setActiveTab"  />
+                            <component 
+                                :is="tab.component" 
+                                @change-tab="setActiveTab" 
+                                @memberships-updated="handleMembershipsUpdated" 
+                            />
                         </div>
                     </div>
                 </div>

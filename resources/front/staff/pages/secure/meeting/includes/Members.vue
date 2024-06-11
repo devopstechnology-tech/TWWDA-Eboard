@@ -42,6 +42,7 @@ const membershipsmodal = ref<HTMLDialogElement | null>(null);
 const selectedMemberIds = ref<string[]>([]);
 const allMembers = ref<Member[]>([]);
 
+const emit = defineEmits(['memberships-updated']);
 const {errorMessage} = useField('assignees');
 
 const memberschema = yup.object({
@@ -97,14 +98,9 @@ const onSubmit = handleSubmit(async (values, {resetForm}) => {
             await useUpdateMembershipRequest(payload, meetingId, boardId);
         }
         await fetchMemberships();
+        emit('memberships-updated');
         reset();
         membershipsmodal.value?.close();
-        // if (props.previousTab === 'agenda') {
-        //     emit('change-tab', 'agenda');
-        // } else {
-        //     emit('change-tab', props.currentTab); // Stay on the current tab
-        // }
-        window.dispatchEvent(new CustomEvent('membershipsUpdated', {detail: {meetingId, boardId}}));
     } catch (err) {
         if (err instanceof ValidationError) {
             setErrors(err.messages);
@@ -150,9 +146,10 @@ const getMembers = async () => {
     allMembers.value = data.data;
 };
 onMounted(async () => {
-    window.dispatchEvent(new CustomEvent('updateTitle', {detail: 'Members'}));
+    // window.dispatchEvent(new CustomEvent('updateTitle', {detail: 'Members'}));
     getMembers();
 });
+
 const {isLoading, data: Memberships, refetch: fetchMemberships} = getMemberships();
 
 </script>
@@ -198,16 +195,16 @@ const {isLoading, data: Memberships, refetch: fetchMemberships} = getMemberships
                                         />
                                     </div>
                                     <h3 class="m-2">
-                                        {{ membership.user.full_name }}
+                                        {{ membership?.user?.full_name }}
                                     </h3>
                                 </div>
                             </td>
 
                             <td class="board-role">
-                                {{ membership.member.position }}
+                                {{ membership?.member?.position }}
                             </td>
                             <td class="admin text-center" data-admin="0">
-                                <p class="my-0 leading-none p-2 mx-auto" v-if="membership.position === 'Owner'">
+                                <p class="my-0 leading-none p-2 mx-auto" v-if="membership?.position === 'Owner'">
                                     Group Owner
                                 </p>
                                 <p class="my-0 leading-none p-2 mx-auto" v-else>

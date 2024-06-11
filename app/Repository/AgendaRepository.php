@@ -68,16 +68,25 @@ class AgendaRepository extends BaseRepository implements AgendaInterface
         ];
         return $this->indexResource(Agenda::class, AgendaResource::class, $filters);
     }
-    public function getlatestMeetingAgendas()
+    public function getLatestMeetingAgendas()
     {
-        $latestAgenda = Agenda::with($this->relationships())->orderBy('created_at', 'desc')->first();
-        $filters = [
-            'meeting_id' => $latestAgenda->meeting_id,
-            'with' => $this->relationships(),
-            'orderBy' => ['field' => 'created_at', 'direction' => 'asc']
-        ];
+        // Get the latest agenda by creation date
+        $latestAgenda = Agenda::orderBy('created_at', 'desc')->first();
+
+        // Define filters only if latestAgenda is found
+        $filters = [];
+        if ($latestAgenda) {
+            $filters = [
+                'meeting_id' => $latestAgenda->meeting_id,
+                'with' => $this->relationships(),
+                'orderBy' => ['field' => 'created_at', 'direction' => 'asc']
+            ];
+        }
+
+        // Return the filtered agenda resource or an empty collection
         return $this->indexResource(Agenda::class, AgendaResource::class, $filters);
     }
+
 
     // Implement the methods
 

@@ -49,9 +49,9 @@ watch(
 
         // Create an ink annotation
         // Replace x1, y1, x2, y2 with the actual coordinates
-        pspdfStore.createInkAnnotation({x1: 10, y1: 20, x2: 30, y2: 40}, userName);
-        pspdfStore.createSignatureField(0, {left: 200, top: 300, width: 250, height: 150}, 'Signature Field 1');
-        pspdfStore.createSignatureField(1, {left: 100, top: 200, width: 200, height: 100}, 'Signature Field 2');
+        // pspdfStore.createInkAnnotation({x1: 10, y1: 20, x2: 30, y2: 40}, userName);
+        // pspdfStore.createSignatureField(0, {left: 200, top: 300, width: 250, height: 150}, 'Signature Field 1');
+        // pspdfStore.createSignatureField(1, {left: 100, top: 200, width: 200, height: 100}, 'Signature Field 2');
     },
     {immediate: true},
 );

@@ -24,12 +24,14 @@ import {Agenda} from '@/common/parsers/agendaParser';
 import {MinuteRequestPayload} from '@/common/parsers/minuteParser';
 
 
-
+const router = useRouter();
 // Define the props the component expects
 const props = defineProps({
     defaultMinutes: Boolean,
 });
-
+function goBack() {
+    router.back();
+}
 const route = useRoute();
 
 const boardId = route.params.boardId as string;
@@ -334,8 +336,32 @@ const minuteDetails = computed(() => {
 
 </script>
 <template>
+    <div class="card card-widget shadow-lg">
+        <div class="card-footer" >
+            <div class="d-flex align-items-center">
+                <div class="ml-3 flex-1" >
+                    <a href="" @click.prevent="goBack()"
+                       class="text-blue-primary" >
+                        <i class="fas fa-chevron-left"></i> Go back To Meeting
+                    </a>
+                </div>
+                <div class="ml-auto flex self-end">
+                    <button v-if="Minutes?.length > 0 && Minutes[0].detailminutes" type="button" class="btn btn-sm mr-1 btn-danger btn-lg">
+                        <i class="fa fa-trash mr-1"></i> Delete Minutes
+                    </button>
+                    <button type="button" class="btn btn-sm mr-1 btn-primary btn-lg">
+                        <i class="fa fa-signature mr-1"></i> Get Signatures
+                    </button>
+                    <button type="button" class="btn btn-sm mr-1 btn-success btn-lg">
+                        <i class="fa fa-check mr-1"></i> Publish Minutes
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
     <div class="card h-full">
-        <div class="card-header flex items-center">
+        <!-- <div class="card-header flex items-center">
             <div class="flex items-center flex-1 w-full">
                 <h2 class="card-header-title h3">
                     Meeting Minutes
@@ -346,7 +372,7 @@ const minuteDetails = computed(() => {
                     <i class="far fa fa-plus mr-2"></i> Publish To be Viewed by others
                 </button>
             </div>
-        </div>
+        </div> -->
         <div id="MinutesEditor" class="container pt-12">
             <div class="codex-editor">
                 <div class="codex-editor__redactor" style="padding-bottom: 300px;">

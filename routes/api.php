@@ -132,6 +132,16 @@ Route::group(['prefix' => 'v1'], function () {
             Route::patch('meetings/committee/meeting/{committee}', [MeetingController::class, 'update']);
             Route::patch('meetings/publish/{meeting}', [MeetingController::class, 'publish']);
 
+            //////////////////////////// scdeulesh/////////////////
+            Route::get('schedules', [ScheduleController::class, 'index']);
+            Route::get('schedules/{meeting}', [ScheduleController::class, 'schedule']);
+            Route::post('schedules/show/{schedule}', [ScheduleController::class, 'show']);
+            Route::post('schedules', [ScheduleController::class, 'store']);
+            Route::patch('schedules/update/{schedule}', [ScheduleController::class, 'update']);
+            Route::delete('schedules/{schedule}', [ScheduleController::class, 'destroy']);
+
+
+
             //////////////////////////// memberships/////////////////
             Route::get('memberships/meeting/{meeting}/board/{board}', [MembershipController::class, 'getmeetingboardmemberships']);
             Route::post('memberships/update/meeting/{meeting}/board/{board}', [MembershipController::class, 'updatemeetingboardmemberships']);
@@ -146,9 +156,6 @@ Route::group(['prefix' => 'v1'], function () {
             Route::post('attendances/updatersvp/{attendance}', [AttendanceController::class, 'updatersvp']);
             Route::post('attendances/signattendance/{attendance}', [AttendanceController::class, 'signattendance']);
 
-
-
-            Route::apiResource('schedules', ScheduleController::class);
             Route::apiResource('tasks', TaskController::class);
             Route::get('tasks/meeting/{meeting}', [TaskController::class, 'getmeetingtasks']);
             Route::post('tasks/meeting/create/{meeting}/board/{board}', [TaskController::class, 'createmeetingtask']);

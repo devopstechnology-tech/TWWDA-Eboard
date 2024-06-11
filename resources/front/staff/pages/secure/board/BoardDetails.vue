@@ -71,7 +71,7 @@ onMounted(async () => {
                                     <li class="nav-item">
                                         <a class="nav-link active" id="custom-tabs-four-home-tab" data-toggle="pill"
                                            href="#custom-tabs-four-home" role="tab"
-                                           aria-controls="custom-tabs-four-home" aria-selected="true">Home</a>
+                                           aria-controls="custom-tabs-four-home" aria-selected="true">Meetings</a>
                                     </li>
                                     <li class="nav-item">
                                         <a class="nav-link" id="custom-tabs-four-documents-tab" data-toggle="pill"

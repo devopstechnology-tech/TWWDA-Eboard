@@ -427,7 +427,7 @@ const getMeetingPolls = () => {
 };
 const {isLoading, data: Polls, refetch: fetchMeetingPolls} = getMeetingPolls();
 onMounted(async () => {
-    window.dispatchEvent(new CustomEvent('updateTitle', {detail: 'Meeting Tasks'}));
+    // window.dispatchEvent(new CustomEvent('updateTitle', {detail: 'Meeting Tasks'}));
     fetchMemberships();
     fetchMeetingPolls();
 });
