@@ -3,7 +3,7 @@ import {useQuery} from '@tanstack/vue-query';
 import {onMounted,ref} from 'vue';
 import {useRoute,useRouter} from 'vue-router';
 import {useGetSingleBoadMeetingRequest} from '@/common/api/requests/modules/meeting/useMeetingRequest'; // Import your API function
-import {formattedDate} from '@/common/customisation/Breadcrumb';
+import {formatDate,formattedDate} from '@/common/customisation/Breadcrumb';
 import {Meeting} from '@/common/parsers/meetingParser';
 // Define a reactive reference for storing meeting data
 // const meeting = ref<Meeting>();
@@ -65,14 +65,13 @@ const getMeeting = () => {
         queryKey: ['getMeetingKey', boardId, meetingId],
         queryFn: async () => {
             const response = await useGetSingleBoadMeetingRequest(meetingId);
+            window.dispatchEvent(new CustomEvent('updateTitle', {detail: response.data.title + ' Meeting'}));
             return response.data;
         },
     });
 };
 
-onMounted(async () => {
-    window.dispatchEvent(new CustomEvent('updateTitle', {detail: 'Meeting'}));
-});
+
 
 const {isLoading, data: Meeting, refetch: fetchMeeting} = getMeeting();
 
@@ -81,7 +80,7 @@ const {isLoading, data: Meeting, refetch: fetchMeeting} = getMeeting();
     <div class="card">
         <div class="card-header flex items-center">
             <h2 class="card-header-title h3">Details</h2>
-            <div class="ml-auto flex items-center space-x-2">
+            <!-- <div class="ml-auto flex items-center space-x-2">
                 <div id="calendar-select" class="dropdown">
                     <div class="dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown"
@@ -104,7 +103,7 @@ const {isLoading, data: Meeting, refetch: fetchMeeting} = getMeeting();
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> -->
         </div>
         <div class="card-body">
             <div class="space-y-6">
@@ -126,10 +125,9 @@ const {isLoading, data: Meeting, refetch: fetchMeeting} = getMeeting();
                                 {{ Meeting?.title}}
                             </p>
                             <p class="m-0">
-                                {{  formattedDate(Meeting?.schedule?.start_time) }} - {{  formattedDate(Meeting?.schedule?.end_time) }}
-                            </p>
-                            <p class="m-0">
-                                {{ Meeting?.schedule.timezone}}
+                            <div  v-for="schedule in Meeting?.schedules" :key="schedule.id">
+                                {{ formatDate(schedule.date) }}
+                            </div>
                             </p>
                         </div>
                     </div>
@@ -180,9 +178,9 @@ const {isLoading, data: Meeting, refetch: fetchMeeting} = getMeeting();
                     </div>
 
                 </div>
-                <div class="flex items-center">
-                    <div class="w-6 mr-4 text-center text-muted">
-                        <svg aria-hidden="true" class="svg-inline--fa fa-phone h-6 w-6 mx-auto"
+                <!-- <div class="flex items-center">
+                    <div class="w-6 mr-4 text-center text-muted"> -->
+                <!-- <svg aria-hidden="true" class="svg-inline--fa fa-phone h-6 w-6 mx-auto"
                              focusable="false" data-prefix="far" data-icon="phone" role="img"
                              xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="">
                             <path fill="currentColor" d="M375.8 275.2c-16.4-7-35.4-2.4-46.7
@@ -195,17 +193,17 @@ const {isLoading, data: Meeting, refetch: fetchMeeting} = getMeeting();
                                                     61.2c30.9 53.3 75.3 97.7 128.6 128.6c20.4 11.8 46.3 7.1 61.2-11.1l29.4-35.9
                                                     100.4 43L441.5 464zM48 64v0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0s0 0 0 0">
                             </path>
-                        </svg>
-                        <!-- <i aria-hidden="true" class="fa-regular h-6 w-6 fa-phone mx-auto"></i> -->
-                    </div>
-                    <p class="m-0">+1 888 998 2469</p>
-                </div>
-                <div class="flex items-center">
+                        </svg> -->
+                <!-- <i aria-hidden="true" class="fa-regular h-6 w-6 fa-phone mx-auto"></i> -->
+                <!-- </div> -->
+                <!-- <p class="m-0">+1 888 998 2469</p> -->
+                <!-- </div> -->
+                <!-- <div class="flex items-center">
                     <div class="w-6 mr-4 text-center text-muted text-sm">
                         PIN
                     </div>
                     <p class="m-0">15854732#</p>
-                </div>
+                </div> -->
                 <div class="flex items-center">
                     <p class="m-0 text-sm">{{ Meeting?.description }}</p>
                 </div>

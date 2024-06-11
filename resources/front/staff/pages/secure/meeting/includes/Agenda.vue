@@ -19,13 +19,16 @@ import {
 } from '@/common/api/requests/modules/agenda/useAgendaRequest';
 import {useGetMeetingMembersRequest} from '@/common/api/requests/modules/meeting/useMeetingMemberRequest';
 import {useGetMembershipsRequest} from '@/common/api/requests/modules/membership/useMembershipRequest';
+import {useGetMeetingScheduleRequest} from '@/common/api/requests/modules/schedule/useScheduleRequest';
 import FormInput from '@/common/components/FormInput.vue';
 import FormMultiSelect from '@/common/components/FormMultiSelect.vue';
 import FormSelect from '@/common/components/FormSelect.vue';
 import FormTextBox from '@/common/components/FormTextBox.vue';
 import useUnexpectedErrorHandler from '@/common/composables/useUnexpectedErrorHandler';
 import {
-    formatAgendaEntry,        formatDuration,
+    formatAgendaEntry,        
+    formatDuration,
+    formatTime,
     resetCoverImage,
     resetIconImage, truncateDescription} from '@/common/customisation/Breadcrumb';
 import ValidationError from '@/common/errors/ValidationError';
@@ -35,14 +38,15 @@ import {
     SelectedResult,
 } from '@/common/parsers/boadParser';
 import {Membership} from '@/common/parsers/membershipParser';
+import {Schedule} from '@/common/parsers/scheduleParser';
 import Multiselect from '@@/@vueform/multiselect';
 
 
 const emit = defineEmits(['change-tab']);
 // Example function that emits an event
-const goToMembers = (tabId:string) => {
-    emit('change-tab', tabId);
-};
+// const goToMembers = (tabId:string) => {
+//     emit('change-tab', tabId);
+// };
 const fetchFunction = ref('default');
 
 const handleUnexpectedError = useUnexpectedErrorHandler();
@@ -56,8 +60,9 @@ const importedAgendaMeetingId = ref('');
 const agendaId = ref<string | null>(null);
 const selectedMembershipIds = ref<string[]>([]);
 const allMemberships = ref<Membership[]>([]);
+const schedule = ref<Schedule | null>(null);
 const selectedAgenda = ref<Agenda | null>(null);
-const SaveAgendasModal = ref<HTMLDialogElement | null>(null);//constants
+const saveagendasModal = ref<HTMLDialogElement | null>(null);//constants
 
 const items = ref([]);
 const is_editing = ref(false);
@@ -233,6 +238,7 @@ const onSubmit = handleSubmit(async (values, {resetForm}) => {
 });
 const cancelEditing = () => {
     action.value = 'create';
+    fetchFunction.value = 'default';
     agendaction.value = '';
     actionitem.value = '';
     is_editing.value = false;
@@ -270,32 +276,7 @@ const durationOptions = [
     {name: '60 minutes', value: '60'},
 ];
 
-// De/fine the initial default agenda structure
-const defaultAgenda = [
-    {id: '1', title: 'Welcome',
-     children: [
-         {id: '1.1', title: 'Call to Order'},
-         {id: '1.2', title: 'Reading of the mission and vision'},
-        ],
-    },
-    {id: '2', title: 'Changes to the Agenda'},
-    {id: '3', title: 'Approval of Minutes'},
-    {id: '4', title: 'Committee Reports',
-     children: [
-         {id: '4.1', title: 'Executive Director'},
-         {id: '4.2', title: 'Finance'},
-         {id: '4.3', title: 'Governance'},
-         {id: '4.4', title: 'Marketing'},
-         {id: '4.5', title: 'Fundraising'},
-         {id: '4.6', title: 'Programs'},
-        ],
-    },
-    {id: '5', title: 'Old Business'},
-    {id: '6', title: 'New Business'},
-    {id: '7', title: 'Comments, Announcements, and Other Business'},
-    {id: '8', title: 'Next Meeting Date'},
-    {id: '9', title: 'Adjournment'},
-];
+
 
 const DurationOptions = computed(() => {
     return durationOptions;
@@ -323,18 +304,8 @@ const Memberships = computed(() => {
     }
     return resul;
 });
-const getmemberships = async () => {
-    const response = await useGetMembershipsRequest(meetingId, boardId, {paginate: 'false'});
-    allMemberships.value = response.data;
-};
 
-
-onMounted(async () => {
-    window.dispatchEvent(new CustomEvent('updateTitle', {detail: 'Agendas'}));
-    getmemberships();
-});
-
-const deleteAgenda = async () => {
+const deleteAgenda = async () =>{
     const id = selectedAgenda.value?.id as string;
     if(actionitem.value ==='agenda'){
         await useDeleteAgendaRequest(id);
@@ -364,12 +335,13 @@ const resetAgendaStartChoice = async () => {
     agendaction.value = ''; 
 };
 const SaveImportedAgendas = async () => {
-    const meeting_id = importedAgendaMeetingId.value; 
-    fetchFunction.value ==='default';
+    const meeting_id = importedAgendaMeetingId.value;    
     resetAgendaStartChoice();
     await agendasSaveImportedMeetingAgendas(meeting_id, meetingId);
-    SaveAgendasModal.value?.close();
-    importedAgendaMeetingId.value = '';   
+    saveagendasModal.value?.close();
+    importedAgendaMeetingId.value = '';  
+    fetchFunction.value ='default'; 
+    agendaction.value='';
     await fetchMeetingAgendas();
 };
 
@@ -377,31 +349,59 @@ const getMeetingAgendas = () => {
     return useQuery({
         queryKey: ['getMeetingAgendasKey', meetingId],
         queryFn: async () => {
+            console.log('fetchFunction.value', fetchFunction.value);
             let response;
-            if(fetchFunction.value ==='default'){
-                response = await useGetMeetingAgendasRequest(meetingId, {paginate: 'false'});
-            }else if(fetchFunction.value ==='custom'){
+            if (fetchFunction.value === 'custom') {
                 response = await fetchlatestMeetingAgendas({paginate: 'false'});
-                if (!response.data.length) {
-                    // startAgenda('scratch');
+                if (response.data && response.data.length > 0) {
+                    importedAgendaMeetingId.value = response.data[0].meeting_id;
+                    saveagendasModal.value?.showModal();
+                } else {
                     notify({
                         title: 'Notice',
                         text: 'No agendas found in the database. Please create an agenda from scratch.',
                         type: 'warning',
                     });
-                } else{
-                    importedAgendaMeetingId.value = response.data[0].meeting_id;
-                    SaveAgendasModal.value?.showModal();                    
+                    fetchFunction.value = 'default';
                 }
+            } else if (fetchFunction.value === 'default') {
+                response = await useGetMeetingAgendasRequest(meetingId, {paginate: 'false'});
             }
-            fetchFunction.value ==='default';            
-            return response.data;                    
+            return response?.data || []; // Ensure that response.data is always an array
         },
     });
 };
 
 const {isLoading, data: Agendas, refetch: fetchMeetingAgendas} = getMeetingAgendas();
 
+// Calculate total remaining time for agendas
+const FetchedSchedule = computed(() => {
+    return schedule.value;
+});
+
+const getmemberships = async () => {
+    const response = await useGetMembershipsRequest(meetingId, boardId, {paginate: 'false'});
+    allMemberships.value = response.data;
+};
+
+const getMeetingSchedule = async () => {
+    const response = await useGetMeetingScheduleRequest(meetingId);
+    schedule.value = response.data;
+};
+
+const handleManageMembersClick = () => {
+    emit('change-tab', 'members');
+};
+
+
+
+
+
+onMounted(() => {
+    getmemberships();
+    // getMeetingSchedule();
+    window.addEventListener('refetchMemberships', getmemberships);
+});
 </script>
 
 <template>
@@ -423,18 +423,28 @@ const {isLoading, data: Agendas, refetch: fetchMeetingAgendas} = getMeetingAgend
                 <div class="card-body">
                     <div class="flex w-full">
                         <div class="flex-1">
+                            <div class="relative h-8">
+                                <div class="absolute border -right-16 text-[10px] bottom-2 rounded
+                                 text-center px-2 py-0.5 text-gray-700 z-10 border-gray-200 bg-gray-200">
+                                    <div class="absolute left-0 right-0 text-green text-xxs bold -top-2.5">
+                                        Start
+                                    </div>
+                                    <!-- {{ FetchedSchedule?.start_time ? formatTime(FetchedSchedule.start_time) : '' }} -->
+                                </div>
+                            </div>
                             <ol data-list_format="num_la_lr" class="agenda-list mb-0 border-l border-blue">
                                 <li class="mb-2 hover:border-gray-400"
                                     v-for="(agenda, pIndex) in Agendas" :key="pIndex">
                                     <div class="rounded-lg border border-transparent hover:cursor-pointer
                                         border-blue -ml-7 p-2 pl-7 relative border-blue">
-                                        <!-- <div class="absolute border -right-16 top-4 text-[10px] rounded
+                                        <div class="absolute border -right-16 top-4 text-[10px] rounded
                                         text-center py-0.5 text-gray-700 z-10 border-gray-200 bg-gray-200 px-2">
-                                            10:30pm
-                                        </div> -->
+                                            <!-- {{formatTime(FetchedSchedule?.start_time)}} -->
+                                        </div>
                                         <div class="flex gap-2 items-start" 
                                              @click="enableEditing(pIndex, -1, agenda, 'agenda')">
-                                            <div class="font-medium flex-1"> {{ formatAgendaEntry(pIndex)}}.{{ agenda.title }}
+                                            <div class="font-medium flex-1">
+                                                {{ formatAgendaEntry(pIndex)}}.{{ agenda.title }}
                                                 <div class="text-sm text-gray-800 font-normal">
                                                     <p>{{ truncateDescription(agenda.description, 40) }}</p>
                                                 </div>
@@ -445,7 +455,7 @@ const {isLoading, data: Agendas, refetch: fetchMeetingAgendas} = getMeetingAgend
                                                 </div>
                                             </div>
                                             <div>
-                                                <ul class="list-none" v-if="agenda.assignees">
+                                                <ul class="list-none assignees-list" v-if="agenda.assignees">
                                                     <li class="text-sm text-primary"
                                                         v-for="(assignee, idx) in agenda.assignees" :key="idx">
                                                         {{idx+1 }}. {{assignee.user?.full_name  }}
@@ -504,12 +514,11 @@ const {isLoading, data: Agendas, refetch: fetchMeetingAgendas} = getMeetingAgend
                                                         </div>
                                                     </div>
                                                     <div>
-                                                        <ul class="list-none" v-if="child.assignees">
-                                                            <li class="text-sm text-primary"
-                                                                v-for="(childassignee, idx) in child.assignees"
+                                                        <ul class="list-none assignees-list" v-if="child.assignees">
+                                                            <li class="text-sm text-primary" 
+                                                                v-for="(childassignee, idx) in child.assignees" 
                                                                 :key="idx">
                                                                 {{idx+1}}. {{ childassignee.user.full_name }}
-                                                                <!-- {{childassignee.user?.full_name  }} -->
                                                             </li>
                                                         </ul>
                                                     </div>
@@ -552,7 +561,7 @@ const {isLoading, data: Agendas, refetch: fetchMeetingAgendas} = getMeetingAgend
                                     <div class="absolute left-0 right-0 text-green text-xxs bold -top-2.5">
                                         END
                                     </div>
-                                    11:30pm
+                                    {{ FetchedSchedule?.end_time ? formatTime(FetchedSchedule.end_time) : '' }}
                                 </div>
                             </div>
                         </div>
@@ -584,10 +593,12 @@ const {isLoading, data: Agendas, refetch: fetchMeetingAgendas} = getMeetingAgend
                                     class=""
                                     placeholder="Enter Agenda  Description"
                                     :rows="2" />
-                                <FormSelect name="duration"
-                                            label="Duration"
-                                            placeholder="Select Duration"
-                                            :options="DurationOptions" />
+                                <FormSelect 
+                                    name="duration"
+                                    label="Duration"
+                                    placeholder="Select Duration"
+                                    :options="DurationOptions" 
+                                />
                                 <div class="form-group">
                                     <label
                                         class="text-xs uppercase font-medium text-gray-700 tracking-wide">
@@ -619,7 +630,7 @@ const {isLoading, data: Agendas, refetch: fetchMeetingAgendas} = getMeetingAgend
                                             ]" @select="selectedUsers()" @deselect="removeselectedUsers()" />
                                         <div v-if="errorMessage" class="message"> {{ errorMessage }} </div>
                                     </div>
-                                    <button @click.prevent="goToMembers('members')" class="btn btn-info mt-2">
+                                    <button @click.prevent="handleManageMembersClick" class="btn btn-info mt-2">
                                         Manage Members
                                     </button>
                                 </div>
@@ -688,7 +699,7 @@ const {isLoading, data: Agendas, refetch: fetchMeetingAgendas} = getMeetingAgend
         </div>
     </div>
     <div class="flex justify-center col-md-6">
-        <dialog id="SaveAgendasModal" class="modal modal-primary" ref="SaveAgendasModal">
+        <dialog id="saveagendasModal" class="modal modal-primary" ref="saveagendasModal">
             <form method="dialog" class="modal-box rounded-xl">
                 <h3 class="font-bold text-lg justify-center flex text-white">
                     save the Imported AGendas from Previous Meeting
@@ -718,6 +729,27 @@ const {isLoading, data: Agendas, refetch: fetchMeetingAgendas} = getMeetingAgend
 </template>
 
 <style scoped>
+.assignees-list {
+    max-height: 100px; /* Adjust this height as needed */
+    overflow-y: auto;
+    padding-right: 5px; /* To prevent horizontal scrollbar if necessary */
+}
 
+.assignees-list::-webkit-scrollbar {
+    width: 8px; /* Adjust the scrollbar width */
+}
+
+.assignees-list::-webkit-scrollbar-thumb {
+    background-color: #888; /* Customize the scrollbar thumb color */
+    border-radius: 4px; /* Round the scrollbar thumb edges */
+}
+
+.assignees-list::-webkit-scrollbar-thumb:hover {
+    background-color: #555; /* Color when hovered */
+}
+
+.assignees-list::-webkit-scrollbar-track {
+    background: #f1f1f1; /* Customize the scrollbar track color */
+}
 </style>
     

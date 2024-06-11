@@ -5,6 +5,7 @@ declare(strict_types=1);
 
 use App\Enums\HeldEnum;
 use App\Enums\PublishEnum;
+use App\Enums\ScheduletypeEnum;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
@@ -23,7 +24,7 @@ return new class() extends Migration
             $table->string('link')->nullable();
             $table->string('location')->nullable();
             $table->string('status')->default(PublishEnum::Default->value);
-            $table->string('heldstatus')->default(HeldEnum::Default->value);
+            $table->string('type')->default(ScheduletypeEnum::Default->value);
             $table->longText('description')->nullable();
             $table->string('owner_id')->nullable();
             // Adds 'meetingable_id' and 'meetingable_type'

@@ -368,7 +368,9 @@ onMounted(async() => {
                                 <div class="col-md-1">
                                     <div class="calendar-icon w-full flex flex-col items-center 
                                         justify-center mt-1 calendaheight">
-                                        <div class="month customonth">{{getMonthAbbreviation(almanac.start)}}</div>
+                                        <div class="month customonth">
+                                            {{getMonthAbbreviation(almanac.start)}}
+                                        </div>
                                         <div class="day font-medium customday">
                                             <span>{{getDayFromDate(almanac.start)}}</span>
                                         </div>
@@ -385,6 +387,7 @@ onMounted(async() => {
                                         <p class=" text-primary font-bold">
                                             {{ almanac.purpose }}
                                         </p>
+                                        {{almanac.start}}
                                     </div>                                    
                                 </div>
                             </div>
@@ -565,19 +568,35 @@ onMounted(async() => {
                                 </div>
                                 <div class="flex flex-wrap -mx-2">
                                     <div class="w-full md:w-1/2 px-2 mb-2">
-                                        <FormDateTimeInput
+                                        <!-- <FormDateTimeInput
                                             label="Meeting Start Day & Time"
                                             name="start"
                                             :flow="['month']"
                                             placeholder="Enter Meeting Start Day & Time"
+                                        /> -->
+                                        <FormDateTimeInput
+                                            :label="'Meeting Start Day & Time'"
+                                            :name="'start'"
+                                            mode="date-picker"
+                                            modeltype="dd-MM-yyyy"
+                                            :enabletimepicker="false"
+                                            placeholder="Meeting Start Day"
                                         />
                                     </div>
                                     <div class="w-full md:w-1/2 px-2 mb-2">
-                                        <FormDateTimeInput
+                                        <!-- <FormDateTimeInput
                                             label="Meeting End Time"
                                             name="end"
                                             :flow="['month']"
                                             placeholder="Enter Meeting End Day & Time"
+                                        /> -->
+                                        <FormDateTimeInput
+                                            :label="'Meeting End Time'"
+                                            :name="'end'"
+                                            mode="date-picker"
+                                            modeltype="dd-MM-yyyy"
+                                            :enabletimepicker="false"
+                                            placeholder="Meeting End Day"
                                         />
                                     </div>
                                 </div>
@@ -621,13 +640,9 @@ onMounted(async() => {
 .customyear{
     font-size: 19px!important;
 }
+
+
+.products-list .product-info {
+    margin-left: 129px!important;
+}
 </style>
-
-
-useCancelledAlmanacRequest,
-    useHeldAlmanacRequest,
-    usePostponedAlmanacRequest,
-    useCancelledAlmanacRequest,
-    useHeldAlmanacRequest,
-    usePostponedAlmanacRequest,
-    

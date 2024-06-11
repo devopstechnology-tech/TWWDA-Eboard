@@ -1,4 +1,5 @@
 import {array, boolean, number, object, output, string} from 'zod';
+import {Schedule, scheduleParser} from './scheduleParser';
 
 export const meetingParser = object({
     // created_at: string(),
@@ -9,15 +10,10 @@ export const meetingParser = object({
     description: string(),
     link: string().nullable(),
     status: string(),
+    type: string(),
     committee_id: string(),
     //schdeule
-    schedule:object({
-        type: string(),
-        timezone: string(),
-        start_time: string(),
-        end_time: string(),
-    }),
-    //agenda
+    schedules:array(scheduleParser),
 });
 export interface MeetingRequestPayload{ //to db
     title: string,
@@ -26,13 +22,8 @@ export interface MeetingRequestPayload{ //to db
     description: string,
     link: string | null,
     status: string,
-    // committee_id: null,
-    // board_id: string,
-    //schdeule
     type: string,
-    timezone: string,
-    start_time: string,
-    end_time: string,
+    schedules:Schedule[],
 }
 
 

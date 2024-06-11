@@ -1,6 +1,6 @@
 
 
-import {differenceInDays, differenceInHours, differenceInMonths, differenceInYears, formatDistanceToNow,parseISO} from 'date-fns';
+import {differenceInDays, differenceInHours, differenceInMinutes, differenceInMonths, differenceInYears, formatDistanceToNow,parse,parseISO} from 'date-fns';
 import {formatInTimeZone} from 'date-fns-tz';
 import {ref} from 'vue';
 // Define a ref for the custom title
@@ -473,7 +473,7 @@ export function loadDefaultThumbPng (image: string | undefined){
 
 
 
-
+// date and time formating 
 
 
 export const test = ref(['month', 'year', 'calendar']);
@@ -484,9 +484,6 @@ export  function formatDuration(duration: string) {
     }
     return ''; // Return empty string if duration is considered empty
 }
-
-// Use a computed property to format the date
-
 
 export function formattedDate(isoDate: string, timezone: string) {
     const formatString = 'hh:mma'; // Simplified for "10:30PM" format
@@ -512,7 +509,6 @@ export function formattedDateTime(isoDate: string, timezone: string) {
     }
 }
 
-
 export function getAlphabet(index: number): string {
     return String.fromCharCode(97 + index);// ASCII 'a' is 97, 65 is A
 };
@@ -520,11 +516,6 @@ export function getNumbering(index: number): string {
     return (index + 1).toString(); // Convert the number to string for consistency in return type
 }
 
-/**
- * Capitalizes the first letter of each word in a string.
- * @param {string} title - The string to capitalize.
- * @returns {string} The capitalized string.
- */
 function capitalizeTitle(title: string): string {
     return title.replace(/\b(\w)/g, char => char.toUpperCase());
 }
@@ -551,28 +542,39 @@ export function formatMinuteEntry(order: any, title: string, day: any, month: an
     return `${minuteLabel}/${formattedDay}/${formattedMonth}/${formattedYear}: ${capitalizedTitle}`;
 }
 
-export function formatDate(dateStr: string): string {
-    const date = new Date(dateStr);
-    const options: Intl.DateTimeFormatOptions = {day: 'numeric', month: 'long', year: 'numeric'};
-    let formattedDate = date.toLocaleDateString('en-US', options);
+// Helper function to add the correct suffix to the day
+function getDayWithSuffix(day: number): string {
+    if (day > 3 && day < 21) return `${day}th`; // covers 4-20
+    switch (day % 10) {
+        case 1: return `${day}st`;
+        case 2: return `${day}nd`;
+        case 3: return `${day}rd`;
+        default: return `${day}th`;
+    }
+}
 
-    // Add suffix for day
-    const day = date.getDate();
-    formattedDate = formattedDate.replace(day.toString(), getDayWithSuffix(day));
+export function formatDate(dateStr: string): string {
+    // Parse the date string in DD-MM-YYYY format
+    const [day, month, year] = dateStr.split('-').map(Number);
+
+    // Ensure correct handling in Date constructor (month is 0-indexed)
+    const date = new Date(year, month - 1, day);
+
+    // Extract the day, month, and year components
+    const dayWithSuffix = getDayWithSuffix(day);
+    const options: Intl.DateTimeFormatOptions = { month: 'long', year: 'numeric' };
+    const formattedMonthYear = date.toLocaleDateString('en-US', options);
+
+    // Construct the desired format
+    const formattedDate = `${dayWithSuffix} ${formattedMonthYear}`;
 
     return formattedDate;
 }
 
-// Helper function to add the correct suffix to the day
-function getDayWithSuffix(day: number): string {
-    if (day > 3 && day < 21) return day + 'th';
-    switch (day % 10) {
-        case 1:  return day + 'st';
-        case 2:  return day + 'nd';
-        case 3:  return day + 'rd';
-        default: return day + 'th';
-    }
-}
+// Example usage:
+const readableDate = formatDate('12-06-2024');
+console.log(readableDate); // "12th June, 2024"
+
 
 // Function to format time from a full datetime string
 export function formatTime(datetimeStr: string): string {
@@ -592,9 +594,11 @@ export function formatTimeAgo(isoDate: string): string {
 }
 
 // Function to calculate duration based on the unit provided
-export function calculateDuration(startDate: string, endDate: string, unit: 'days' | 'months' | 'years' | 'hours') {
-    const start = parseISO(startDate);
-    const end = parseISO(endDate);
+// Function to calculate duration based on the unit provided
+export function calculateDuration(startDate: string, endDate: string, unit: 'days' | 'months' | 'years' | 'hours' | 'minutes'): string {
+    const start = parseDate(startDate);
+    const end = parseDate(endDate);
+
     switch (unit) {
         case 'days':
             return `${differenceInDays(end, start)} days`;
@@ -604,52 +608,153 @@ export function calculateDuration(startDate: string, endDate: string, unit: 'day
             return `${differenceInYears(end, start)} years`;
         case 'hours':
             return `${differenceInHours(end, start)} hours`;
+        case 'minutes':
+            return `${differenceInMinutes(end, start)} minutes`;
         default:
             return '';
     }
 }
 
-// Function to format dates as 'x days/months/years ago' or 'in x days/months/years'
-export function formatDateAgo(dateString: string) {
-    const date = parseISO(dateString);
-    return formatDistanceToNow(date, {addSuffix: true});
+// Combined function to get both duration and formatted 'ago' string
+export function getDuration(startDate: string, endDate: string, unit: 'days' | 'months' | 'years' | 'hours' | 'minutes'): string {
+    return calculateDuration(startDate, endDate, unit);
+}
+// Function to get time duration in specified units
+function convertTo24HourFormat(time: string): string {
+    const [timePart, modifier] = time.split(' ');
+    let [hours, minutes] = timePart.split(':').map(Number);
+
+    if (modifier.toLowerCase() === 'p.m.' && hours !== 12) {
+        hours += 12;
+    } else if (modifier.toLowerCase() === 'a.m.' && hours === 12) {
+        hours = 0;
+    }
+
+    return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
 }
 
-// Combined function to get both duration and formatted 'ago' string
-export function getDuration(startDate: string, endDate: string, unit: 'days' | 'months' | 'years' | 'hours') {
-    const duration = calculateDuration(startDate, endDate, unit);
-    return duration;
+// Function to get time duration in specified units
+export function getTimeDuration(startTime: string, endTime: string, unit: 'hours' | 'minutes') {
+    const start24Hour = convertTo24HourFormat(startTime);
+    const end24Hour = convertTo24HourFormat(endTime);
+
+    const start = parse(start24Hour, 'HH:mm', new Date());
+    const end = parse(end24Hour, 'HH:mm', new Date());
+
+    switch (unit) {
+        case 'hours':
+            return `${differenceInHours(end, start)} hours`;
+        case 'minutes':
+            return `${differenceInMinutes(end, start)} minutes`;
+        default:
+            return '';
+    }
 }
-export function FormattedAgo(startDate: string, endDate: string, unit: 'days' | 'months' | 'years' | 'hours') {
+
+function convertToISOFormat(dateStr: string): string {
+    const [day, month, year] = dateStr.split('-').map(Number);
+    return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+}
+
+function parseDate(dateStr: string): Date {
+    let date: Date;
+    
+    // Try to parse as ISO format
+    try {
+        date = parseISO(dateStr);
+        if (!isNaN(date.getTime())) {
+            return date;
+        }
+    } catch (e) {
+        // Continue to try the next format
+    }
+    
+    // Try to parse as DD-MM-YYYY format
+    try {
+        date = parse(convertToISOFormat(dateStr), 'dd-MM-yyyy', new Date());
+        if (!isNaN(date.getTime())) {
+            return date;
+        }
+    } catch (e) {
+        // Continue to try the next format
+    }
+    
+    // Try to parse as YYYY-MM-DD format
+    try {
+        date = parse(dateStr, 'dd-MM-yyyy', new Date());
+        if (!isNaN(date.getTime())) {
+            return date;
+        }
+    } catch (e) {
+        // If all parsing attempts fail, throw an error
+    }
+    
+    throw new Error('Invalid date format');
+}
+
+// Function to format dates as 'x days/months/years ago' or 'in x days/months/years'
+export function formatDateAgo(dateString: string) {
+    const date = parseDate(dateString);
+    return formatDistanceToNow(date, { addSuffix: true });
+}
+
+export function FormattedAgo(endDate: string) {
     const formattedAgo = formatDateAgo(endDate);
     return formattedAgo;
 }
 
+// Example usage:
+const readableAgo = FormattedAgo("02-09-2024");
+console.log(readableAgo); // e.g., "in 3 months"
 
-/**
- * Extracts the month in uppercase abbreviated form from a date string.
- * @param dateString The input date string in format "YYYY-MM-DD HH:MM:SS".
- * @returns The abbreviated month in uppercase (e.g., 'JAN', 'FEB').
- */
-export function getYearFromDate(dateString: string): string {
-    const date = new Date(dateString);
-    return new Intl.DateTimeFormat('en-US', {year: 'numeric'}).format(date);
-}
-export function getMonthAbbreviation(dateString: string): string {
-    const date = new Date(dateString);
-    return new Intl.DateTimeFormat('en-US', {month: 'short'}).format(date).toUpperCase();
-}
+const readableAgoISO = FormattedAgo("2024-08-15T07:27:00.000Z");
+console.log(readableAgoISO); // e.g., "in 2 months"
+
+// export function getYearFromDate(dateString: string): string {
+//     const date = new Date(dateString);
+//     return new Intl.DateTimeFormat('en-US', {year: 'numeric'}).format(date);
+// }
+// export function getMonthAbbreviation(dateString: string): string {
+//     const date = new Date(dateString);
+//     return new Intl.DateTimeFormat('en-US', {month: 'short'}).format(date).toUpperCase();
+// }
   
-/**
-   * Extracts the day from a date string.
-   * @param dateString The input date string in format "YYYY-MM-DD HH:MM:SS".
-   * @returns The day as a string.
-   */
-export function getDayFromDate(dateString: string): string {
-    const date = new Date(dateString);
-    return date.getDate().toString();  // Convert day to string for consistency
+
+// export function getDayFromDate(dateString: string): string {
+//     const date = new Date(dateString);
+//     return date.getDate().toString();  // Convert day to string for consistency
+// }
+export function getYearFromDate(dateString: string): string {
+    const [day, month, year] = dateString.split('-').map(Number);
+    const date = new Date(year, month - 1, day);
+    return new Intl.DateTimeFormat('en-US', { year: 'numeric' }).format(date);
 }
-// moneyFormatter.ts
+
+export function getMonthAbbreviation(dateString: string): string {
+    const [day, month, year] = dateString.split('-').map(Number);
+    const date = new Date(year, month - 1, day);
+    return new Intl.DateTimeFormat('en-US', { month: 'short' }).format(date).toUpperCase();
+}
+
+export function getDayFromDate(dateString: string): string {
+    const [day, month, year] = dateString.split('-').map(Number);
+    const date = new Date(year, month - 1, day);
+    return date.getDate().toString(); // Convert day to string for consistency
+}
+
+export function isPast(scheduleDate:string) {
+    // Convert scheduleDate from 'dd-mm-yyyy' to 'yyyy-mm-dd'
+    const formattedDate = scheduleDate.split('-').reverse().join('-');
+    const now = new Date();
+    const schedule = new Date(formattedDate);
+
+    // If schedule date is less than current date, it's in the past
+    if (schedule < now) {
+        return true;
+    } else {
+        return false;
+    }
+}
 
 /**
  * Formats a number or string to a specified format with a custom prefix.

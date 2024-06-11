@@ -111,7 +111,6 @@ const {
     refetch: fetchMeetingAttendances} = getMeetingAttendances();
 
 onMounted(async () => {
-    window.dispatchEvent(new CustomEvent('updateTitle', {detail: 'Atendance'}));
     fetchMeetingAttendances();
 });
 onMounted(() => {
@@ -201,15 +200,15 @@ function handleMeetingUpdated(event) {
                                                  title="" class="person-card">.
                                                 Nyariki Felix
                                             </a> -->
-                                                {{attendee.membership.user.full_name}}
+                                                {{attendee.membership?.user?.full_name}}
                                             </p>
                                         </div>
-                                        <p class="text-muted text-sm mb-0">{{attendee.membership.user.role}}</p>
+                                        <p class="text-muted text-sm mb-0">{{attendee?.membership?.user.role}}</p>
                                     </div>
                                 </div>
                             </td>
                             <td data-role="meetingOwner" class="role">
-                                <span class="text-sm"> {{attendee.membership.member.position}}</span>
+                                <span class="text-sm"> {{attendee.membership?.member?.position}}</span>
                             </td>
                             <td class="invited lg:text-center">
                                 <span class="cell-label">Invited</span> 

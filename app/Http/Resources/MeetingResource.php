@@ -19,6 +19,7 @@ class MeetingResource extends BaseResource
             'conference' => $this->resource->conference,
             'link' => $this->resource->link,
             'location' => $this->resource->location,
+            'type' => $this->resource->type,
             'status' => $this->resource->status,
             'description' => $this->resource->description,
             'owner_id' => $this->resource->owner_id,
@@ -31,7 +32,7 @@ class MeetingResource extends BaseResource
             'folders' => $this->resource->folders,
             'agendas' => $this->resource->agendas,
             'attendances' => $this->resource->attendances,
-            'schedule' => $this->resource->schedule,
+            'schedules' => $this->resource->schedules,
         ];
     }
 

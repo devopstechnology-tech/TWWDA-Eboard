@@ -30,7 +30,6 @@ class BoardObserver
      */
     public function updated(Board $board): void
     {
-        // dd($board->tempMemberUserId, $board->tempMemberRole);
         if (!empty($board->tempUserIds)) {
             $this->notifyBoardMembers($board, $board->tempUserIds);
         }
@@ -102,7 +101,6 @@ class BoardObserver
         // Fetch existing member IDs for comparison
         $existingMemberIds = $board->members->pluck('user_id')->toArray();
 
-
         // Determine members to add or remove
         $membersToAdd = array_diff($newMemberIds, $existingMemberIds);
         $membersToRemove = array_diff($existingMemberIds, $newMemberIds);
@@ -117,20 +115,14 @@ class BoardObserver
 
         // Add new members or update existing ones
         foreach ($membersToAdd as $memberId) {
-            $user = User::find($memberId);
-            $role = $user->roles()->first()->name;
-            $position = $this->mapRoleToPosition($role);
+            $member = $board->members()->Create(
+                ['board_id' => $board->id, 'user_id' => $memberId],
+                ['position' => PositionEnum::Member->value] // Assumes a default position enum is used
+            );
 
-            // Use only one array with all attributes for the create method
-            $member = $board->members()->create([
-                'board_id' => $board->id,
-                'user_id' => $memberId,
-                'position' => $position
-            ]);
-
-            // dd($role, $this->mapRoleToPosition($role), $member->position);
             // Notify new members
             if ($member->wasRecentlyCreated) {
+                $user = User::find($memberId);
                 $user->notify(new BoardNewMemberNotification($user, $board));
             }
         }
@@ -148,7 +140,7 @@ class BoardObserver
             'secretary'         => PositionEnum::Secretary->value,
             'member'            => PositionEnum::Member->value,
             'guest'             => PositionEnum::Guest->value,
-            'owner'             => PositionEnum::Owner->value,  // Owner maps to Default
+            'owner'             => PositionEnum::Owner->value,  // Observer maps to Default
             'observer'          => PositionEnum::Default->value,  // Observer maps to Default
         ];
 

@@ -1,11 +1,13 @@
 <script setup lang="ts">
 
 import '@@/@vueform/multiselect/themes/default.css';
+import {notify} from '@kyvg/vue3-notification';
 import {useQuery} from '@tanstack/vue-query';
 import VueDatePicker from '@vuepic/vue-datepicker';
 import {formatISO,parseISO} from 'date-fns';
+import {v4 as uuidv4} from 'uuid';
 import {useField, useForm} from 'vee-validate';
-import {computed,onMounted,ref} from 'vue';
+import {computed,onMounted,ref, watch} from 'vue';
 import {useRoute} from 'vue-router';
 import * as yup from 'yup';
 import {
@@ -18,23 +20,38 @@ import FormDateInput from '@/common/components/FormDateInput.vue';
 import FormDateTimeInput from '@/common/components/FormDateTimeInput.vue';
 import FormInput from '@/common/components/FormInput.vue';
 import FormMultiSelect from '@/common/components/FormMultiSelect.vue';
+import FormRadioInput from '@/common/components/FormRadioInput.vue';
 import FormSelect from '@/common/components/FormSelect.vue';
 import FormTextBox from '@/common/components/FormTextBox.vue';
 import LoadingComponent from '@/common/components/LoadingComponent.vue';
 import SimpleTable from '@/common/components/Tables/SimpleTable.vue';
 import useUnexpectedErrorHandler from '@/common/composables/useUnexpectedErrorHandler';
-import {formattedDate,loadImage,test,truncateDescription} from '@/common/customisation/Breadcrumb';
+import {
+    formatDate,
+    FormattedAgo,
+    getDayFromDate,
+    getMonthAbbreviation,
+    // combineDateAndTime,
+    // formatDate,
+    // formatDateToReadableString,
+    getTimeDuration,
+    getYearFromDate,
+    isPast,
+    truncateDescription,  
+} from '@/common/customisation/Breadcrumb';
 import ValidationError from '@/common/errors/ValidationError';
 import {Meeting} from '@/common/parsers/meetingParser';
+import {Schedule} from '@/common/parsers/scheduleParser';
 import {Meta} from '@/common/types/types';
 import Multiselect from '@@/@vueform/multiselect';
+import {ScheduleRequestPayload} from '../../../../../common/parsers/scheduleParser';
 
 //constants
 const showCreate = ref(false);
 const action = ref('create');
-const dates = ref('');
 const selectedMeeting = ref<Meeting | null>(null);
 const MeetingModal = ref<HTMLDialogElement | null>(null);
+const ScheduleModal = ref<HTMLDialogElement | null>(null);
 const handleUnexpectedError = useUnexpectedErrorHandler();
 const page = ref(1);
 const perPage = ref(15);
@@ -42,8 +59,18 @@ const meta = ref<Meta>();
 const route = useRoute();
 const boardId = route.params.boardId as string;
 const selectedConferenceType = ref('');
+
 //inputs forms handling
 //meeting
+const scheduleSchema = yup.object({
+    id: yup.string().required(),
+    date: yup.string().required(),
+    start_time: yup.string().required(),
+    end_time: yup.string().required(),
+    status:yup.string().nullable(),
+    heldstatus:yup.string().nullable(),
+    meeting_id: yup.string().nullable(),
+});
 const schema = yup.object({
     title: yup.string().required(),
     conference: yup.string().required(),
@@ -52,12 +79,9 @@ const schema = yup.object({
     description: yup.string().required(),
     status: yup.string().required(),
     board_id: yup.string().required(),
-    //schedules
     type: yup.string().required(),
-    timezone: yup.string().required(),
-    start_time: yup.string().required(),
-    end_time: yup.string().required(),
-    //agenda
+    //schedules
+    schedules: yup.array().of(scheduleSchema).required(),
 
 });
 const {
@@ -69,12 +93,17 @@ const {
     link:string | null;
     board_id:string;
     status:string;
-    //schedule
     type:string;
-    timezone:string;
-    start_time:string;
-    end_time:string;
-
+    //schedule
+    schedules:{
+        id:string;
+        date:string;
+        start_time:string;
+        end_time:string;
+        status:string|null;
+        heldstatus:string|null;
+        meeting_id:string|null;
+    }[] | [];
 }>({
     validationSchema: schema,
     initialValues: {
@@ -86,44 +115,90 @@ const {
         board_id: boardId,
         status: 'unpublished',
         //schedule
-        type:'',
-        timezone:'',
-        start_time:'',
-        end_time:'',
-
+        type:'single',
+        schedules:[
+            {
+                id: uuidv4(),
+                date: '',
+                start_time: '',
+                end_time: '',
+                status: null,
+                heldstatus: null,
+                meeting_id: null,
+            },
+        ],        
     },
 });
 
-const date = ref(new Date());
 // modals
+
 const openCreateMeetingModal = () => {
-    reseting();
+    reseting();  
     action.value = 'create';
     showCreate.value = true;
     MeetingModal.value?.showModal();
 };
 const openEditMeetingModal = (e: Meeting) => {
+    reseting();
     selectedMeeting.value = e;
     // Set field values here
     setFieldValue('title', e.title);
     setFieldValue('conference', e.conference);
     setFieldValue('location', e.location);
     setFieldValue('description', e.description);
+    setFieldValue('type', e.type);
+    setFieldValue('status', e.status);
+    setFieldValue('schedules',e.schedules);
+    const schedule = {
+        id:e.nearestSchedule.id,
+        date:e.nearestSchedule.date,
+        start_time:e.nearestSchedule.start_time,
+        end_time:e.nearestSchedule.end_time,
+        status:e.nearestSchedule.status,
+        heldstatus:e.nearestSchedule.heldstatus,
+        meeting_id:e.nearestSchedule.meeting_id,
+    }; 
+    setFieldValue('schedules', [...values.schedules, schedule]);
     if (e.conference === 'Custom 3rd party Links') {
-        // If so, handle it accordingly and set the link
         handleConferenceTypeChange(e.conference);
         setFieldValue('link', e.link);
-    }
-    // schedules
-    setFieldValue('type', e.schedule?.type);
-    setFieldValue('timezone', e.schedule?.timezone);
-    setFieldValue('start_time', (e.schedule?.start_time));
-    setFieldValue('end_time', (e.schedule?.end_time));
-    console.log(selectedConferenceType.value, e, e.conference === 'Custom 3rd party Links');
+    }    
+    console.log('values', values);
     action.value = 'edit';
     showCreate.value = true;
     MeetingModal.value?.showModal();
 };
+const openEditScheduleMeetingModal = (e: Meeting, schedule:Schedule) => {
+    reseting();
+    selectedMeeting.value = e;
+    // Set field values here
+    setFieldValue('title', e.title);
+    setFieldValue('conference', e.conference);
+    setFieldValue('location', e.location);
+    setFieldValue('description', e.description);
+    setFieldValue('type', e.type);
+    setFieldValue('status', e.status);       
+    if (e.conference === 'Custom 3rd party Links') {
+        handleConferenceTypeChange(e.conference);
+        setFieldValue('link', e.link);
+    }  
+    const sched = {
+        id:schedule.id,
+        date:schedule.date,
+        start_time:schedule.start_time,
+        end_time:schedule.end_time,
+        status:schedule.status,
+        heldstatus:schedule.heldstatus,
+        meeting_id:schedule.meeting_id,
+    };  
+    setFieldValue('schedules', [sched]);
+    console.log('values', values);
+    action.value = 'schedule';
+    showCreate.value = true;
+    MeetingModal.value?.showModal();
+};
+
+
 // data
 const conferenceTypes = [
     {name: 'In Person', value: 'No Vedio (Meeting in Person)'},
@@ -131,9 +206,9 @@ const conferenceTypes = [
     {name: '3rd party', value: 'Custom 3rd party Links'},
 ];
 const meetingschedules = [
-    {name: 'Single meeting', value: 'Single meeting)'},
-    {name: 'Recurring meeting', value: 'Recurring meeting'},
-    {name: 'Find a meeting date', value: 'Find a meeting date'},
+    {name: 'Single', value: 'single'},
+    // {name: 'Recurring', value: 'recurring'},
+    {name: 'Find Date', value: 'manual'},
 ];
 
 const handleConferenceTypeChange = (selectedValue) => {
@@ -197,22 +272,60 @@ const onSubmit = handleSubmit(async (values) => {
     }
 });
 
-function handleTimezoneUpdate(newTimezone) {
-    const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    setFieldValue('timezone', userTimezone);
-}
+
 function reseting(){
     setFieldValue('title', '');
     setFieldValue('conference', '');
     setFieldValue('location', '');
     setFieldValue('description', '');
     setFieldValue('link', null);
+    setFieldValue('type', 'single');
+    setFieldValue('status', 'unpublished');
     // schedules
-    setFieldValue('type', '');
-    setFieldValue('timezone', '');
-    setFieldValue('start_time', '');
-    setFieldValue('end_time', '');
+    setFieldValue('schedules', [
+        {
+            id: uuidv4(), 
+            date: '',
+            start_time: '',
+            end_time: '',
+            status: null,
+            heldstatus: null,
+            meeting_id: null,
+        },
+    ]);
+    
 }
+
+const addEmptySchedule = () => {
+    if (!Array.isArray(values.schedules)) {
+        console.error('Invalid state: values.schedules is not an array.');
+        setFieldValue('schedules', []); // Reinitialize to an empty array if necessary
+    }
+    const newSchedule = {
+        id: uuidv4(),
+        date: '',
+        start_time: '',
+        end_time: '',
+        status: null,
+        heldstatus: null,
+        meeting_id: null,
+    };    
+    setFieldValue('schedules', [...values.schedules, newSchedule]);
+};
+
+const removeSchedule = (index: number) => {
+       
+    if (values.schedules.length === 1) {
+        notify({
+            title: 'Error',
+            text: 'You need at least one date to schedule.',
+            type: 'error',
+        });
+        return;
+    }
+    const updatedSchedules = values.schedules.filter((_, i) => i !== index); 
+    setFieldValue('schedules', updatedSchedules);
+};
 
 //delete
 const deleteMeeting = async (e: string) => {
@@ -225,26 +338,218 @@ const {isLoading, data, refetch: fetchMeetings} = getMeetings(boardId);
 
 const currentStatus = ref('published');
 
+// const filteredMeetings = computed(() => {
+//     if (!data.value) return []; // Check if data is not loaded
+
+//     if (currentStatus.value === 'past') {
+//         const now = new Date();
+//         return data.value.filter(meeting => {
+//             const meetingDate = new Date(meeting.created_at); // Assuming you have a `date` field in your meetings
+//             return meetingDate < now;
+//         });
+//     } else {
+//         return data.value.filter(meeting => meeting.status.toLowerCase() === currentStatus.value);
+//     }
+// });
+// const filteredMeetings = computed(() => {
+//     if (!data.value) return []; // Check if data is not loaded
+
+//     const now = new Date();
+
+//     // Filter meetings based on status or created date
+//     const filtered = data.value.filter(meeting => {
+//         if (currentStatus.value === 'past') {
+//             const meetingDate = new Date(meeting.created_at);
+//             return meetingDate < now;
+//         } else {
+//             return meeting.status.toLowerCase() === currentStatus.value;
+//         }
+//     });
+
+//     // Process each filtered meeting
+//     return filtered.map(meeting => {
+//         if (meeting.schedules && meeting.schedules.length > 0) {
+//             // Sort schedules to find the nearest upcoming one
+//             const sortedSchedules = [...meeting.schedules].sort((a, b) => {
+//                 const dateA = new Date(`${a.date} ${a.start_time}`);
+//                 const dateB = new Date(`${b.date} ${b.start_time}`);
+//                 return dateA.getTime() - dateB.getTime();
+//             });
+
+//             const nearestSchedule = sortedSchedules.find(schedule => new Date(`${schedule.date} ${schedule.start_time}`) >= now) || sortedSchedules[0];
+
+//             // Create a new meeting object with the nearest schedule
+//             const updatedMeeting = {
+//                 ...meeting,
+//                 nearestSchedule: nearestSchedule, // Add nearest schedule to meeting
+//                 schedules: sortedSchedules.filter(schedule => schedule.id !== nearestSchedule.id), // Remove the nearest schedule from the schedules array
+//             };
+
+//             return updatedMeeting;
+//         } else {
+//             // If no schedules, return the meeting as is
+//             return meeting;
+//         }
+//     });
+// });
+
 const filteredMeetings = computed(() => {
     if (!data.value) return []; // Check if data is not loaded
 
-    if (currentStatus.value === 'past') {
-        const now = new Date();
-        return data.value.filter(meeting => {
-            const meetingDate = new Date(meeting.created_at); // Assuming you have a `date` field in your meetings
+    const now = new Date();
+
+    // Filter meetings based on status or created date
+    const filtered = data.value.filter(meeting => {
+        if (currentStatus.value === 'past') {
+            const meetingDate = new Date(meeting.created_at);
             return meetingDate < now;
-        });
-    } else {
-        return data.value.filter(meeting => meeting.status.toLowerCase() === currentStatus.value);
-    }
+        } else {
+            return meeting.status.toLowerCase() === currentStatus.value;
+        }
+    });
+
+    // Process each filtered meeting
+    return filtered.map(meeting => {
+        if (meeting.schedules && meeting.schedules.length > 0) {
+            // Sort schedules by date in ascending order
+            const sortedSchedules = [...meeting.schedules].sort((a, b) => {
+                const dateA = new Date(a.date.split('-').reverse().join('-'));
+                const dateB = new Date(b.date.split('-').reverse().join('-'));
+                return dateA.getTime() - dateB.getTime();
+            });
+
+            // Find the nearest schedule, either future or past
+            let nearestSchedule = sortedSchedules[0];
+            let smallestDifference = Infinity;
+
+            sortedSchedules.forEach(schedule => {
+                const scheduleDate = new Date(schedule.date.split('-').reverse().join('-'));
+                const timeDifference = scheduleDate.getTime() - now.getTime();
+
+                if (Math.abs(timeDifference) < Math.abs(smallestDifference)) {
+                    smallestDifference = timeDifference;
+                    nearestSchedule = schedule;
+                }
+            });
+
+            // Create a new meeting object with the nearest schedule
+            const updatedMeeting = {
+                ...meeting,
+                nearestSchedule, // Add nearest schedule to meeting
+                schedules: sortedSchedules.filter(schedule => schedule.id !== nearestSchedule.id), // Retain all schedules including past ones
+            };
+
+            return updatedMeeting;
+        } else {
+            // If no schedules, return the meeting as is
+            return meeting;
+        }
+    });
 });
+
+
+
+
+
+
 const filterMeetings = (status: string) => {
     currentStatus.value = status;
+};
+const getHeldStatusClass = (status: string) => {
+    switch (status) {
+        case 'scheduled':
+            return 'text-primary';
+        case 'held':
+            return 'text-success';
+        case 'cancelled':
+            return 'text-danger';
+        case 'postponed':
+            return 'text-warning';
+        default:
+            return '';
+    }
 };
 const onPublish = async (id: string) => {
     await usePublishMeetingRequest(id);
     await fetchMeetings();
 };
+
+// // Schedule schema
+// const scheduleschem = yup.object({
+//     id: yup.string().required(),
+//     date: yup.string().required(),
+//     start_time: yup.string().required(),
+//     end_time: yup.string().required(),
+//     status:yup.string().nullable(),
+//     heldstatus:yup.string().nullable(),
+//     meeting_id: yup.string().nullable(),
+// });
+
+// // Schedule form
+// const {
+//     handleSubmit: handleScheduleSubmit,
+//     setErrors: setScheduleErrors,
+//     setFieldValue: setScheduleFieldValue,
+//     values: scheduleValues,
+// } = useForm<{
+//     id:string;
+//     date:string;
+//     start_time:string;
+//     end_time:string;
+//     status:string|null;
+//     heldstatus:string|null;
+//     meeting_id:string|null;
+// }>({
+//     validationSchema: scheduleschem,
+//     initialValues: {
+//         id: '',
+//         date: '',
+//         start_time: '',
+//         end_time: '',
+//         status: null,
+//         heldstatus: null,
+//         meeting_id: null,
+//     },
+// });
+
+// const openEditScheduleModal = (schedule: Schedule) => {  
+//     schedulereseting();  
+//     setScheduleFieldValue('id', schedule.id);
+//     setScheduleFieldValue('date', schedule.date);
+//     setScheduleFieldValue('start_time', schedule.start_time);
+//     setScheduleFieldValue('end_time', schedule.end_time);
+//     setScheduleFieldValue('status', schedule.status);
+//     setScheduleFieldValue('heldstatus', schedule.heldstatus);
+//     setScheduleFieldValue('meeting_id', schedule.meeting_id);
+//     action.value = 'edit';
+//     showCreate.value = true;
+//     ScheduleModal.value?.showModal();
+// };
+// function schedulereseting(){
+//     setScheduleFieldValue('id', '');
+//     setScheduleFieldValue('date', '');
+//     setScheduleFieldValue('start_time', '');
+//     setScheduleFieldValue('end_time', '');
+//     setScheduleFieldValue('status', null);
+//     setScheduleFieldValue('heldstatus', null);
+//     setScheduleFieldValue('meeting_id', null);    
+// }
+
+// // Schedule submit handler
+// const onScheduleSubmit = handleScheduleSubmit(async (scheduleValues) => {
+//     console.log('schedule values', scheduleValues);
+//     try {
+//         // Submit the schedule here
+//         // For example:
+//         // await useCreateScheduleRequest(values);
+//     } catch (err) {
+//         if (err instanceof ValidationError) {
+//             setScheduleErrors(err.messages);
+//         } else {
+//             handleUnexpectedError(err);
+//         }
+//     }
+// });
 
 </script>
 
@@ -277,22 +582,46 @@ const onPublish = async (id: string) => {
                             <i class="far fa fa-plus mr-2 "></i>
                         </button>
                     </div>
+                   
                     <!-- /.card-tools -->
                 </div>
+
+             
                 <!-- /.card-header -->
                 <div class="card-body">
                     <ul class="products-list product-list-in-card pl-2 pr-2"  v-if="filteredMeetings.length > 0">
                         <li class="item" v-for="meeting in filteredMeetings" :key="meeting.id">
-                            <div class="product-img">
-                                <div class="calendar-icon w-10 h-10 flex flex-col items-center justify-center mt-1">
-                                    <div class="month">Mar</div>
-                                    <div class="day font-medium">
-                                        <span>27</span>
+                            <div class="product-img custom-size mr-2">
+                                
+                                <div class="calendar-icon w-full flex flex-col items-center 
+                                        justify-center mt-1 calendaheight" v-if="meeting?.nearestSchedule">
+                                    <div class="month customonth">
+                                        {{getMonthAbbreviation(meeting.nearestSchedule.date)}}                                        
                                     </div>
+                                    <div class="day font-medium customday">
+                                        <span>{{getDayFromDate(meeting.nearestSchedule.date)}}</span>
+                                    </div>
+                                    <div class="year font-medium customyear">
+                                        <span>{{getYearFromDate(meeting.nearestSchedule.date)}}</span>
+                                    </div>
+                                </div>
+                                <div>
+                                    <span class="text-danger font-bold ml-2 mr-2">
+                                        Upcoming
+                                    </span>
                                 </div>
                             </div>
                             <div class="product-info">
-                                <a href="javascript:void(0)" class="product-title">{{ meeting.title }}
+                                <!-- {{meeting?.nearestSchedule?.date}} -->
+                                <router-link 
+                                    :to="{ name: 'BoardMeetingDetails',
+                                           params: {
+                                               boardId: boardId,
+                                               meetingId: meeting.id
+                                           }
+                                    }"
+                                    class="product-title">
+                                    Meeting: <span class="text-primary text-bold">{{ meeting.title }}</span>
                                     <span class="badge float-right bg-white" v-if="currentStatus === 'unpublished'">
                                         <a href="" @click.prevent="onPublish(meeting.id)"
                                            class="text-blue-500 hover:text-blue-700
@@ -301,11 +630,6 @@ const onPublish = async (id: string) => {
                                         </a>
                                     </span>
                                     <span class="badge float-right bg-white">
-                                        <!-- <router-link :to="{ name: 'MeetingDetails', params: { id: meeting.id } }"
-                                                     class="text-green-500
-                                                hover:text-green-700 transition duration-150 ease-in-out">
-                                            <i class="far fa-eye"></i>
-                                        </router-link> -->
                                         <router-link
                                             :to="{ name: 'BoardMeetingDetails',
                                                    params: {
@@ -325,10 +649,95 @@ const onPublish = async (id: string) => {
                                             <i class="far fa-edit"></i>
                                         </a>
                                     </span>
-                                </a>
+                                </router-link>
                                 <span class="product-description">
-                                    {{ truncateDescription(meeting.description, 80) }}
+                                    Description: 
+                                    <span class="text-primary text-bold">
+                                        {{ truncateDescription(meeting.description, 80) }}
+                                    </span>
                                 </span>
+                                <div class="row border-top border-bottom border-warning 
+                                d-flex justify-content-between align-items-center bg-warning" 
+                                     v-if="meeting?.nearestSchedule">
+                                    <div>
+                                        <span class="text-primary bg-primary font-bold ml-2 mr-2">
+                                            Upcoming Meeting Schedule on {{formatDate(meeting.nearestSchedule.date)}}
+                                        </span>
+                                        ||
+                                        Start: <span class="text-primary font-bold ml-2 mr-2">
+                                            {{meeting.nearestSchedule.start_time}}
+                                        </span>
+                                        ||
+                                        End: <span class="text-primary font-bold ml-2 mr-2">
+                                            {{meeting.nearestSchedule.end_time}}
+                                        </span>
+                                        ||
+                                        Duration: <span class="text-primary font-bold ml-2 mr-2">
+                                            {{ getTimeDuration(meeting.nearestSchedule.start_time,
+                                                               meeting.nearestSchedule.end_time, 'hours') }}
+                                        </span>
+                                        ||
+                                        When: <span class="text-primary font-bold ml-2 mr-2">
+                                            {{ FormattedAgo(meeting.nearestSchedule.date) }}
+                                        </span>
+                                        ||
+                                        Held Status: <span 
+                                            :class="getHeldStatusClass(meeting.nearestSchedule.heldstatus)" 
+                                            class="font-bold ml-2 mr-2">
+                                            {{ meeting.nearestSchedule.heldstatus }}
+                                        </span>
+                                    </div>
+                                    <span v-if="meeting?.nearestSchedule">
+                                        <button v-if="meeting.nearestSchedule.heldstatus === 'scheduled'" 
+                                                class="btn btn-sm btn-warning 
+                                            font-bold ml-2 mr-2 mt-1 mb-1" 
+                                                @click.prevent="openEditScheduleMeetingModal(meeting, meeting.nearestSchedule)">
+                                            Postpone
+                                        </button>
+                                    </span>
+                               
+                                </div>
+                                <div :class="['row', 'border-top', 'border-bottom', 'border-warning', 
+                                              'd-flex', 'justify-content-between', 'align-items-center', 
+                                              isPast(schedule.date) ? 'bg-gray' : '']"
+                                     v-for="schedule in meeting.schedules" :key="schedule.id">
+
+                                    <div>
+                                        Day: <span class="text-primary font-bold ml-2 mr-2">
+                                            {{formatDate(schedule.date)}}
+                                        </span>
+                                        ||
+                                        Start: <span class="text-primary font-bold ml-2 mr-2">
+                                            {{schedule.start_time}}
+                                        </span>
+                                        ||
+                                        End: <span class="text-primary font-bold ml-2 mr-2">
+                                            {{schedule.end_time}}
+                                        </span>
+                                        ||
+                                        Duration: <span class="text-primary font-bold ml-2 mr-2">
+                                            {{ getTimeDuration(schedule.start_time, schedule.end_time, 'hours') }}
+                                        </span>
+                                        ||
+                                        When: <span class="text-primary font-bold ml-2 mr-2">
+                                            {{ FormattedAgo(schedule.date) }}
+                                        </span> 
+                                        ||
+                                        Held Status: <span :class="getHeldStatusClass(schedule.heldstatus)" 
+                                                           class="font-bold ml-2 mr-2">
+                                            {{ schedule.heldstatus }}
+                                        </span>
+                                    </div>
+                                    <span>
+                                        <button v-if="schedule.heldstatus === 'scheduled'" 
+                                                class="btn btn-sm btn-warning 
+                                            font-bold ml-2 mr-2 mt-1 mb-1" 
+                                                @click.prevent="openEditScheduleMeetingModal(meeting, schedule)">
+                                            Postpone
+                                        </button>
+                                    </span>
+                               
+                                </div>
                             </div>
                         </li>
                     </ul>
@@ -379,90 +788,137 @@ const onPublish = async (id: string) => {
         <dialog id="meetingmodal" class="modal" ref="MeetingModal">
             <form method="dialog" class="modal-box rounded-xl">
                 <h3 class="font-bold text-lg justify-center flex">
-                    {{action == 'create' ? 'Create Meeting' : 'Edit Meeting'}}
+                    {{ action == 'create' ? 'Create Meeting' : 'Edit Meeting' }}
                 </h3>
-                {{ selectedConferenceType}}
                 <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
-                <div class="w-full mt-6 p-2">
-                    <div class="font-thin text-sm flex flex-col items-center gap-6">
-                        <form novalidate @submit.prevent="onSubmit"
-                              class="w-full rounded-xl mx-auto p-1">
-                            <div class="grid grid-cols-3 gap-2">
-                                <FormInput
-                                    :labeled="true"
-                                    label="Meeting Title"
-                                    name="title"
-                                    class="w-full text-sm  text-white tracking-wide"
-                                    placeholder="Enter Meeting Title"
-                                    type="text"
-                                />
-                                <FormSelect
-                                    :labeled="true"
-                                    name="conference"
-                                    label="Select Conference Type"
-                                    placeholder="Select Conference Type"
-                                    :options="ConferenceTypes"
-                                    @selectedItem="handleConferenceTypeChange"/>
+                <div class="overflow-auto p-4" style="max-height: 80vh;"
+                    :style="action == 'schedule' ? 'height:500px;':''">
 
-                                <FormInput
-                                    v-if="selectedConferenceType === 'Custom 3rd party Links'"
-                                    :labeled="true"
-                                    label="Meeting Link"
-                                    name="link"
-                                    class="w-full text-sm  text-white tracking-wide"
-                                    placeholder="Enter Third Party Link'"
-                                    type="text"
-                                />
-                                <FormInput
-                                    :labeled="true"
-                                    label="Meeting Location"
-                                    name="location"
-                                    class="w-full text-sm  text-white tracking-wide"
-                                    placeholder="e.g 'Conference Room 6'"
-                                    type="text"
-                                />
-                                <FormTextBox
-                                    :labeled="true"
-                                    label="Meeting Description"
-                                    name="description"
-                                    class="col-span-3"
-                                    placeholder="Enter Meeting Description"
-                                    :rows="2"
-                                />
-                                <FormSelect
-                                    :labeled="true"
-                                    name="type"
-                                    label="Meeting Schedule"
-                                    placeholder="Select Meeting Schedule"
-                                    :options="Meetingschedules"/>
-                                <FormInput
-                                    :labeled="true"
-                                    label="Meeting Timezone"
-                                    name="timezone"
-                                    class="w-full text-sm  text-white tracking-wide"
-                                    placeholder="Enter Meeting Timezone"
-                                    type="text"
-
-                                />
-                                <FormDateTimeInput
-                                    label="Meeting Start Time"
-                                    name="start_time"
-                                    :flow="['day']"
-                                    placeholder="Select Start Time"
-                                    @updateTimezone="handleTimezoneUpdate"
-                                />
-                                <FormDateTimeInput
-                                    label="Meeting End Time"
-                                    name="end_time"
-                                    :flow="['day']"
-                                    placeholder="Enter End Time"
-                                    @updateTimezone="handleTimezoneUpdate"
-                                />
-                            </div>
-                            <button type="submit" class="btn btn-md  mb-1 w-full pt-1 text-red-600 mt-6 bg-primary">
-                                {{action == 'create' ? 'Create Meeting' : 'Edit Meeting'}}
-                            </button>
-                        </form>
+                    <div class="grid grid-cols-3 md:grid-cols-3 gap-2 p-2">
+                        <div class="col-span-3">
+                            <form novalidate @submit.prevent="onSubmit" class="">
+                                <div class="flex flex-wrap -mx-2 mt-2" 
+                                     v-if="action == 'create' || action == 'edit'">
+                                    <div class="w-full md:w-1/2 px-1 md:px-2">
+                                        <FormInput
+                                            :labeled="true"
+                                            label="Meeting Title"
+                                            name="title"
+                                            placeholder="Enter Meeting Title"
+                                            type="text"
+                                        />
+                                    </div>
+                                    <div class="w-full md:w-1/2 px-1 md:px-2">
+                                        <FormSelect
+                                            :labeled="true"
+                                            name="conference"
+                                            label="Select Meeting Type"
+                                            placeholder="Select Meeting Type"
+                                            :options="ConferenceTypes"
+                                            @selectedItem="handleConferenceTypeChange"
+                                        />
+                                    </div>
+                                </div>
+                                <div class="flex flex-wrap -mx-2 mt-2"
+                                     v-if="action == 'create' || action == 'edit'">
+                                    <div class="w-full md:w-1/2 px-1 md:px-2">
+                                        <FormInput
+                                            v-if="selectedConferenceType === 'Custom 3rd party Links'"
+                                            :labeled="true"
+                                            label="Meeting Link"
+                                            name="link"
+                                            placeholder="Enter Third Party Link"
+                                            type="text"
+                                        />
+                                    </div>
+                                    <div class="w-full  px-1 md:px-2" 
+                                         :class="selectedConferenceType === 'Custom 3rd party Links'? 'md:w-1/2':''">
+                                        <FormInput
+                                            :labeled="true"
+                                            label="Meeting Location"
+                                            name="location"
+                                            placeholder="e.g 'Conference Room 6'"
+                                            type="text"
+                                        />
+                                    </div>
+                                </div>
+                                <div class="flex flex-wrap -mx-2 mt-2"
+                                     v-if="action == 'create' || action == 'edit'">
+                                    <FormTextBox  
+                                        v-if="action == 'create' || action == 'edit'"
+                                        :labeled="true"
+                                        label="Meeting Description"
+                                        name="description"
+                                        class="col-span-3"
+                                        placeholder="Enter Meeting Description"
+                                        :rows="2"
+                                    />
+                                </div>
+                                <div class="flex flex-wrap -mx-2 mt-2"
+                                     v-if="action == 'create' || action == 'edit'">
+                                    <FormRadioInput
+                                        name="type"
+                                        label="Meeting Schedule Type"
+                                        placeholder="Select Meeting Schedule Type"
+                                        :inline="true"
+                                        :options="Meetingschedules"
+                                        :checked="values.type"
+                                    />
+                                </div>
+                                <div class="flex flex-wrap -mx-2 mt-2 relative"
+                                     v-for="(schedule, index) in values.schedules" :key="index" 
+                                        v-if="values.schedules">
+                                    <!-- {{ schedule.start_time }} -->
+                                    <div class="w-full md:w-1/3 px-1 md:px-2"> 
+                                        <FormDateTimeInput
+                                            :label="'Meeting Date ' + (index + 1)"
+                                            :name="'schedules[' + index + '].date'"
+                                            mode="date-picker"
+                                            modeltype="dd-MM-yyyy"
+                                            :enabletimepicker="false"
+                                            placeholder="Meeting Date"
+                                        />
+                                    </div>                                    
+                                    <div class="w-full md:w-1/3 px-1 md:px-2">
+                                        <FormDateTimeInput
+                                            :label="'Meeting Start Time ' + (index + 1)"
+                                            :name="'schedules[' + index + '].start_time'"
+                                            mode="time-picker"
+                                            modeltype="h:mm bbbb"
+                                            :is24="false"
+                                            :enabletimepicker="true"
+                                            placeholder="Select Start Time"
+                                        />
+                                    </div>
+                                    <div class="w-full md:w-1/3 px-1 md:px-2">
+                                        <FormDateTimeInput
+                                            :label="'Meeting End Time ' + (index + 1)"
+                                            :name="'schedules[' + index + '].end_time'"
+                                            mode="time-picker"
+                                            modeltype="h:mm bbbb"
+                                            :is24="false"
+                                            :enabletimepicker="true"
+                                            placeholder="Select End Time"
+                                        />
+                                    </div> 
+                                    <button v-if="action !== 'schedule'"  
+                                            type="button" class="absolute top-0 right-0 mt-2 mr-2
+                                            text-red-600 font-bold"
+                                            @click.prevent="removeSchedule(index)">
+                                        ✕
+                                    </button>
+                                </div>
+                                <button v-if="values.type === 'manual' && action !== 'schedule'" 
+                                        type="button"
+                                        class="btn btn-primary mt-4"
+                                        @click="addEmptySchedule">
+                                    Add Another Data
+                                </button>
+                                <button type="submit" class="btn btn-primary btn-md w-full mt-6">
+                                    {{ action === 'create' ? 'Create Meeting' : 'Edit Meeting' }}
+                                </button>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </form>
@@ -470,10 +926,34 @@ const onPublish = async (id: string) => {
     </div>
 </template>
 <style scoped>
-
+.modal-box {
+  max-width: 800px;
+  width: 100%;
+}
 .btn-info {
   background-color: #17a2b8;
   color: #fff;
 }
+.custom-size{
+    width: 105px!important;
+}
+.calendaheight{
+    height: 100px!important;
+    margin-bottom: 5px!important;
+}
+.customonth{
+    margin-top: 10px !important;
+    font-size: 17px !important;
+    color: rgb(255, 255, 255) !important;
+    margin-bottom: 10px !important;
+}
+.customday{
+    font-size: 24px!important;
+}
+.customyear{
+    font-size: 19px!important;
+}
+.products-list .product-info {
+    margin-left: 129px!important;
+}
 </style>
-
