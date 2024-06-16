@@ -37,7 +37,7 @@ class UpdateProfileRequest extends FormRequest
             'establishment' => RuleSet::create()->nullable()->string(),
             'title' => RuleSet::create()->nullable()->string(),
             'appointing_authority' => RuleSet::create()->nullable()->string(),
-            'appointnment_date' => RuleSet::create()->nullable()->string(),
+            'appointment_date' => RuleSet::create()->nullable()->string(),
             'appointment_letter' => RuleSet::create()->nullable()->string(),
             'appointment_end_date' => RuleSet::create()->nullable()->string(),
             'serving_term' => RuleSet::create()->nullable()->string(),

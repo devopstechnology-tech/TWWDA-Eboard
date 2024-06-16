@@ -22,8 +22,8 @@ import {
 } from '@/common/customisation/Breadcrumb';
 import ValidationError from '@/common/errors/ValidationError';
 import {User} from '@/common/parsers/userParser';
-import queryClient from '@/queryClient';
 import useAuthStore from '@/common/stores/auth.store';
+import queryClient from '@/queryClient';
 const authStore = useAuthStore();
 
 
@@ -66,7 +66,7 @@ const userchema = yup.object({
     establishment:yup.string().nullable(),
     title:yup.string().nullable(),
     appointing_authority:yup.string().nullable(),
-    appointnment_date:yup.string().nullable(),
+    appointment_date:yup.string().nullable(),
     appointment_letter:yup.string().nullable(),
     appointment_end_date:yup.string().nullable(),
     serving_term:yup.string().nullable(),
@@ -107,7 +107,7 @@ const {
     establishment:string | null,
     title:string | null,
     appointing_authority:string | null,
-    appointnment_date:string | null,
+    appointment_date:string | null,
     appointment_letter:string | null,
     appointment_end_date:string | null,
     serving_term:string | null,
@@ -144,7 +144,7 @@ const {
         establishment:null,
         title:null,
         appointing_authority:null,
-        appointnment_date:null,
+        appointment_date:null,
         appointment_letter:null,
         appointment_end_date:null,
         serving_term:null,
@@ -199,7 +199,7 @@ const populateForm = (data)=>{
     setFieldValue('establishment', data.establishment? data.establishment: null);
     setFieldValue('title', data.title? data.title: null);
     setFieldValue('appointing_authority', data.appointing_authority? data.appointing_authority: null);
-    setFieldValue('appointnment_date', data.appointnment_date? data.appointnment_date: null);
+    setFieldValue('appointment_date', data.appointment_date? data.appointment_date: null);
     setFieldValue('appointment_letter', data.appointment_letter? data.appointment_letter: null);
     setFieldValue('appointment_end_date', data.appointment_end_date? data.appointment_end_date: null);
     setFieldValue('serving_term', data.serving_term? data.serving_term: null);
@@ -236,7 +236,7 @@ const resetForm = ()=>{
     setFieldValue('establishment', null);
     setFieldValue('title',  null);
     setFieldValue('appointing_authority', null);
-    setFieldValue('appointnment_date', null);
+    setFieldValue('appointment_date', null);
     setFieldValue('appointment_letter',  null);
     setFieldValue('appointment_end_date',null);
     setFieldValue('serving_term', null);
@@ -364,9 +364,13 @@ const {isLoading, data: fetchedProfile, refetch: fetchProfile} = getProfile();
                     <span class="info-box-icon"><i class="fas fa-calendar-day"></i></span>
                     <div class="info-box-content">
                         <span class="info-box-text">Appointment Start</span>
-                        <span class="info-box-number">{{ formatDate(fetchedProfile.appointnment_date) }}</span>
+                        <span class="info-box-number">
+                            {{ formatDate(fetchedProfile.appointment_date) }}
+                        </span>
                         <span class="info-box-text">Appointment End</span>
-                        <span class="info-box-number">{{ formatDate(fetchedProfile.appointment_end_date) }}</span>
+                        <span class="info-box-number" >
+                            {{ formatDate(fetchedProfile.appointment_end_date) }}
+                        </span>
                     </div>
                 </div>
             </div>
@@ -702,16 +706,20 @@ const {isLoading, data: fetchedProfile, refetch: fetchProfile} = getProfile();
                                                     type="text"
                                                 />
                                                 <FormDateTimeInput
-                                                    label="Date of Appointment"
-                                                    name="appointnment_date"
-                                                    :flow="['day']"
+                                                    :label="'Date of Appointment'"
+                                                    :name="'appointment_end_date'"
+                                                    mode="date-picker"
+                                                    modeltype="dd-MM-yyyy"
+                                                    :enabletimepicker="false"
                                                     class="col-md-6 w-full text-sm  tracking-wide col-md-6 mb-2"
                                                     placeholder="Enter Date of Appointment"
                                                 />
                                                 <FormDateTimeInput
-                                                    label="Appointment End Date"
-                                                    name="appointment_end_date"
-                                                    :flow="['day']"
+                                                    :label="'Appointment End Date'"
+                                                    :name="'appointment_end_date'"
+                                                    mode="date-picker"
+                                                    modeltype="dd-MM-yyyy"
+                                                    :enabletimepicker="false"
                                                     class="col-md-6 w-full text-sm  tracking-wide col-md-6 mb-2"
                                                     placeholder="Enter Appointment End Date"
                                                 />
@@ -794,7 +802,7 @@ const {isLoading, data: fetchedProfile, refetch: fetchProfile} = getProfile();
                                     <div class="info-box-content">
                                         <span class="info-box-text">Appointment Start</span>
                                         <span class="info-box-number">
-                                            {{ formatDate(fetchedProfile.appointnment_date) }}</span>
+                                            {{ formatDate(fetchedProfile.appointment_date) }}</span>
                                         <span class="info-box-text">Appointment End</span>
                                         <span class="info-box-number">
                                             {{ formatDate(fetchedProfile.appointment_end_date) }}</span>

@@ -16,15 +16,16 @@ class DetailMinuteResource extends BaseResource
     public function base(): array
     {
         return [
-            // Base resource fields here
             'id' => $this->resource->getRouteKey(),
-            'description' => $this->resource->description,
-            'status' => $this->resource->status,
             'minute_id' => $this->resource->minute_id,
             'agenda_id' => $this->resource->agenda_id,
-            // 'minute' => Minute::query()->find($this->$this->resource->minute_id),
-            // 'agenda' => $this->whenLoaded('agenda', $this->resource->agenda, null),
-            // 'subdetailminute' => SubDetailMinute::query()->where('detail_minute_id', $this->resource->getRouteKey())->first(),
+            'description' => $this->resource->description,
+            'status' => $this->resource->status,
+            'minute' => $this->resource->minute,
+            'agenda' => $this->resource->agenda,
+            'subagenda' => $this->resource->subagenda,
+            'subdetailminutes' =>  SubDetailMinuteResource::collection($this->resource->subdetailminutes ?? collect())->format('short'),
+            'minutereview' => $this->resource->minutereview,
         ];
     }
 
@@ -32,14 +33,12 @@ class DetailMinuteResource extends BaseResource
     public function short(): array
     {
         return [
-            // Short resource fields here
             'id' => $this->resource->getRouteKey(),
             'description' => $this->resource->description,
             'status' => $this->resource->status,
             'minute_id' => $this->resource->minute_id,
             'agenda_id' => $this->resource->agenda_id,
-            // 'subdetailminute' => SubDetailMinute::query()->where('detail_minute_id', $this->resource->getRouteKey())->first(),
-            'subdetailminute' => (new SubDetailMinuteResource($this->resource->subdetailminute))->format('short'),
+            'subdetailminutes' =>  SubDetailMinuteResource::collection($this->resource->subdetailminutes ?? collect())->format('short'),
         ];
     }
 }

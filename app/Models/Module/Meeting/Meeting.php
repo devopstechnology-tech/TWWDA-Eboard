@@ -105,7 +105,8 @@ class Meeting extends BaseModel
     }
     public function schedules()
     {
-        return $this->hasMany(Schedule::class, 'meeting_id');
+        return $this->hasMany(Schedule::class, 'meeting_id')
+            ->with('attendances', 'agendas');
     }
 
     public function meetingable()
@@ -113,18 +114,10 @@ class Meeting extends BaseModel
         return $this->morphTo();
     }
 
-    public function agendas()
-    {
-        return $this->hasMany(Agenda::class, 'meeting_id');
-    }
 
     public function memberships()
     {
         return $this->hasMany(Membership::class, 'meeting_id');
-    }
-    public function attendances()
-    {
-        return $this->hasMany(Attendance::class, 'meeting_id');
     }
 
     public function minutes()

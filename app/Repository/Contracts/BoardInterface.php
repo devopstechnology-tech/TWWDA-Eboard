@@ -18,7 +18,7 @@ interface BoardInterface
 
     public function update(Board|string $board, array $payload): Board;
     public function updateMembers(Board|string $board, array $payload): Board;
-    public function updateMemberRole(Board|string $board, array $payload): Board;
+    public function updateMemberPosition(Board|string $board, array $payload): Board;
 
     public function delete(Board|string $board);
 }

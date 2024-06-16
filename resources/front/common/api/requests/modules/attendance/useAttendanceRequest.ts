@@ -10,20 +10,20 @@ export async function useGetAttendancesRequest(options?: object):Promise<nonPagi
     return await client.get(AttendancesRoute() + '?' + cn).json();
 }
 //meetign attendances
-export async function useGetMeetingAttendancesRequest(meeting_id:string, options?: object):Promise<nonPaginateResponse>{
+export async function useGetMeetingAttendancesRequest(scheduleId:string, options?: object):Promise<nonPaginateResponse>{
     const client = useClient();
 
     const cn = Qs.stringify(options, {arrayFormat: 'brackets'});
-    return await client.get(AttendancesRoute()+ '/meeting/' + meeting_id + '?' + cn).json();
+    return await client.get(AttendancesRoute()+ '/schedule/' + scheduleId + '?' + cn).json();
 }
 
 export async function useCreateAttendanceRequest(
     payload: AttendanceRequestPayload, 
-    meetingid: string, 
+    scheduleId: string, 
 ){
     const client = useClient();
     const response = await 
-    client.post(AttendancesRoute() + '/create/' + meetingid ,{
+    client.post(AttendancesRoute() + '/create/' + scheduleId ,{
         json: payload,
     });
     return response.json();

@@ -1,4 +1,6 @@
 <!-- eslint-disable max-len -->
+<!-- eslint-disable vue/no-unused-vars -->
+<!-- eslint-disable max-len -->
 <!-- eslint-disable max-len -->
 <!-- eslint-disable max-len -->
 <!-- eslint-disable max-len -->
@@ -9,8 +11,8 @@ import {useField, useForm} from 'vee-validate';
 import {computed,defineProps,onMounted, Ref, ref, watch} from 'vue';
 import {useRoute,useRouter} from 'vue-router';
 import * as yup from 'yup';
-import {useGetMeetingAgendasRequest} from '@/common/api/requests/modules/agenda/useAgendaRequest';
-import {useCreateMinuteRequest, useCreateSubMinuteRequest, useGetMinutesRequest, useUpdateMinuteRequest, useUpdateSubMinuteRequest} from '@/common/api/requests/modules/minute/useMinuteRequest';
+import {useGetMeetingScheduleAgendasRequest} from '@/common/api/requests/modules/agenda/useAgendaRequest';
+import {useCreateMinuteRequest, useCreateSubMinuteRequest, useDeleteMinutesRequest, useGetCEOApprovalRequest, useGetMinutesRequest, useGetMinutesSignaturesRequest, useGetPublishMinutesRequest, useUpdateMinuteRequest, useUpdateSubMinuteRequest} from '@/common/api/requests/modules/minute/useMinuteRequest';
 import FormInput from '@/common/components/FormInput.vue';
 import FormTextBox from '@/common/components/FormTextBox.vue';
 import useUnexpectedErrorHandler from '@/common/composables/useUnexpectedErrorHandler';
@@ -19,9 +21,13 @@ import {
     getNumbering,
     truncateDescription,
 } from '@/common/customisation/Breadcrumb';
+import {formatDate,formattedDate} from '@/common/customisation/Breadcrumb';
 import ValidationError from '@/common/errors/ValidationError';
 import {Agenda} from '@/common/parsers/agendaParser';
-import {MinuteRequestPayload} from '@/common/parsers/minuteParser';
+import {DetailMinute} from '@/common/parsers/detailminuteParser';
+import {Minute, MinuteRequestPayload} from '@/common/parsers/minuteParser';
+import {SubdetailMinute} from '@/common/parsers/subdetailminuteParser';
+import { useGetCloseMeetingRequest } from '@/common/api/requests/modules/schedule/useScheduleRequest';
 
 
 const router = useRouter();
@@ -36,6 +42,7 @@ const route = useRoute();
 
 const boardId = route.params.boardId as string;
 const meetingId = route.params.meetingId as string;
+const scheduleId = route.params.scheduleId as string;
 const  defaultMinutes = props.defaultMinutes;
 
 
@@ -57,7 +64,7 @@ const childIndex = 2 as number; // Example child index, increment as needed
 
 
 
-// meeting_id
+// schedule_id
 // board_id
 // committee_id
 // membership_id
@@ -69,7 +76,7 @@ const childIndex = 2 as number; // Example child index, increment as needed
 // status
 //oneagnda
 const minuteschema = yup.object({
-    meeting_id: yup.mixed().required(),
+    schedule_id: yup.mixed().required(),
     board_id: yup.string().nullable(),
     committee_id: yup.number().nullable(),
     membership_id: yup.string().nullable(),
@@ -88,7 +95,7 @@ const {
     setFieldValue,
     values,
 } = useForm<{
-    meeting_id: string;
+    schedule_id: string;
     board_id: string | null;
     committee_id: string | null;
     membership_id: string | null;
@@ -104,7 +111,7 @@ const {
 }>({
     validationSchema: minuteschema,
     initialValues: {
-        meeting_id: meetingId,
+        schedule_id: scheduleId,
         board_id: boardId,
         committee_id: null,
         membership_id: null,
@@ -122,8 +129,7 @@ const {
 const onSubmit = handleSubmit(async (values, {resetForm}) =>{
     try {
         const payload: MinuteRequestPayload = {
-            meeting_id: values.meeting_id,
-            board_id: values.meeting_id,
+            schedule_id: values.schedule_id,
             committee_id: null,
             membership_id: null,
             // // minutedetails
@@ -138,21 +144,46 @@ const onSubmit = handleSubmit(async (values, {resetForm}) =>{
         if (action.value === 'create') {
             if(addingChild.value)
             {
-                await useCreateSubMinuteRequest(payload, meetingId);
+                await useCreateSubMinuteRequest(payload, scheduleId);
             }
             else if(isAddingNewParent.value)
             {
-                await useCreateMinuteRequest(payload, meetingId);
+                await useCreateMinuteRequest(payload, scheduleId);
             }
         }
         else {
             if(editingChildIndex.value !== -1){
                 // update child
-                await useUpdateSubMinuteRequest(payload, meetingId);
+                await useUpdateSubMinuteRequest(payload, scheduleId);
+                console.log('payload',payload);
+                // {
+                // "agenda_id": "9c475357-5bd0-4619-83d7-09938183e2d9",
+                // "committee_id": null,
+                // "description": "payload payload",
+                // "detail_minute_id": "9c4753dc-4dc4-4539-9f58-d1bc339af9ff",
+                // "membership_id": null,
+                // "minute_id": "9c474fa2-b367-4487-a87d-6bc63bf00b71",
+                // "schedule_id": "9c471064-45be-4f6a-a592-814149a835c2",
+                // "status": "unpublished",
+                // "subagenda_id": "9c475374-30ab-46f6-b4b5-4e7a7848b988",
+                // "subdetailminute_id": "9c4782ec-3cf5-47fd-8f8e-e6fe3dfabb1c"
+            // }
+            // },
+            // {
+                // "agenda_id": "9c475357-5bd0-4619-83d7-09938183e2d9",
+                // "committee_id": null,
+                // "description": "srvqsoil",
+                // "detail_minute_id": "9c4753dc-4dc4-4539-9f58-d1bc339af9ff",
+                // "membership_id": null,
+                // "minute_id": "9c474fa2-b367-4487-a87d-6bc63bf00b71",
+                // "schedule_id": "9c471064-45be-4f6a-a592-814149a835c2",
+                // "status": "unpublished",
+                // "subagenda_id": "9c47535f-48aa-4c59-a7f0-9c3b23c25c4f",
+                // "subdetailminute_id": "9c4783a4-b71b-44a4-9c3a-3a17719f2f1d"
             }
             else if(editingParentIndex.value !== -1){
                 // update parent
-                await useUpdateMinuteRequest(payload, meetingId);
+                await useUpdateMinuteRequest(payload, scheduleId);
             }
         }
         await fetchMinutes();
@@ -178,7 +209,7 @@ const reset = ()=>{
     editingParentIndex.value = -1;
     is_editing.value = false;
     isAddingNewParent.value = false;
-    setFieldValue('meeting_id', meetingId);
+    setFieldValue('schedule_id', scheduleId);
     setFieldValue('board_id', boardId);
     setFieldValue('committee_id', null);
     setFieldValue('membership_id', null);
@@ -230,7 +261,7 @@ const isEditing = computed(() => {
     return result;
 });
 // edit functionality of minutes
-const enableEditing = (pIndex: number, cIndex: number, agenda:Agenda, minute:Minute) => {
+const enableEditing = (pIndex: number, cIndex: number, agenda:Agenda, detailminute:DetailMinute, subminute:SubdetailMinute) => {
     reset();
     is_editing.value = true;
     isAddingNewParent.value = false;
@@ -238,7 +269,7 @@ const enableEditing = (pIndex: number, cIndex: number, agenda:Agenda, minute:Min
     editingParentIndex.value = pIndex;
     editingChildIndex.value = cIndex;
     action.value = 'edit';
-
+    console.log('pIndex: number, cIndex:',pIndex, cIndex);
     console.log('States after enabling adding child:', {
         is_editing: is_editing.value,
         isAddingNewParent: isAddingNewParent.value,
@@ -250,31 +281,26 @@ const enableEditing = (pIndex: number, cIndex: number, agenda:Agenda, minute:Min
     // console.log('child', editingChildIndex.value !== -1, 'AGENDA', agenda.id, 'detailmnute', minute.id, 'subdetailminute', minute.subdetailminute);
     // console.log('PARENT',editingParentIndex.value !== -1, 'AGENDA', agenda.id, 'detailmnute', minute.id, minute.description);
     setFieldValue('agenda_id', agenda.id);
-    setFieldValue('detail_minute_id', minute.id);
+    
     if(editingChildIndex.value !== -1){
-        setFieldValue('subdetailminute_id', minute.subdetailminute.id);
-        setFieldValue('subagenda_id', minute.subdetailminute.subagenda_id);
-        setFieldValue('description', minute.subdetailminute.description);
+        setFieldValue('subdetailminute_id', subminute.id);
+        setFieldValue('detail_minute_id', subminute.detail_minute_id);
+        setFieldValue('subagenda_id', subminute.subagenda_id);
+        setFieldValue('description', subminute.description);
     }
     else if(editingParentIndex.value !== -1){
-        setFieldValue('description', minute.description);
+        setFieldValue('detail_minute_id', detailminute.id);
+        setFieldValue('description', detailminute.description);
     }
 };
-
-interface Minute {
-    text: string;
-}
 
 // Fetch minutes and initialize minuteId
 const getMinutes = () => {
     return useQuery({
-        queryKey: ['getMinutesKey', meetingId],
+        queryKey: ['getMinutesKey', scheduleId],
         queryFn: async () => {
-            const response = await useGetMinutesRequest(meetingId, {paginate: 'false'});
-            // Assuming response.data returns an array of minutes
-            if (response.data.length > 0) {
-                minuteId.value = response.data[0].id;  // Set minuteId from the first minute
-            }
+            const response = await useGetMinutesRequest(scheduleId, {paginate: 'false'});
+            minuteId.value = response.data.id; 
             return response.data;
         },
         onSuccess: (data) => {
@@ -289,7 +315,7 @@ const getMinutes = () => {
 // const {data: minutes, refetch: fetchMinutes} = getMinutes();
 const {isLoading, data: Minutes, refetch: fetchMinutes} = getMinutes();
 const getmeetingagendas = async () => {
-    const response = await useGetMeetingAgendasRequest(meetingId, {paginate: 'false'});
+    const response = await useGetMeetingScheduleAgendasRequest(scheduleId, {paginate: 'false'});
     allAgendas.value = response.data;
 };
 
@@ -310,88 +336,130 @@ onMounted(async () => {
 // Watch for changes that might affect minuteId
 watch(() => minutes.value, (newMinutes) => {
     // Update minuteId when minutes data changes
-    if (newMinutes.length > 0) {
-        minuteId.value = newMinutes[0];
+    if (newMinutes) {
+        minuteId.value = newMinutes;
     }
 }, {deep: true});
 
 
-
 const minuteDetails = computed(() => {
-    const map: Record<string, DetailMinute[]> = {};
+    const map: Record<string, (DetailMinute | SubdetailMinute)[]> = {};
 
-    // Ensure 'Minutes.value' has at least one item and that the first item has the 'detailminutes' property
-    if (Minutes.value?.length > 0 && Minutes.value[0].detailminutes) {
-        Minutes.value[0].detailminutes.forEach((detailminute) => {
-            // Initialize the array in the map if it does not exist
+    if (Minutes.value && Minutes.value.detailminutes) {
+        Minutes.value.detailminutes.forEach((detailminute) => {
+            // Initialize the array in the map if it does not exist for detailminute
             if (!map[detailminute.agenda_id]) {
                 map[detailminute.agenda_id] = [];
             }
             map[detailminute.agenda_id].push(detailminute);
+
+            // Map subdetailminutes by subagenda_id
+            detailminute.subdetailminutes.forEach((subdetailminute:SubdetailMinute) => {
+                if (!map[subdetailminute.subagenda_id]) {
+                    map[subdetailminute.subagenda_id] = [];
+                }
+                map[subdetailminute.subagenda_id].push(subdetailminute);
+            });
         });
     }
+
     return map;
 });
 
-
+const onDeleteMinutes = async (id: string) => {
+    await useDeleteMinutesRequest(id);
+    await fetchMinutes();
+};
+const onGetMinutesSignatures = async (id: string) => {
+    await useGetMinutesSignaturesRequest(id);
+    await fetchMinutes();
+};
+const onCEOApproval = async (id: string) => {
+    await useGetCEOApprovalRequest(id);
+    await fetchMinutes();
+};
+const onGetPublishMinutes = async (id: string) => {
+    await useGetPublishMinutesRequest(id);
+    await fetchMinutes();
+};
+const onCloseMeeting = async (id: string) => {
+    await useGetCloseMeetingRequest(id);
+    await fetchMinutes();
+};
 </script>
 <template>
     <div class="card card-widget shadow-lg">
-        <div class="card-footer" >
+        <div class="card-footer">
             <div class="d-flex align-items-center">
-                <div class="ml-3 flex-1" >
-                    <a href="" @click.prevent="goBack()"
-                       class="text-blue-primary" >
+                <div class="ml-3 flex-1">
+                    <a href="" @click.prevent="goBack" class="text-blue-primary">
                         <i class="fas fa-chevron-left"></i> Go back To Meeting
                     </a>
                 </div>
-                <div class="ml-auto flex self-end">
-                    <button v-if="Minutes?.length > 0 && Minutes[0].detailminutes" type="button" class="btn btn-sm mr-1 btn-danger btn-lg">
+                <div class="ml-auto flex self-end" v-if="Minutes">
+                    <button type="button" class="btn btn-sm mr-1 btn-success btn-lg"
+                            @click.prevent="onCloseMeeting(Minutes.schedule.id)">
+                        <i class="fas fa-door-closed mr-1"></i> Close Meeting
+                    </button>
+                    <button type="button" class="btn btn-sm mr-1 btn-warning btn-lg"
+                            @click.prevent="onCEOApproval(Minutes.id)">
+                           <i class="fa fa-check mr-1"></i> Send Approval to CEO
+                    </button>
+                    <button v-if="Minutes.detailminutes" 
+                            type="button" class="btn btn-sm mr-1 btn-danger btn-lg"
+                            @click.prevent="onDeleteMinutes(Minutes.id)">
                         <i class="fa fa-trash mr-1"></i> Delete Minutes
                     </button>
-                    <button type="button" class="btn btn-sm mr-1 btn-primary btn-lg">
+                    <button type="button" class="btn btn-sm mr-1 btn-primary btn-lg"
+                            @click.prevent="onGetMinutesSignatures(Minutes.id)">
                         <i class="fa fa-signature mr-1"></i> Get Signatures
                     </button>
-                    <button type="button" class="btn btn-sm mr-1 btn-success btn-lg">
+                    <button type="button" class="btn btn-sm mr-1 btn-success btn-lg"
+                            @click.prevent="onGetPublishMinutes(Minutes.id)">
                         <i class="fa fa-check mr-1"></i> Publish Minutes
-                    </button>
+                    </button>                    
                 </div>
-
             </div>
         </div>
     </div>
     <div class="card h-full">
-        <!-- <div class="card-header flex items-center">
-            <div class="flex items-center flex-1 w-full">
-                <h2 class="card-header-title h3">
-                    Meeting Minutes
-                </h2>
+        <div class=" flex items-start" v-if="Minutes">
+            <div>
+                <div class="h3 mb-0">
+                    <p class="m-0">
+                        Title: <span class=" text-primary">{{ Minutes.meeting?.title}}</span>
+                    </p>
+                    <div v-if="Minutes.schedule?.id === scheduleId">
+                        <p class="m-0 text-black" v-if="Minutes.schedule.id === scheduleId">
+                            Date: <span class=" text-primary">{{ formatDate(Minutes.schedule.date) }}</span>
+                        </p>
+                        <p class="m-0 text-black"> 
+                            Start: <span class=" text-primary">{{Minutes.schedule.start_time}} </span>
+                            End: <span class=" text-primary">{{Minutes.schedule.end_time}}  </span>
+                        </p>
+                    </div> 
+                </div>
             </div>
-            <div class="flex items-center space-x-2">
-                <button type="button" @click.prevent="openCreateTaskModal" class="btn btn-tool">
-                    <i class="far fa fa-plus mr-2"></i> Publish To be Viewed by others
-                </button>
-            </div>
-        </div> -->
+        </div>
+    </div>
+    <div class="card h-full">
         <div id="MinutesEditor" class="container pt-12">
             <div class="codex-editor">
                 <div class="codex-editor__redactor" style="padding-bottom: 300px;">
                     <div class="ce-block">
                         <div class="flex w-full">
-                            <div class="flex-1" >
+                            <div class="flex-1">
                                 <ol data-list_format="num_la_lr" class="agenda-list mb-0 border-l border-blue" v-if="Agendas">
                                     <li class="mb-2 hover:border-gray-400" v-for="(agenda, pIndex) in Agendas" :key="pIndex">
-                                        <div class="rounded-lg border border-transparent hover:cursor-pointer
-                                                border-blue -ml-7 p-2 pl-7 relative border-blue">
-                                            <div class="flex gap-2 items-start" >
-                                                <div class="font-medium flex-1" v-if="editingParentIndex === pIndex && editingChildIndex === -1 && action === 'edit'||
-                                                    isAddingNewParent && currentParentId === agenda.id && editingChildIndex === -1 && action === 'create'">
+                                        <div class="rounded-lg border border-transparent hover:cursor-pointer border-blue -ml-7 p-2 pl-7 relative border-blue">
+                                            <div class="flex gap-2 items-start">
+                                                <div class="font-medium flex-1" v-if="editingParentIndex === pIndex && editingChildIndex === -1 && action === 'edit' || isAddingNewParent && currentParentId === agenda.id && editingChildIndex === -1 && action === 'create'">
                                                     <div class="text-sm text-gray-800 font-normal">
                                                         <form novalidate @submit.prevent="onSubmit">
                                                             <div class="flex gap-x-2">
                                                                 <FormTextBox
                                                                     :labeled="true"
-                                                                    :label="`${ formatMinuteEntry(getNumbering(pIndex), agenda.title)}`"
+                                                                    :label="`${formatMinuteEntry(getNumbering(pIndex), agenda.title)}`"
                                                                     name="description"
                                                                     placeholder="Enter minute description and hit save"
                                                                     type="text"
@@ -404,24 +472,23 @@ const minuteDetails = computed(() => {
                                                         </form>
                                                     </div>
                                                 </div>
-                                                <div v-else class="font-medium flex-1" >
-                                                    <div  v-for="(minutedetail, dIndex) in minuteDetails[agenda.id]" :key="dIndex"
-                                                          @click="enableEditing(pIndex, -1, agenda, minutedetail)">
-                                                        <div class="font-bold text-primary" >
-                                                            {{formatMinuteEntry(getNumbering(pIndex), agenda.title) }}
+                                                <div v-else class="font-medium flex-1">
+                                                    <div v-for="(minutedetail, dIndex) in minuteDetails[agenda.id]" :key="dIndex" @click="enableEditing(pIndex, -1, agenda, minutedetail, undefined)">
+                                                        <div class="font-bold text-primary">
+                                                            {{ formatMinuteEntry(getNumbering(pIndex), agenda.title) }}
                                                         </div>
                                                         <div class="font-medium text-danger">
-                                                            <p>{{minutedetail.description}}</p>
+                                                            <p>{{ minutedetail.description }}</p>
                                                         </div>
-                                                        <div class="font-medium" >
+                                                        <div class="font-medium">
                                                             <div class="badge bg-warning text-bold"> Click Here to Edit This Agenda Minute And Click save</div>
                                                         </div>
                                                     </div>
                                                     <div v-if="!minuteDetails[agenda.id]" @click="enableAddingNewParent(agenda)">
-                                                        <div class="font-bold text-primary" >
-                                                            {{formatMinuteEntry(getNumbering(pIndex), agenda.title) }}
+                                                        <div class="font-bold text-primary">
+                                                            {{ formatMinuteEntry(getNumbering(pIndex), agenda.title) }}
                                                         </div>
-                                                        <div class="font-medium" >
+                                                        <div class="font-medium">
                                                             <div class="badge bg-info text-bold"> Click Here to add Minutes for this Agenda and Click Save</div>
                                                         </div>
                                                     </div>
@@ -429,20 +496,16 @@ const minuteDetails = computed(() => {
                                             </div>
                                         </div>
                                         <ol class="min-h-6 border-l border-blue">
-                                            <li class="mb-2 hover:border-gray-400" draggable="false"
-                                                v-for="(child, cIndex) in agenda.children" :key="cIndex">
-                                                <div class="rounded-lg border border-transparent hover:cursor-pointer
-                                                    border-blue -ml-7 p-2 pl-7 relative border-blue">
-                                                    <div class="flex gap-2 items-start" >
-                                                        <div class="font-medium flex-1"
-                                                             v-if="addingChild && currentParentId === agenda.id && editingParentIndex === pIndex && editingChildIndex === cIndex && action === 'create'
-                                                                 || is_editing && !isAddingNewParent && !addingChild && editingParentIndex === pIndex && editingChildIndex === cIndex  && action === 'edit'">
+                                            <li class="mb-2 hover:border-gray-400" draggable="false" v-for="(child, cIndex) in agenda.children" :key="cIndex">
+                                                <div class="rounded-lg border border-transparent hover:cursor-pointer border-blue -ml-7 p-2 pl-7 relative border-blue">
+                                                    <div class="flex gap-2 items-start">
+                                                        <div class="font-medium flex-1" v-if="addingChild && currentParentId === agenda.id && editingParentIndex === pIndex && editingChildIndex === cIndex && action === 'create' || is_editing && !isAddingNewParent && !addingChild && editingParentIndex === pIndex && editingChildIndex === cIndex  && action === 'edit'">
                                                             <div class="text-sm text-gray-800 font-normal">
                                                                 <form novalidate @submit.prevent="onSubmit">
                                                                     <div class="flex gap-x-2">
                                                                         <FormTextBox
                                                                             :labeled="true"
-                                                                            :label="`${ formatMinuteEntry(getNumbering(pIndex), child.title, undefined, undefined, undefined,  getNumbering(cIndex))}`"
+                                                                            :label="`${formatMinuteEntry(getNumbering(pIndex), child.title, undefined, undefined, undefined, getNumbering(cIndex))}`"
                                                                             name="description"
                                                                             placeholder="Enter minute description and hit save"
                                                                             type="text"
@@ -455,66 +518,66 @@ const minuteDetails = computed(() => {
                                                                 </form>
                                                             </div>
                                                         </div>
-                                                        <div  v-else class="font-medium flex-1" >
-                                                            <!-- <div v-if="minuteDetails[agenda.id] && minuteDetails[agenda.id][0].subdetailminute"  @click="enableEditing(pIndex, -1, agenda, minutedetail)"> -->
-                                                            <div v-for="(minutedetail, dIndex) in minuteDetails[agenda.id]" >
-                                                                <div class="font-bold text-primary" >
-                                                                    {{formatMinuteEntry(getNumbering(pIndex), child.title, undefined, undefined, undefined,  getNumbering(cIndex)) }}
-                                                                </div>
-                                                                <div v-if="minutedetail.subdetailminute?.subagenda_id == child.id" @click="enableEditing(pIndex, cIndex, agenda, minutedetail)">
-                                                                    <div class="font-medium text-black" >
-                                                                        <p>{{minutedetail.subdetailminute.description}}</p>
-                                                                    </div>
-                                                                    <div class="font-medium" >
-                                                                        <div class="badge bg-warning text-bold"> Click Here to Edit This SubAgenda Minute And Click save</div>
-                                                                    </div>
-                                                                </div>
-                                                                <div v-else>
-                                                                    <div v-if="editingParentIndex !== pIndex && !addingChild" @click="enableAddingChild(pIndex, cIndex, agenda, child)">
-                                                                        <div class="font-medium" >
-                                                                            <div class="badge bg-success text-bold"> Click Here to add Minutes for this SubAgenda and Click Save</div>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div v-else-if="addingChild && currentParentId === agenda.id && editingParentIndex === pIndex && editingChildIndex === cIndex"></div>
-                                                                    <div v-else>
-                                                                        <div class="font-medium" @click="enableAddingChild(pIndex, cIndex, agenda, child)">
-                                                                            <div class="badge bg-success text-bold"> Click Here to add Minutes for this SubAgenda and Click Save</div>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-
+                                                        <div v-else class="font-medium flex-1">
+                                                            <div class="font-bold text-primary">
+                                                                {{ formatMinuteEntry(getNumbering(pIndex), child.title, undefined, undefined, undefined, getNumbering(cIndex)) }}
                                                             </div>
-                                                            <div v-if="!minuteDetails[agenda.id]">
-                                                                <div v-if="editingParentIndex !== pIndex && !addingChild" >
-                                                                    <div  v-if="minuteDetails && minuteDetails[agenda.id] && minuteDetails[agenda.id].length > 0"  @click="enableAddingChild(pIndex, cIndex, agenda, child)">
-                                                                        <div class="font-bold text-primary" >
-                                                                            {{formatMinuteEntry(getNumbering(pIndex), child.title, undefined, undefined, undefined,  getNumbering(cIndex)) }}
+                                                            <div v-for="(minutedetail, dIndex) in minuteDetails[agenda.id]" :key="dIndex">
+                                                                <div v-for="subminutedetail in minuteDetails[child.id]" :key="subminutedetail.id">
+                                                                    <div v-if="subminutedetail.subagenda_id === child.id" @click="enableEditing(pIndex, cIndex, agenda, minutedetail, subminutedetail)">
+                                                                        <div class="font-medium text-danger">
+                                                                            <p>{{ subminutedetail.description }}</p>
                                                                         </div>
-                                                                        <div class="font-medium" >
-                                                                            <div class="badge bg-success text-bold"> Click Here to add Minutes for this SubAgenda and Click Savexx</div>
+                                                                        <div class="font-medium">
+                                                                            <div class="badge bg-warning text-bold"> Click Here to Edit This Agenda Minute And Click save</div>
                                                                         </div>
                                                                     </div>
-                                                                    <div v-else>
-                                                                        <div class="font-medium" @click="enableAddingNewParent(agenda)">
-                                                                            <div class="badge bg-warning text-bold"> Create Minute for main Agenda before Sub Agenda First</div>
-                                                                        </div>
+                                                                </div>
+                                                            </div>
+                                                            <div v-if="!minuteDetails[child.id]">
+                                                                <div v-if="editingParentIndex !== pIndex && !addingChild" @click="enableAddingChild(pIndex, cIndex, agenda, child)">
+                                                                    <div class="font-medium" >
+                                                                        <div class="badge bg-success text-bold"> Click Here to add Minutes for this SubAgenda and Click Save</div>
                                                                     </div>
                                                                 </div>
                                                                 <div v-else-if="addingChild && currentParentId === agenda.id && editingParentIndex === pIndex && editingChildIndex === cIndex"></div>
-                                                                <div v-else >
-                                                                    <div  v-if="minuteDetails && minuteDetails[agenda.id] && minuteDetails[agenda.id].length > 0" @click="enableAddingChild(pIndex, cIndex, agenda, child)">
-                                                                        <div class="font-bold text-primary" >
-                                                                            {{formatMinuteEntry(getNumbering(pIndex), child.title, undefined, undefined, undefined,  getNumbering(cIndex)) }}
-                                                                        </div>
-                                                                        <div class="font-medium" >
-                                                                            <div class="badge bg-success text-bold"> Click Here to add Minutes for this SubAgenda and Click Savevv</div>
-                                                                        </div>
+                                                                <div v-else>
+                                                                    <div class="font-medium" @click="enableAddingChild(pIndex, cIndex, agenda, child)">
+                                                                        <div class="badge bg-success text-bold"> Click Here to add Minutes for this SubAgenda and Click Save</div>
                                                                     </div>
-                                                                    <div v-else>
-                                                                        <div class="font-medium" @click="enableAddingNewParent(agenda)">
-                                                                            <div class="badge bg-warning text-bold"> Create Minute for main Agenda before Sub Agenda First</div>
-                                                                        </div>>
+                                                                </div> 
+                                                            </div>
+                                                        </div>                                                        <div v-if="!minuteDetails[agenda.id]">
+                                                            
+                                                            <div v-if="editingParentIndex !== pIndex && !addingChild" >
+                                                                <div  v-if="minuteDetails && minuteDetails[agenda.id] && minuteDetails[agenda.id].length > 0"  @click="enableAddingChild(pIndex, cIndex, agenda, child)">
+                                                                    <div class="font-bold text-primary" >
+                                                                        {{formatMinuteEntry(getNumbering(pIndex), child.title, undefined, undefined, undefined,  getNumbering(cIndex)) }}
                                                                     </div>
+                                                                    <div class="font-medium" >
+                                                                        <div class="badge bg-success text-bold"> Click Here to add Minutes for this SubAgenda and Click Savexx</div>
+                                                                    </div>
+                                                                </div>
+                                                                <div v-else>
+                                                                    <div class="font-medium" @click="enableAddingNewParent(agenda)">
+                                                                        <div class="badge bg-warning text-bold"> Create Minute for main Agenda before Sub Agenda First</div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div v-else-if="addingChild && currentParentId === agenda.id && editingParentIndex === pIndex && editingChildIndex === cIndex"></div>
+                                                            <div v-else >
+                                                                <div  v-if="minuteDetails && minuteDetails[agenda.id] && minuteDetails[agenda.id].length > 0" @click="enableAddingChild(pIndex, cIndex, agenda, child)">
+                                                                    <div class="font-bold text-primary" >
+                                                                        {{formatMinuteEntry(getNumbering(pIndex), child.title, undefined, undefined, undefined,  getNumbering(cIndex)) }}
+                                                                    </div>
+                                                                    <div class="font-medium" >
+                                                                        <div class="badge bg-success text-bold"> Click Here to add Minutes for this SubAgenda and Click Savevv</div>
+                                                                    </div>
+                                                                </div>
+                                                                <div v-else>
+                                                                    <div class="font-medium" @click="enableAddingNewParent(agenda)">
+                                                                        <div class="badge bg-warning text-bold"> Create Minute for main Agenda before Sub Agenda First</div>
+                                                                    </div>>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -532,6 +595,7 @@ const minuteDetails = computed(() => {
         </div>
     </div>
 </template>
+  
 
 
 

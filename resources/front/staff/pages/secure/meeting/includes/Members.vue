@@ -37,6 +37,7 @@ const route = useRoute();
 const action = ref('create');
 const boardId = route.params.boardId as string;
 const meetingId = route.params.meetingId as string;
+const scheduleId = route.params.scheduleId as string;
 const showCreate = ref(false);
 const membershipsmodal = ref<HTMLDialogElement | null>(null);
 const selectedMemberIds = ref<string[]>([]);
@@ -93,9 +94,9 @@ const onSubmit = handleSubmit(async (values, {resetForm}) => {
             memberships: values.memberships,
         };
         if (action.value === 'create') {
-            await useCreateMembershipRequest(payload, meetingId, boardId);
+            await useCreateMembershipRequest(payload, meetingId, scheduleId);
         } else {
-            await useUpdateMembershipRequest(payload, meetingId, boardId);
+            await useUpdateMembershipRequest(payload, meetingId, scheduleId);
         }
         await fetchMemberships();
         emit('memberships-updated');
@@ -119,9 +120,9 @@ const reset = () => {
 
 const getMemberships = () => {
     return useQuery({
-        queryKey: ['getMembershipsKey', boardId, meetingId],
+        queryKey: ['getMembershipsKey', meetingId, scheduleId],
         queryFn: async () => {
-            const response = await useGetMembershipsRequest(meetingId, boardId, {paginate: 'false'});
+            const response = await useGetMembershipsRequest(meetingId, scheduleId, {paginate: 'false'});
             return response.data;
         },
     });

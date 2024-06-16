@@ -12,6 +12,7 @@ export const meetingParser = object({
     status: string(),
     type: string(),
     committee_id: string(),
+    meetingable: string(),
     //schdeule
     schedules:array(scheduleParser),
 });

@@ -7,6 +7,7 @@ namespace App\Models\Module\Meeting;
 use App\Traits\Uuids;
 use App\Models\BaseModel;
 use App\Models\Module\Board\Board;
+use App\Models\Module\Meeting\Schedule;
 use App\Models\Module\Member\Membership;
 use App\Models\Module\Committe\Committee;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -23,16 +24,18 @@ class Minute extends BaseModel
 
     protected $dates = ['deleted_at'];
     protected $fillable = [
-        'meeting_id',
+        'schedule_id',
         'board_id',
         'committee_id',
         'membership_id',
         'status',
+        'approvalstatus',
     ];
 
-    public function meeting()
+    public function schedule()
     {
-        return $this->belongsTo(Meeting::class, 'meeting_id');
+        return $this->belongsTo(Schedule::class, 'schedule_id')
+            ->with('meeting');
     }
     public function board()
     {
@@ -42,14 +45,16 @@ class Minute extends BaseModel
     {
         return $this->belongsTo(Committee::class, 'committee_id');
     }
-    public function membership()
+    public function author() //minute author
     {
         return $this->belongsTo(Membership::class, 'membership_id');
     }
 
     public function detailminutes(): HasMany
     {
-        return $this->hasMany(DetailMinute::class, 'minute_id')->orderBy('created_at', 'asc');
+        return $this->hasMany(DetailMinute::class, 'minute_id')
+            ->with('subdetailminutes')
+            ->orderBy('created_at', 'asc');
     }
     public function minuteReviews()
     {

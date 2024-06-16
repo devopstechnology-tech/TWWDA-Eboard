@@ -4,16 +4,17 @@ declare(strict_types=1);
 
 namespace App\Http\Requests;
 
+
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rules\Unique;
 use Sourcetoad\RuleHelper\RuleSet;
 
-class UpdateMemberRoleRequest extends FormRequest
+class UpdatePositionRequest extends FormRequest
 {
     public function rules(): array
     {
         return [
-            'id' => RuleSet::create()->required()->string(),
-            'role' => RuleSet::create()->required()->string(),
+            // Your rules here for update
         ];
     }
 }

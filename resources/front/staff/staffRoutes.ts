@@ -108,7 +108,7 @@ const staffRoutes: RouteRecordRaw[] = [
                     component: () => import('@/staff/pages/secure/meeting/MeetingsDetails.vue'),
                     // Ensure this component is created
                     name: 'BoardMeetingDetails', // A unique name for the route
-                    path: '/board/:boardId/meeting/:meetingId', // Dynamic segment to capture the board ID & meting id
+                    path: '/board/:boardId/meeting/:meetingId/schedule/:scheduleId', // Dynamic segment to capture the board ID & meting id
                     meta: {title: 'Board Meeting Details'},
                 },
                 // {
@@ -141,11 +141,12 @@ const staffRoutes: RouteRecordRaw[] = [
                     component: () => import('@/staff/pages/secure/meeting/includes/Minute.vue'),
                     // Ensure this component is created
                     name: 'BoardMeetingMinutes', // A unique name for the route
-                    path: '/board/:boardId/meeting/:meetingId/minutes', // Dynamic segment to capture the board ID & meting id
+                    path: '/board/:boardId/meeting/:meetingId/schedule/:scheduleId/minutes', // Dynamic segment to capture the board ID & meting id
                     meta: {title: 'Board Meeting Minutes Details'},
                     props: route => ({
                         boardId: route.params.boardId,
                         meetingId: route.params.meetingId,
+                        scheduleId: route.params.scheduleId,
                         defaultMinutes: route.query.defaultMinutes === 'true',  // Interpret as boolean
                         // otherParam: route.query.otherParam  // Pass other parameters as needed
                     }),

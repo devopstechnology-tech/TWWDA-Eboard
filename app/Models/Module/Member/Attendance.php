@@ -10,6 +10,7 @@ use App\Enums\InviteEnum;
 use App\Models\BaseModel;
 use App\Enums\AttendanceEnum;
 use App\Models\Module\Meeting\Meeting;
+use App\Models\Module\Meeting\Schedule;
 use App\Models\Module\Member\Membership;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -23,7 +24,7 @@ class Attendance extends BaseModel
     protected $dates = ['deleted_at'];
     protected $fillable = [
         'location',
-        'meeting_id',
+        'schedule_id',
         'membership_id',
         'invite_status',
         'rsvp_status',
@@ -40,8 +41,8 @@ class Attendance extends BaseModel
         return $this->belongsTo(Membership::class);
     }
 
-    public function meeting()
+    public function schedule()
     {
-        return $this->belongsTo(Meeting::class);
+        return $this->belongsTo(Schedule::class, 'schedule_id');
     }
 }

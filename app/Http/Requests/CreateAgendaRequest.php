@@ -13,7 +13,7 @@ class CreateAgendaRequest extends FormRequest
     {
         return [
             'title' => RuleSet::create()->required()->string(),
-            'meeting_id' => RuleSet::create()->required()->string(),
+            'schedule_id' => RuleSet::create()->required()->string(),
         ];
     }
 }

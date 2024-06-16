@@ -11,7 +11,10 @@ import * as yup from 'yup';
 import {
     useCreateMemberRequest,
     useGetBoardMembersRequest,
-    useUpdateMemberRequest} from '@/common/api/requests/modules/member/useMemberRequest';
+    useUpdateMemberPositionRequest,
+    useUpdateMemberRequest,
+} from '@/common/api/requests/modules/member/useMemberRequest';
+import {useGetPositionsRequest} from '@/common/api/requests/modules/member/usePositionRequest';
 import{useGetStaffsRequest}from '@/common/api/requests/staff/useStaffRequest';
 import FormDateInput from '@/common/components/FormDateInput.vue';
 import FormDateTimeInput from '@/common/components/FormDateTimeInput.vue';
@@ -22,18 +25,25 @@ import FormTextBox from '@/common/components/FormTextBox.vue';
 import LoadingComponent from '@/common/components/LoadingComponent.vue';
 import SimpleTable from '@/common/components/Tables/SimpleTable.vue';
 import useUnexpectedErrorHandler from '@/common/composables/useUnexpectedErrorHandler';
-import {formattedDate,loadImage,test,truncateDescription} from '@/common/customisation/Breadcrumb';
+import {
+    formattedDate,
+    loadImage,    mapIconToRole,
+    test,
+    truncateDescription, 
+} from '@/common/customisation/Breadcrumb';
 import ValidationError from '@/common/errors/ValidationError';
-import {Member, MemberEditParams,MemberRequestPayload,SelectedResult} from '@/common/parsers/memberParser';
+import {Member, MemberEditParams,MemberPositionRequestPayload,MemberRequestPayload,SelectedResult} from '@/common/parsers/memberParser';
+import {Position} from '@/common/parsers/positionParser';
+import {User} from '@/common/parsers/userParser';
 import {Meta} from '@/common/types/types';
+import MemberPosition from '@/staff/pages/secure/board/includes/MemberPosition.vue';
 import Multiselect from '@@/@vueform/multiselect';
-
 
 //constants
 const handleUnexpectedError = useUnexpectedErrorHandler();
 const route = useRoute();
 const action = ref('create');
-const boardId = route.params.id as string;
+const boardId = route.params.boardId as string;
 const showCreate = ref(false);
 const membersmodal = ref<HTMLDialogElement | null>(null);
 const selectedMemberIds = ref<string[]>([]);
@@ -42,8 +52,10 @@ const allUsers = ref<User[]>([]);
 const {errorMessage} = useField('assignees');
 
 const memberschema = yup.object({
+    id: yup.string().nullable(),
+    position_id: yup.string().nullable(),
     board_id: yup.mixed().required(),
-    members: yup.array().of(yup.string()).required('Members selection is required.'),
+    members: yup.array().of(yup.string()).nullable(),
 });
 const {
     handleSubmit,
@@ -51,12 +63,16 @@ const {
     setFieldValue,
     values,
 } = useForm<{
+    id: string;
+    position_id: string;
     board_id: string;
     members: string[];
 
 }>({
     validationSchema: memberschema,
     initialValues: {
+        id: '',//member id for update user role
+        position_id: '',
         board_id: boardId,
         members: [],
     },
@@ -77,7 +93,6 @@ const openEditMembersModal = (params: MemberEditParams) => {
 };
 
 
-
 const onSubmit = handleSubmit(async (values, {resetForm}) => {
     try {
         setFieldValue('members', selectedMemberIds.value);
@@ -87,8 +102,14 @@ const onSubmit = handleSubmit(async (values, {resetForm}) => {
         };
         if (action.value === 'create') {
             await useCreateMemberRequest(payload, boardId);
-        } else {
+        } else if(action.value === 'edit') {
             await useUpdateMemberRequest(payload, boardId);
+        } else if(action.value === 'position') {
+            const payload: MemberPositionRequestPayload = {
+                id: values.id,
+                position_id: values.position_id,
+            };
+            await useUpdateMemberPositionRequest(payload, boardId);
         }
         await fetchBoardMembers();
         reset();
@@ -108,17 +129,26 @@ const reset = () => {
     showCreate.value = false;
     selectedMemberIds.value = [];
     setFieldValue('members', []);
+    setFieldValue('position_id', '');
 };
 
-const getBoardMembers = () => {
-    return useQuery({
-        queryKey: ['getBoardMembersKey', boardId],
-        queryFn: async () => {
-            const response = await useGetBoardMembersRequest(boardId, {paginate: 'false'});
-            return response.data;
-        },
-    });
+const getIconForPosition = (position: string) => {
+    const iconMap: Record<string, string> = {
+        member: 'fa fa-user',
+        system: 'fa fa-cogs',
+        admin: 'fa fa-user-shield',
+        ceo: 'fa fa-user-tie',
+        'company chairman': 'fa fa-chess-king',
+        'company secretary': 'fa fa-user-secret',
+        chairperson: 'fa fa-users',
+        secretary: 'fa fa-user-circle',
+        guest: 'fa fa-user-tag',
+        observer: 'fa fa-binoculars',
+        owner: 'fa fa-crown',  // Adding the icon for Owner
+    };
+    return iconMap[position.toLowerCase()] || 'fa fa-user';
 };
+
 
 
 const Users = computed(() => {
@@ -142,40 +172,114 @@ onMounted(async () => {
     window.dispatchEvent(new CustomEvent('updateTitle', {detail: 'Members'}));
     getUsers();
 });
+const getBoardMembers = () => {
+    return useQuery({
+        queryKey: ['getBoardMembersKey', boardId],
+        queryFn: async () => {
+            const response = await useGetBoardMembersRequest(boardId, {paginate: 'false'});
+            // console.log('response.data', response.data);
+            return response.data;
+        },
+    });
+};
 const {isLoading, data: Members, refetch: fetchBoardMembers} = getBoardMembers();
+
+// Fetch positions once and pass to child components
+const allPositions = ref<Position[]>([]);
+const getPositions = async () => {
+    const data = await useGetPositionsRequest({paginate: 'false'});
+    allPositions.value = data.data;
+};
+onMounted(async () => {
+    await getPositions();
+});
+const handlePositionUpdated = (event: { memberId: string; positionId: string }) => {
+    reset();
+    action.value = 'position';
+    setFieldValue('id', event.memberId);
+    setFieldValue('position_id', event.positionId);
+    onSubmit();
+};
+
+
+
+const roleIcon = ((roleType:string) => {
+    return `mr-2 fa ${mapIconToRole(roleType)}`;
+});
 
 </script>
 <template>
-    <div class="row">
-        <div class="col-md-12">
-            <div class="card card-widget">
-                <div class="card-header">
-                    <h1 class="h2 mb-2 lg:mb-0">Meeting Participants</h1>
-                    <!-- /.user-block -->
-                    <div class="card-tools">
-                        <button type="button" @click.prevent="openEditMembersModal(
+    <div class="card">
+        <div class="card-header flex items-center">
+            <h2 class="card-header-title h3">Board Members</h2>
+            <div class="ml-auto flex items-center space-x-2">
+                <button class="btn btn-secondary btn-sm"
+                        @click.prevent="openEditMembersModal(
                             {
                                 members: Members
-                            })" class="btn btn-tool">
-                            <i class="far fa fa-plus mr-2 "></i>
-                        </button>
-                    </div>
-                    <!-- /.card-tools -->
-                </div>
-                <!-- /.card-header -->
-                <div class="card-body">
-                    <ul class="products-list product-list-in-card pl-2 pr-2"  v-if="Members">
-                        <li class="item" v-for="member in Members" :key="member?.id">
-                            <div class="product-info" v-if=" member.user">
-                                <div class="product-title">{{ member.user.full_name }}
+                            })">
+                    Update Members
+                </button>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <div id="member-list">
+                <table class="table table-striped card-table">
+                    <thead>
+                        <tr>
+                            <th scope="col">
+                                <button class="btn btn-link btn-sm list-sort asc" data-sort="user-name">Name</button>
+                            </th>
+                            <th scope="col">
+                                <button class="btn btn-link btn-sm list-sort" data-sort="board-role">Board Role</button>
+                            </th>
+                            <th scope="col" class="text-justify">
+                                <button class="btn btn-link btn-sm list-sort" data-sort="admin">Board Position</button>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="list" v-if="Members">
+                        <tr v-for="(member, idx) in Members" :key="idx">
+                            <td class="user-name" data-name="Felix Nyariki">
+                                <div class="flex items-center space-x-3" v-if=" member.user">
+                                    <div class="avatar avatar-sm">
+                                        <img
+                                            class="far fa-user avatar-img rounded-full"
+                                            role="img"
+                                            data-uw-rm-alt="ALT"
+                                        />
+                                    </div>
+                                    <h3 class="m-2">
+                                        {{ member.user.full_name}}
+                                    </h3>
                                 </div>
-                            </div>
-                        </li>
-                    </ul>
-                </div>
+                            </td>
+                            <td class="role lg:text-center">
+                                <div class="flex justify">
+                                    <div>
+                                        <i :class="roleIcon(member.user.roles[0]?.type)" class="mr-2"></i> 
+                                        {{ member.user.roles[0].name }}
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="role lg:text-center">
+                                <div class="flex justify">
+                                    <MemberPosition
+                                        :member="member"
+                                        :positions="allPositions"
+                                        :disableRemotePosition="0"
+                                        @position-updated="handlePositionUpdated"
+                                    />
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
+
     <div class="flex justify-center col-md-6">
         <dialog id="membersmodal" class="modal" ref="membersmodal">
             <form method="dialog" class="modal-box rounded-xl">
@@ -224,6 +328,42 @@ const {isLoading, data: Members, refetch: fetchBoardMembers} = getBoardMembers()
 .btn-info {
   background-color: #17a2b8;
   color: #fff;
+}
+th button.list-sort {
+    background-color: #f9fbfd;
+    color: #4b6c92;
+    font-size: .8125rem;
+    font-weight: 600;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+}
+.avatar-sm {
+    font-size: .8333333333rem;
+    height: 2.5rem;
+    width: 2.5rem;
+}
+.avatar {
+    display: inline-block;
+    font-size: 1rem;
+    height: 3rem;
+    position: relative;
+    width: 3rem;
+}
+.rounded-full {
+    border-radius: 9999px;
+}
+.avatar-img {
+    height: 100%;
+    -o-object-fit: cover;
+    object-fit: cover;
+    width: 100%;
+}
+img {
+    display: block;
+    max-width: 100%;
+}
+img, svg {
+    vertical-align: middle;
 }
 </style>
 

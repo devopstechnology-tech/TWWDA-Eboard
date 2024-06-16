@@ -2,7 +2,7 @@ import {notify} from '@kyvg/vue3-notification';
 import Qs from 'qs';
 import useClient from '@/common/api/client';
 import {boardMembersRoute} from '@/common/api/member_routes';
-import {Member, MemberRequestPayload, MemberRoleRequestPayload, nonPaginateResponse} from '@/common/parsers/memberParser';
+import {Member, MemberRequestPayload, MemberPositionRequestPayload, nonPaginateResponse} from '@/common/parsers/memberParser';
 import {Meta} from '@/common/types/types';
 
 //get board memmbers
@@ -28,10 +28,10 @@ export async function useUpdateMemberRequest(payload: MemberRequestPayload, id: 
         json: payload,
     }).json();
 }
-export async function useUpdateMemberRoleRequest(payload: MemberRoleRequestPayload, id: string | null) {
+export async function useUpdateMemberPositionRequest(payload: MemberPositionRequestPayload, id: string | null) {
     const client = useClient();
 
-    await client.post(boardMembersRoute() + '/update/member/role/' + id, {
+    await client.post(boardMembersRoute() + '/update/member/position/' + id, {
         json: payload,
     }).json();
 }

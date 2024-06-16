@@ -27,24 +27,24 @@ class AgendaController extends Controller
 
         return $this->response(Response::HTTP_OK, __('messages.records-fetched'), $agenda, Agenda::class);
     }
-    public function latestmeetingagendas(): JsonResponse
+    public function latestscheduleagendas(): JsonResponse
     {
         // $this->authorize('viewAny', Agenda::class);
-        $agendas = $this->agendaRepository->getlatestMeetingAgendas();
+        $agendas = $this->agendaRepository->getlatestScheduleAgendas();
 
         return $this->response(Response::HTTP_OK, __('messages.records-fetched'), $agendas, Agenda::class);
     }
-    public function acceptlatestmeetingagendas($oldmeeting, $newmeeting): JsonResponse
+    public function acceptlatestscheduleagendas($oldschedule, $newschedule): JsonResponse
     {
         // $this->authorize('viewAny', Agenda::class);
-        $agendas = $this->agendaRepository->AcceptLatestMeetingAgendas($oldmeeting, $newmeeting);
+        $agendas = $this->agendaRepository->AcceptLatestScheduleAgendas($oldschedule, $newschedule);
 
         return $this->response(Response::HTTP_OK, __('messages.records-fetched'), $agendas, Agenda::class);
     }
-    public function meetingagendas($meeting): JsonResponse
+    public function scheduleagendas($schedule): JsonResponse
     {
         // $this->authorize('viewAny', Agenda::class);
-        $agenda = $this->agendaRepository->getMeetingAgendas($meeting);
+        $agenda = $this->agendaRepository->getScheduleAgendas($schedule);
 
         return $this->response(Response::HTTP_OK, __('messages.records-fetched'), $agenda, Agenda::class);
     }
@@ -57,17 +57,17 @@ class AgendaController extends Controller
         return $this->response(Response::HTTP_OK, __('messages.record-fetched'), $agenda, Agenda::class);
     }
 
-    public function store(CreateAgendaRequest $request, $meeting): JsonResponse
+    public function store(CreateAgendaRequest $request, $schedule): JsonResponse
     {
         // $this->authorize('create', [Agenda::class]);
-        $agenda = $this->agendaRepository->create($meeting, $request->validated());
+        $agenda = $this->agendaRepository->create($schedule, $request->validated());
 
         return $this->response(Response::HTTP_CREATED, __('messages.record-created'), $agenda, Agenda::class);
     }
-    public function createsubagenda(CreateSubAgendaRequest $request, $meeting): JsonResponse
+    public function createsubagenda(CreateSubAgendaRequest $request, $schedule): JsonResponse
     {
         // $this->authorize('create', [Agenda::class]);
-        $agenda = $this->agendaRepository->createSubAgenda($meeting, $request->validated());
+        $agenda = $this->agendaRepository->createSubAgenda($schedule, $request->validated());
 
         return $this->response(Response::HTTP_CREATED, __('messages.record-created'), $agenda, Agenda::class);
     }

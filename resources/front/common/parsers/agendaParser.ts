@@ -6,7 +6,7 @@ import {SubAgenda, subagendaParser} from '@/common/parsers/subagendaParser';
 
 export const agendaRequestParser = object({
     id:string(), //from db
-    meeting_id:string(), //from db
+    schedule_id:string(), //from db
     title: string(),
     duration: number(),
     description: string(),
@@ -18,7 +18,7 @@ export const agendaRequestParser = object({
 
 export interface AgendaRequestPayload{ //to db
     title: string,
-    meeting_id: string,
+    schedule_id: string,
     duration: number | null,
     description: string | null,
     agenda_id: string | null,

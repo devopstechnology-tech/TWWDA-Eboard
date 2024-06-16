@@ -17,6 +17,7 @@ return new class () extends Migration {
             $table->uuid('id')->primary();
             $table->string('description')->nullable();
             $table->string('status')->default(StatusEnum::Inactive->value);
+            $table->string('board_id')->nullable();
             $table->string('meeting_id')->nullable();
             $table->softDeletes();
             $table->timestamps();

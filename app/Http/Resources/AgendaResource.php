@@ -29,8 +29,8 @@ class AgendaResource extends BaseResource
             'title' => $this->resource->title,
             'description' => $this->resource->description,
             'duration' => $this->resource->duration,
-            'meeting_id' => $this->resource->meeting_id,
-            'meeting' => $this->resource->meeting,
+            'schedule_id' => $this->resource->schedule_id,
+            'schedule' => $this->resource->schedule,
             'assignees' => $this->resource->assignees,
             'children' => $this->resource->children,
         ];

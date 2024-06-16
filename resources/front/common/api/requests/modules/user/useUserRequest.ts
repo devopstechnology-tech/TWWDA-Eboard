@@ -13,6 +13,11 @@ export async function useGetUsersRequest(options?: object):Promise<nonPaginateRe
     const cn = Qs.stringify(options, {arrayFormat: 'brackets'});
     return await client.get(userRoute() + '?' + cn).json();
 }
+export async function useGetTrashedUsersRequest(options?: object):Promise<nonPaginateResponse>{
+    const client = useClient();
+    const cn = Qs.stringify(options, {arrayFormat: 'brackets'});
+    return await client.get(userRoute() + '/trashedusers'+ '?' + cn).json();
+}
 
 
 
@@ -40,13 +45,26 @@ export async function useUpdateProfileUserRequest(payload: AcceptInviteRequestPa
     });
     return response.json();
 }
-// export async function useDeleteUserRequest(payload: UserRequestPayload, id: string){
-//     const client = useClient();
-//     const response = await client.patch(userRoute() + '/delete/' + id ,{
-//         json: payload,
-//     });
-//     return response.json();
-// }
+// update via users update
+export async function useUpdateUserRoleRequest(payload: UserRequestPayload, userId:string){
+    const client = useClient();
+    const response = await client.post(userRoute() + '/role/update/' + userId ,{
+        json: payload,
+    });
+    return response.json();
+}
+export async function useDeleteUserRequest(id: string){
+    const client = useClient();
+    await client.post(userRoute() + '/delete/' + id);
+}
+export async function useRestoreDeleteUserRequest(id: string){
+    const client = useClient();
+    await client.post(userRoute() + '/restore/delete/' + id);
+}
+export async function useForceDeleteUserRequest(id: string){
+    const client = useClient();
+    await client.post(userRoute() + '/force/delete/' + id);
+}
 
 
 // acceprt invitation with otp direct login

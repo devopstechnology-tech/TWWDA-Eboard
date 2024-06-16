@@ -36,23 +36,23 @@ class Board extends BaseModel
     protected $appends = [
         'tempUserIds',
         'tempMemberUpdates',
-        'tempMemberUserId', //for rol update on board/commitie member
-        'tempMemberRole', //for rol update on board/commitie member
+        'tempMemberId', //for position update on board/commitie member
+        'tempMemberPosition', //for rol update on board/commitie member
     ];
     protected $hidden = [
         'tempUserIds',
         'tempMemberUpdates',
-        'tempMemberUserId',
-        'tempMemberRole',
+        'tempMemberId',
+        'tempMemberPosition',
     ];   // Ensure it doesn't appear in model's array/json output
 
     private $tempUserIds = [];
 
     public $tempMemberUpdates = [];
 
-    private $tempMemberUserId = '';
+    private $tempMemberId = '';
 
-    public $tempMemberRole = '';
+    public $tempMemberPosition = '';
 
     public function setTempUserIdsAttribute($value)
     {
@@ -76,27 +76,27 @@ class Board extends BaseModel
         return $this->tempMemberUpdates;
     }
 
-    public function settempMemberUserIdAttribute($value)
+    public function settempMemberIdAttribute($value)
     {
-        $this->tempMemberUserId = $value;
+        $this->tempMemberId = $value;
     }
 
 
-    public function gettempMemberUserIdAttribute()
+    public function gettempMemberIdAttribute()
     {
-        return $this->tempMemberUserId;
+        return $this->tempMemberId;
     }
     //observer item
     //for use in observer since we cant access request data in observer 
     //this from request array 
-    public function settempMemberRoleAttribute($value)
+    public function settempMemberPositionAttribute($value)
     {
-        $this->tempMemberRole = $value;
+        $this->tempMemberPosition = $value;
     }
 
-    public function gettempMemberRoleAttribute()
+    public function gettempMemberPositionAttribute()
     {
-        return $this->tempMemberRole;
+        return $this->tempMemberPosition;
     }
 
 

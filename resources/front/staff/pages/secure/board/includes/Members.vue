@@ -6,13 +6,15 @@ import VueDatePicker from '@vuepic/vue-datepicker';
 import {formatISO,parseISO} from 'date-fns';
 import {useField, useForm} from 'vee-validate';
 import {computed,onMounted,ref} from 'vue';
-import {useRoute} from 'vue-router';
+import {useRoute, useRouter} from 'vue-router';
 import * as yup from 'yup';
 import {
     useCreateMemberRequest,
     useGetBoardMembersRequest,
+    useUpdateMemberPositionRequest,
     useUpdateMemberRequest,
-    useUpdateMemberRoleRequest} from '@/common/api/requests/modules/member/useMemberRequest';
+} from '@/common/api/requests/modules/member/useMemberRequest';
+import {useGetPositionsRequest} from '@/common/api/requests/modules/member/usePositionRequest';
 import{useGetStaffsRequest}from '@/common/api/requests/staff/useStaffRequest';
 import FormDateInput from '@/common/components/FormDateInput.vue';
 import FormDateTimeInput from '@/common/components/FormDateTimeInput.vue';
@@ -23,17 +25,26 @@ import FormTextBox from '@/common/components/FormTextBox.vue';
 import LoadingComponent from '@/common/components/LoadingComponent.vue';
 import SimpleTable from '@/common/components/Tables/SimpleTable.vue';
 import useUnexpectedErrorHandler from '@/common/composables/useUnexpectedErrorHandler';
-import {formattedDate,loadImage,test,truncateDescription} from '@/common/customisation/Breadcrumb';
+import {
+    formattedDate,
+    loadAvatar,
+    loadImage,    mapIconToRole,
+    test,
+    truncateDescription,
+    formattedDateTime, 
+} from '@/common/customisation/Breadcrumb';
 import ValidationError from '@/common/errors/ValidationError';
-import {Member, MemberEditParams,MemberRequestPayload,MemberRoleRequestPayload,SelectedResult} from '@/common/parsers/memberParser';
+import {Member, MemberEditParams,MemberPositionRequestPayload,MemberRequestPayload,SelectedResult} from '@/common/parsers/memberParser';
+import {Position} from '@/common/parsers/positionParser';
 import {User} from '@/common/parsers/userParser';
 import {Meta} from '@/common/types/types';
-import MemberRole from '@/staff/pages/secure/board/includes/MemberRole.vue';
+import MemberPosition from '@/staff/pages/secure/board/includes/MemberPosition.vue';
 import Multiselect from '@@/@vueform/multiselect';
 
 //constants
-const handleUnexpectedError = useUnexpectedErrorHandler();
 const route = useRoute();
+const router = useRouter();
+const handleUnexpectedError = useUnexpectedErrorHandler();
 const action = ref('create');
 const boardId = route.params.boardId as string;
 const showCreate = ref(false);
@@ -45,7 +56,7 @@ const {errorMessage} = useField('assignees');
 
 const memberschema = yup.object({
     id: yup.string().nullable(),
-    role: yup.string().nullable(),
+    position_id: yup.string().nullable(),
     board_id: yup.mixed().required(),
     members: yup.array().of(yup.string()).nullable(),
 });
@@ -56,7 +67,7 @@ const {
     values,
 } = useForm<{
     id: string;
-    role: string;
+    position_id: string;
     board_id: string;
     members: string[];
 
@@ -64,6 +75,7 @@ const {
     validationSchema: memberschema,
     initialValues: {
         id: '',//member id for update user role
+        position_id: '',
         board_id: boardId,
         members: [],
     },
@@ -83,16 +95,6 @@ const openEditMembersModal = (params: MemberEditParams) => {
     membersmodal.value?.showModal();
 };
 
-const handleRoleUpdated = (event: { userId: string; role: string }) => {
-    reset();
-    action.value = 'role';
-    setFieldValue('id', event.userId);
-    setFieldValue('role', event.role);
-    onSubmit();
-};
-
-
-
 
 const onSubmit = handleSubmit(async (values, {resetForm}) => {
     try {
@@ -105,12 +107,12 @@ const onSubmit = handleSubmit(async (values, {resetForm}) => {
             await useCreateMemberRequest(payload, boardId);
         } else if(action.value === 'edit') {
             await useUpdateMemberRequest(payload, boardId);
-        } else if(action.value === 'role') {
-            const payload: MemberRoleRequestPayload = {
+        } else if(action.value === 'position') {
+            const payload: MemberPositionRequestPayload = {
                 id: values.id,
-                role: values.role,
+                position_id: values.position_id,
             };
-            await useUpdateMemberRoleRequest(payload, boardId);
+            await useUpdateMemberPositionRequest(payload, boardId);
         }
         await fetchBoardMembers();
         reset();
@@ -130,6 +132,7 @@ const reset = () => {
     showCreate.value = false;
     selectedMemberIds.value = [];
     setFieldValue('members', []);
+    setFieldValue('position_id', '');
 };
 
 const getIconForPosition = (position: string) => {
@@ -184,6 +187,41 @@ const getBoardMembers = () => {
 };
 const {isLoading, data: Members, refetch: fetchBoardMembers} = getBoardMembers();
 
+// Fetch positions once and pass to child components
+const allPositions = ref<Position[]>([]);
+const getPositions = async () => {
+    const data = await useGetPositionsRequest({paginate: 'false'});
+    allPositions.value = data.data;
+};
+onMounted(async () => {
+    await getPositions();
+});
+const handlePositionUpdated = (event: { memberId: string; positionId: string }) => {
+    reset();
+    action.value = 'position';
+    setFieldValue('id', event.memberId);
+    setFieldValue('position_id', event.positionId);
+    onSubmit();
+};
+const openUserProfile = (user: User) => {
+    router.push({
+        name: 'ProfileDetails',  // The name of the route to navigate to
+        params: {
+            userId: user.id,
+            profileId: user.profile.id,
+        },
+    });
+};
+
+const onDeleteMember = async (id: string) => {
+    await useDeleteMemberRequest(id);
+    await fetchBoardMembers();
+};
+
+const roleIcon = ((roleType:string) => {
+    return `mr-2 fa ${mapIconToRole(roleType)}`;
+});
+
 </script>
 <template>
     <div class="card">
@@ -199,66 +237,66 @@ const {isLoading, data: Members, refetch: fetchBoardMembers} = getBoardMembers()
                 </button>
             </div>
         </div>
-
-        <div class="table-responsive">
-            <div id="member-list">
-                <table class="table table-striped card-table">
-                    <thead>
-                        <tr>
-                            <th scope="col">
-                                <button class="btn btn-link btn-sm list-sort asc" data-sort="user-name">Name</button>
-                            </th>
-                            <th scope="col">
-                                <button class="btn btn-link btn-sm list-sort" data-sort="board-role">Board Role</button>
-                            </th>
-                            <th scope="col" class="text-justify">
-                                <button class="btn btn-link btn-sm list-sort" data-sort="admin">Board Position</button>
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody class="list" v-if="Members">
-                        <tr v-for="(member, idx) in Members" :key="idx">
-                            <td class="user-name" data-name="Felix Nyariki">
-                                <div class="flex items-center space-x-3" v-if=" member.user">
-                                    <div class="avatar avatar-sm">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-lg-3 col-md-4 col-sm-6 mb-3" v-for="(member, idx) in Members" :key="idx">
+                    <div class="card card-outline card-primary h-100">
+                        <div class="card-body box-profile">
+                            <div class="text-center">
+                                <!-- Image and User Info Column -->
+                                <!-- <div class="avatar avatar-md mb-3">
+                                    <a href="" >
                                         <img
-                                            class="far fa-user avatar-img rounded-full"
+                                            class="profile-user-img img-fluid img-circle"
+                                            :src="loadAvatar(member.user.profile.avatar)"
                                             role="img"
                                             data-uw-rm-alt="ALT"
                                         />
-                                    </div>
-                                    <h3 class="m-2">
-                                        {{ member.user.full_name}}
-                                    </h3>
+                                    </a>
+                                </div> -->
+                                <h3 class="profile-username text-center text-primary">
+                                    <a href="" @click.prevent="openUserProfile(member.user)">
+                                        {{ member.user.full_name }}
+                                    </a>
+                                    <button type="button" @click.prevent="openUserProfile(member.user)"
+                                            title="" class="mx-2 btn btn-sm btn-primary">
+                                        <i class="far fa-eye"></i>
+                                    </button>
+                                    <!-- <button v-show="member.user.role !== 'Super Admin'" 
+                                            type="button" @click.prevent="onDeleteMember(member.id)"
+                                            title="" class="mx-2 btn btn-sm btn-primary">
+                                        <i class="fa fa-trash mr-1"></i>
+                                    </button> -->
+                                </h3>
+                                <p class="text-muted text-center text-bold">{{ member.position.name }}</p>
+                            </div>
+                            <!-- Action Column -->
+                            <div class="mt-3">
+                                <div class="text-bold text-danger text-center mb-1" >
+                                    Position
                                 </div>
-                            </td>
-                            <td class="role lg:text-center">
-                                <div class="flex justify">
-                                    <MemberRole
-                                        :user="member.user"
-                                        :disableRemoteRole="0"
-                                        @role-updated="handleRoleUpdated"
+                                <div class="text-center">
+                                    <MemberPosition
+                                        :member="member"
+                                        :positions="allPositions"
+                                        :disableRemotePosition="0"
+                                        @position-updated="handlePositionUpdated"
                                     />
                                 </div>
-                            </td>
-
-
-                            <td class="admin text-justify" data-admin="0">
-                                <!-- <p class="my-0 leading-none p-2 mx-auto" v-if="member.position === 'Owner'">
-                                    Group Owner
-                                </p>
-                                <p class="my-0 leading-none p-2 mx-auto" v-else>
-                                    {{ member.position }}
-                                </p> -->
-                                <i :class="getIconForPosition(member.position)"></i>
-                                {{ member.position }}
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+                            </div>
+                            <!-- Last Updated Column -->
+                            <div class="mt-3">
+                                <div class="text-bold text-danger text-center mb-1">
+                                    Last Updated
+                                </div>
+                                <p class="text-center text-primary text-small">{{ formattedDateTime(member.updated_at, null) }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
+    </div>>
 
     <div class="flex justify-center col-md-6">
         <dialog id="membersmodal" class="modal" ref="membersmodal">

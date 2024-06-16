@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use Carbon\Carbon;
+use App\Traits\Types;
 use App\Traits\Uuids;
 use App\Traits\Loggable;
 use App\Models\BaseModel;
@@ -62,6 +63,7 @@ class User extends BaseModel implements AuthenticatableContract, AuthorizableCon
     use HasApiTokens {
         HasApiTokens::createToken as createBaseToken;
     }
+    use Types;
 
     use RequiresApproval;
     use SoftDeletes;

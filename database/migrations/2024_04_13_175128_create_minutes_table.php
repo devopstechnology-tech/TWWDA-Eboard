@@ -3,9 +3,10 @@
 declare(strict_types=1);
 
 use App\Enums\PublishEnum;
-use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
+use App\Enums\ApprovalEnum;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 return new class () extends Migration {
     /**
@@ -15,11 +16,13 @@ return new class () extends Migration {
     {
         Schema::create('minutes', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->string('meeting_id')->nullable();
+            $table->string('schedule_id')->nullable();
             $table->string('board_id')->nullable();
             $table->string('committee_id')->nullable();
             $table->string('membership_id')->nullable();//author
+            $table->string('approvalstatus')->default(ApprovalEnum::Default->value);//published or unpublished
             $table->string('status')->default(PublishEnum::Default->value);//published or unpublished
+            $table->string('signatures')->nullable();//published or unpublished
             $table->softDeletes();
             $table->timestamps();
         });

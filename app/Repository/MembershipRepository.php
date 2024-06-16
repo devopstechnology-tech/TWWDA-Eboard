@@ -9,6 +9,7 @@ use App\Models\Module\Board\Board;
 use App\Models\Module\Member\Member;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Module\Meeting\Meeting;
+use App\Models\Module\Meeting\Schedule;
 use App\Models\Module\Member\Membership;
 use App\Http\Resources\MembershipResource;
 use App\Repository\Contracts\AttendanceInterface;
@@ -45,7 +46,7 @@ class MembershipRepository extends BaseRepository implements MembershipInterface
     {
         return Membership::where('user_id', Auth::user()->id)->first();
     }
-    public function create($meeting, $member, array $payload): void
+    public function create($meeting, $member, $schedule, array $payload): void
     {
         //memberable_id
         //memberable_type
@@ -64,11 +65,11 @@ class MembershipRepository extends BaseRepository implements MembershipInterface
         $membership->save();
 
         if ($membership->save()) {
-            $this->attendanceRepository->create($membership);
+            $this->attendanceRepository->create($schedule, $membership);
         }
     }
 
-    public function updateMeetingBoardMemberships(Meeting|string $meeting, Board|string $board, array $payload): Membership
+    public function updateMeetingBoardMemberships(Meeting|string $meeting, Schedule|string $schedule, array $payload): Membership
     {
         $membershipIds = $payload['memberships'] ?? [];
 
@@ -104,10 +105,9 @@ class MembershipRepository extends BaseRepository implements MembershipInterface
                 'memberable_type'   => Meeting::class,
             ]);
             if ($membership) {
-                $this->attendanceRepository->update($membership);
+                $this->attendanceRepository->update($schedule, $membership);
             }
         }
-
 
         $membership = Membership::where('meeting_id', $meeting)->first();
         return $membership;

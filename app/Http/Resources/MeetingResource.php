@@ -30,8 +30,8 @@ class MeetingResource extends BaseResource
                 'details' => $this->meetingable,
             ],
             'folders' => $this->resource->folders,
-            'agendas' => $this->resource->agendas,
-            'attendances' => $this->resource->attendances,
+            // 'agendas' => $this->resource->agendas,
+            // 'attendances' => $this->resource->attendances,
             'schedules' => $this->resource->schedules,
         ];
     }
@@ -40,7 +40,17 @@ class MeetingResource extends BaseResource
     public function short(): array
     {
         return [
-            // Short resource fields here
+            // Base resource fields here
+            'id' => $this->resource->getRouteKey(),
+            'title' => $this->resource->title,
+            'conference' => $this->resource->conference,
+            'link' => $this->resource->link,
+            'location' => $this->resource->location,
+            'type' => $this->resource->type,
+            'status' => $this->resource->status,
+            'description' => $this->resource->description,
+            'owner_id' => $this->resource->owner_id,
+            'owner' => $this->owner->full_name,
         ];
     }
 }

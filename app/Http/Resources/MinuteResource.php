@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Http\Resources;
 
+use App\Http\Resources\MeetingResource;
+use App\Http\Resources\DetailMinuteResource;
 use Sourcetoad\EnhancedResources\Formatting\Attributes\Format;
 use Sourcetoad\EnhancedResources\Formatting\Attributes\IsDefault;
 
@@ -12,42 +14,30 @@ class MinuteResource extends BaseResource
     #[Format, IsDefault]
     public function base(): array
     {
-        // if (!$this->resource->relationLoaded('meeting')) {
-        //     $this->resource->load('meeting');
-        // }
-        // if (!$this->resource->relationLoaded('board')) {
-        //     $this->resource->load('board');//fecthing only user id
-        // }
-        // if (!$this->resource->relationLoaded('committee')) {
-        //     $this->resource->load('committee');//fecthing only user id
-        // }
-        // if (!$this->resource->relationLoaded('membership')) {
-        //     $this->resource->load('membership');//fecthing only user id
-        // }
-        // if (!$this->resource->relationLoaded('detailminutes')) {
-        //     $this->resource->load('detailminutes.subagendas');//fecthing only user id
-        // }
+        if (!$this->resource) {
+            return []; // or return a default array structure
+        }
 
         return [
-            // Base resource fields here
             'id' => $this->resource->getRouteKey(),
-            'meeting_id' => $this->resource->meeting_id,
-            'board_id' => $this->resource->board_id,
-            'committee_id' => $this->resource->committee_id,
+            'schedule_id' => $this->resource->schedule_id,
+            'schedule' => $this->resource->schedule,
+            'meeting' => $this->resource->schedule ? (new MeetingResource($this->resource->schedule->meeting))->format('short') : null,
             'membership_id' => $this->resource->membership_id,
             'status' => $this->resource->status,
-            //
-            // 'meeting' =>$this->resource->meeting,
-            // 'board' =>$this->resource->board,
-            // 'committee' =>$this->resource->committee,
-            // 'membership' =>$this->resource->membership,
-            'detailminutes' => DetailMinuteResource::collection($this->resource->detailminutes)->format('short'),
+            'author' => $this->resource->author,
+            'detailminutes' => DetailMinuteResource::collection($this->resource->detailminutes ?? collect())->format('short'),
+            'minuteReviews' => MinuteReviewResource::collection($this->resource->minuteReviews ?? collect())->format('short'),
         ];
     }
 
     #[Format('short')]
     public function short(): array
     {
+        if (!$this->resource) {
+            return []; // or return a default array structure
+        }
+
         return [
             // Short resource fields here
         ];

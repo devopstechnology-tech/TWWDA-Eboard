@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Enums\RSVPEnum;
 use App\Enums\AttendanceEnum;
 use App\Repository\BaseRepository;
+use App\Models\Module\Meeting\Schedule;
 use App\Models\Module\Member\Attendance;
 use App\Models\Module\Member\Membership;
 use App\Http\Resources\AttendanceResource;
@@ -18,13 +19,13 @@ class AttendanceRepository extends BaseRepository implements AttendanceInterface
         return [
             'membership.user.profile',
             'membership.member',
-            'meeting',
+            'schedule',
         ];
     }
     public function getAll()
     {
         // membership
-        // meeting
+        // schedule
         $filters = [
             // 'owner_id' => Auth::user()->id,
             'with' => $this->relationships(),
@@ -32,36 +33,39 @@ class AttendanceRepository extends BaseRepository implements AttendanceInterface
         ];
         return $this->indexResource(Attendance::class, AttendanceResource::class, $filters);
     }
-    public function getMeetingAttendances($meeting)
+    public function getScheduleAttendances($schedule)
     {
         // $filters = [
-        //     'meeting_id' => $meeting,
+        //     'schedule_id' => $schedule,
         //     'with' => $this->relationships(),
         //     'orderBy' => ['field' => 'id', 'direction' => 'asc']
         // ];
         // return $this->indexResource(Task::class, TaskResource::class, $filters);
         // dd(Attendance::get());
         $filters = [
-            'meeting_id' => $meeting,
+            'schedule_id' => $schedule,
             'with' => $this->relationships(),
             'orderBy' => ['field' => 'created_at', 'direction' => 'asc']
         ];
         return $this->indexResource(Attendance::class, AttendanceResource::class, $filters);
     }
-    public function create(Membership | string $membership)
+    public function create(Schedule | string $schedule, Membership | string $membership)
     {
         $attendance = new Attendance();
-        $attendance->meeting_id        = $membership->meeting_id;
+        $attendance->schedule_id       = $schedule->id;
         $attendance->membership_id     = $membership->id;
         $attendance->rsvp_status       = RSVPEnum::Default->value;
         $attendance->attendance_status = AttendanceEnum::Default->value;
         $attendance->save();
         return $attendance;
     }
-    public function update(Membership | string $membership)
+    public function update(Schedule | string $schedule, Membership | string $membership)
     {
+        if (!($schedule instanceof Schedule)) {
+            $schedule = Schedule::findOrFail($schedule);
+        }
         $attendance = new Attendance();
-        $attendance->meeting_id        = $membership->meeting_id;
+        $attendance->schedule_id       = $schedule->id;
         $attendance->membership_id     = $membership->id;
         $attendance->rsvp_status       = RSVPEnum::Default->value;
         $attendance->attendance_status = AttendanceEnum::Default->value;
@@ -94,7 +98,7 @@ class AttendanceRepository extends BaseRepository implements AttendanceInterface
     {
         return Attendance::whereIn('membership_id', $oldMembershipIds)->forceDelete();
     }
-    public function destroyMeetingAttendance(Attendance | string $attendance)
+    public function destroyScheduleAttendance(Attendance | string $attendance)
     {
     }
 }

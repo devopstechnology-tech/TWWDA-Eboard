@@ -554,6 +554,9 @@ function getDayWithSuffix(day: number): string {
 }
 
 export function formatDate(dateStr: string): string {
+    if (!dateStr) {
+        dateStr = '1901-01-01'; // Placeholder date
+    }
     // Parse the date string in DD-MM-YYYY format
     const [day, month, year] = dateStr.split('-').map(Number);
 
@@ -562,7 +565,7 @@ export function formatDate(dateStr: string): string {
 
     // Extract the day, month, and year components
     const dayWithSuffix = getDayWithSuffix(day);
-    const options: Intl.DateTimeFormatOptions = { month: 'long', year: 'numeric' };
+    const options: Intl.DateTimeFormatOptions = {month: 'long', year: 'numeric'};
     const formattedMonthYear = date.toLocaleDateString('en-US', options);
 
     // Construct the desired format
@@ -695,7 +698,7 @@ function parseDate(dateStr: string): Date {
 // Function to format dates as 'x days/months/years ago' or 'in x days/months/years'
 export function formatDateAgo(dateString: string) {
     const date = parseDate(dateString);
-    return formatDistanceToNow(date, { addSuffix: true });
+    return formatDistanceToNow(date, {addSuffix: true});
 }
 
 export function FormattedAgo(endDate: string) {
@@ -704,10 +707,10 @@ export function FormattedAgo(endDate: string) {
 }
 
 // Example usage:
-const readableAgo = FormattedAgo("02-09-2024");
+const readableAgo = FormattedAgo('02-09-2024');
 console.log(readableAgo); // e.g., "in 3 months"
 
-const readableAgoISO = FormattedAgo("2024-08-15T07:27:00.000Z");
+const readableAgoISO = FormattedAgo('2024-08-15T07:27:00.000Z');
 console.log(readableAgoISO); // e.g., "in 2 months"
 
 // export function getYearFromDate(dateString: string): string {
@@ -727,13 +730,13 @@ console.log(readableAgoISO); // e.g., "in 2 months"
 export function getYearFromDate(dateString: string): string {
     const [day, month, year] = dateString.split('-').map(Number);
     const date = new Date(year, month - 1, day);
-    return new Intl.DateTimeFormat('en-US', { year: 'numeric' }).format(date);
+    return new Intl.DateTimeFormat('en-US', {year: 'numeric'}).format(date);
 }
 
 export function getMonthAbbreviation(dateString: string): string {
     const [day, month, year] = dateString.split('-').map(Number);
     const date = new Date(year, month - 1, day);
-    return new Intl.DateTimeFormat('en-US', { month: 'short' }).format(date).toUpperCase();
+    return new Intl.DateTimeFormat('en-US', {month: 'short'}).format(date).toUpperCase();
 }
 
 export function getDayFromDate(dateString: string): string {
@@ -789,3 +792,17 @@ export function formatMoney(money:number | string, currency:string ): string {
     return `${currency} ${formatter.format(numericValue)}`;
 }
   
+export const mapIconToRole = (type: string) => {
+    const iconMap: { [key: string]: string } = {
+        system: 'fa-cogs',
+        admin: 'fa-user-shield',
+        ceo: 'fa-user-tie',
+        companychairman: 'fa-chess-king',
+        companysecretary: 'fa-user-secret',
+        chairperson: 'fa-users',
+        secretary: 'fa-user-circle',
+        guest: 'fa-user-tag',
+        observer: 'fa-binoculars',
+    };
+    return iconMap[type.toLowerCase()] || 'fa-user'; // Default icon
+};

@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\Controller;
-use App\Models\Module\Meeting\Meeting;
+use App\Models\Module\Meeting\Schedule;
 use App\Models\Module\Member\Attendance;
 use App\Http\Requests\CreateAttendanceRequest;
 use App\Http\Requests\UpdateAttendanceRequest;
@@ -26,16 +26,16 @@ class AttendanceController extends Controller
 
         return $this->response(Response::HTTP_OK, __('messages.records-fetched'), $attendances, Attendance::class);
     }
-    public function show($meeting): JsonResponse
+    public function show($schedule): JsonResponse
     {
-        $attendances = $this->attendanceRepository->getMeetingAttendances($meeting);
+        $attendances = $this->attendanceRepository->getScheduleAttendances($schedule);
 
         return $this->response(Response::HTTP_OK, __('messages.records-fetched'), $attendances, Attendance::class);
     }
 
-    public function store(CreateAttendanceRequest $request, Meeting $meeting): JsonResponse
+    public function store(CreateAttendanceRequest $request, Schedule $schedule): JsonResponse
     {
-        $attendance = $this->attendanceRepository->creatersvp($meeting, $request->validated());
+        $attendance = $this->attendanceRepository->creatersvp($schedule, $request->validated());
 
         return $this->response(Response::HTTP_OK, __('messages.records-fetched'), $attendance, Attendance::class);
     }
@@ -66,7 +66,7 @@ class AttendanceController extends Controller
     }
     public function destroy(Attendance $attendance): JsonResponse
     {
-        $attendance = $this->attendanceRepository->destroyMeetingAttendance($attendance);
+        $attendance = $this->attendanceRepository->destroyScheduleAttendance($attendance);
 
         return $this->response(Response::HTTP_OK, __('messages.records-fetched'), $attendance, Attendance::class);
     }

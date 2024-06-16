@@ -141,6 +141,8 @@ class UserSeeder extends Seeder
                 'phone'              => $user['phone'],
                 'idpassportnumber'   => $user['idpassportnumber'],
                 'title'              => $user['role'],
+                'appointment_date'   => '02-02-2024',
+                'appointment_end_date'=> '02-02-2030',
             ]);
         }
         //self update

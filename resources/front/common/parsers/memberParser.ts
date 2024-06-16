@@ -2,6 +2,7 @@
 import {icon} from '@fortawesome/fontawesome-svg-core';
 import {array, nullable, number, object, output, string} from 'zod';
 import {userparser} from './userParser';
+import { positionParser } from './positionParser';
 
 export const memberParser = object({
     id: string(),
@@ -10,8 +11,10 @@ export const memberParser = object({
     committee_id:string(),
     guest:string(),
     guest_id:string(),
-    position:string(),
+    position_id:string(),
+    position:positionParser,
     user:userparser,
+    updated_at:string(),
 });
 
 
@@ -27,9 +30,9 @@ export interface MemberRequestPayload{ //to db
     board_id: string,
     members: string[],
 }
-export interface MemberRoleRequestPayload{ //to db update mber usr role
+export interface MemberPositionRequestPayload{ //to db update mber usr role
     id: string,
-    role: string,
+    position_id: string,
 }
 
 //for selcting when filetering users fromdb

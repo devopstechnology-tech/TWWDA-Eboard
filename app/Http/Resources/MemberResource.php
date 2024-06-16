@@ -23,7 +23,10 @@ class MemberResource extends BaseResource
             'guest_id' => $this->resource->guest_id,
             'guest' => $this->resource->guest,
             'position' => $this->resource->position,
+            'position_id' => $this->resource->position_id,
             'user' => $this->resource->user,
+            'updated_at' => $this->resource->updated_at,
+            // 'profile' => (new ProfilResource($this->resource->user->profile))->format('short'),
         ];
     }
 
