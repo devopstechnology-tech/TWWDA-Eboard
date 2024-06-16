@@ -14,7 +14,7 @@ class CreateSubAgendaRequest extends FormRequest
         return [
             // Your rules here
             'title' => RuleSet::create()->required()->string(),
-            'meeting_id' => RuleSet::create()->required()->string(),
+            'schedule_id' => RuleSet::create()->required()->string(),
             'agenda_id' => RuleSet::create()->sometimes()->string(),
         ];
     }

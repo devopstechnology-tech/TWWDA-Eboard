@@ -38,7 +38,7 @@ export async function useUpdateProfileRequest(payload, profileId: string)
     updatedata.append('establishment', payload.establishment);
     updatedata.append('title', payload.title);
     updatedata.append('appointing_authority', payload.appointing_authority);
-    updatedata.append('appointnment_date', payload.appointnment_date);
+    updatedata.append('appointment_date', payload.appointment_date);
     updatedata.append('appointment_letter', payload.appointment_letter);
     updatedata.append('appointment_end_date', payload.appointment_end_date);
     updatedata.append('serving_term', payload.serving_term);

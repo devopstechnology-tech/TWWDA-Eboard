@@ -18,6 +18,7 @@ function goBack() {
 // Extract the id parameter from the route
 const boardId = route.params.boardId as string;
 const meetingId = route.params.meetingId as string;
+const scheduleId = route.params.scheduleId as string;
 
 const fallbackCopyTextToClipboard = (text) => {
     const textArea = document.createElement('textarea');
@@ -77,7 +78,7 @@ const {isLoading, data: Meeting, refetch: fetchMeeting} = getMeeting();
 
 </script>
 <template>
-    <div class="card">
+    <div class="card" v-if="Meeting">
         <div class="card-header flex items-center">
             <h2 class="card-header-title h3">Details</h2>
             <!-- <div class="ml-auto flex items-center space-x-2">
@@ -109,42 +110,30 @@ const {isLoading, data: Meeting, refetch: fetchMeeting} = getMeeting();
             <div class="space-y-6">
                 <div class=" flex items-start">
                     <div class="mr-4 w-6 text-muted">
-                        <svg aria-hidden="true" class="svg-inline--fa fa-calendar-day h-6 w-6"
-                             focusable="false" data-prefix="far" data-icon="calendar-day" role="img"
-                             xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg="">
-                            <path fill="currentColor" d="M128 0c13.3 0 24 10.7 24 24V64H296V24c0-13.3 10.7-24 24-24s24 10.7 24
-                                                    24V64h40c35.3 0 64 28.7 64 64v16 48V448c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V192 144 128C0
-                                                    92.7 28.7 64 64 64h40V24c0-13.3 10.7-24 24-24zM400 192H48V448c0 8.8 7.2 16 16 16H384c8.8 0 16-7.2
-                                                    16-16V192zM112 256h96c8.8 0 16 7.2 16 16v96c0 8.8-7.2 16-16 16H112c-8.8 0-16-7.2-16-16V272c0-8.8
-                                                    7.2-16 16-16z"></path>
-                        </svg>
+                        <i class="fas fa-calendar-day"></i>
                     </div>
                     <div>
                         <div class="h3 mb-0">
                             <p class="m-0">
-                                {{ Meeting?.title}}
+                                Title: <span class=" text-primary">{{ Meeting?.title}}</span>
                             </p>
-                            <p class="m-0">
                             <div  v-for="schedule in Meeting?.schedules" :key="schedule.id">
-                                {{ formatDate(schedule.date) }}
+                                <div v-if="schedule.id === scheduleId">
+                                    <p class="m-0 text-black" v-if="schedule.id === scheduleId">
+                                        Date: <span class=" text-primary">{{ formatDate(schedule.date) }}</span>
+                                    </p>
+                                    <p class="m-0 text-black"> 
+                                        Start: <span class=" text-primary">{{schedule.start_time}} </span>
+                                        End: <span class=" text-primary">{{schedule.end_time}}  </span>
+                                    </p>
+                                </div>                                
                             </div>
-                            </p>
                         </div>
                     </div>
                 </div>
-                <div class="flex">
-                    <div class="w-6 mr-4 mt-2 text-muted">
-                        <svg aria-hidden="true" class="svg-inline--fa fa-video h-6 w-6 mx-auto" focusable="false"
-                             data-prefix="far" data-icon="video" role="img" xmlns="http://www.w3.org/2000/svg"
-                             viewBox="0 0 576 512" data-fa-i2svg="">
-                            <path fill="currentColor" d="M64 112c-8.8 0-16 7.2-16 16V384c0 8.8 7.2 16 16 16H320c8.8
-                                                    0 16-7.2 16-16V128c0-8.8-7.2-16-16-16H64zM0 128C0 92.7 28.7 64 64 64H320c35.3 0 64
-                                                    28.7 64 64v33V351v33c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V128zM528
-                                                    363.4V148.6L416 199V146.4L520.3 99.5c5.1-2.3 10.6-3.5 16.2-3.5c21.8 0 39.5 17.7
-                                                    39.5 39.5v241c0 21.8-17.7 39.5-39.5 39.5c-5.6 0-11.1-1.2-16.2-3.5L416 365.6V313l112 50.4z">
-                            </path>
-                        </svg>
-                        <!-- <i aria-hidden="true" class="fa-regular h-6 w-6 fa-video mx-auto"></i> -->
+                <div class="flex" >
+                    <div class="w-6 mr-4 mt-2 text-muted" v-if="Meeting?.link">
+                        <i class="fas fa-video h-6 w-6 fa-video mx-auto"></i>
                     </div>
                     <div>
                         <div class="flex mb-2 flex-wrap" v-if="Meeting?.link">
@@ -173,10 +162,11 @@ const {isLoading, data: Meeting, refetch: fetchMeeting} = getMeeting();
                             </a>
                         </div>
                         <div v-else>
-                            Physical Meeting at {{ Meeting?.location }}
+                            <p class="m-0 text-black">
+                                Physical Meeting at:<span class=" text-primary"> {{ Meeting?.location }}</span>
+                            </p>                           
                         </div>
                     </div>
-
                 </div>
                 <!-- <div class="flex items-center">
                     <div class="w-6 mr-4 text-center text-muted"> -->
@@ -205,12 +195,34 @@ const {isLoading, data: Meeting, refetch: fetchMeeting} = getMeeting();
                     <p class="m-0">15854732#</p>
                 </div> -->
                 <div class="flex items-center">
-                    <p class="m-0 text-sm">{{ Meeting?.description }}</p>
+                    <p class="m-0 text-sm">
+                        Meeting Description: <span class=" text-primary"> {{ Meeting?.description }}</span>
+                    </p>  
                 </div>
                 <div>
                     <!-- <a href="https://app.boardable.com/felix-1/groups/dff155-board"
                         class="badge badge-soft">{{  meeting?.board?.title }}  Board</a>
                     <a href="" class="badge badge-soft">{{  meeting?.title }}</a> -->
+                    <router-link 
+                        :to="{
+                            name: 'BoardDetails',
+                            params: {
+                                boardId: boardId,
+                            },
+                        }"
+                        class="badge badge-soft">{{ Meeting.meetingable.name }}
+                    </router-link>
+                    <router-link 
+                        :to="{
+                            name: 'BoardMeetingDetails',
+                            params: {
+                                boardId: boardId,
+                                meetingId: meetingId,
+                                scheduleId: scheduleId
+                            },
+                        }"
+                        class="badge badge-soft">{{ Meeting.title }}
+                    </router-link>
                 </div>
             </div>
         </div>

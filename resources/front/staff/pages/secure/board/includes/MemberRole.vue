@@ -7,14 +7,14 @@
                     aria-haspopup="true" :aria-expanded="dropdownOpen">
                 <i :class="roleIcon" class="mr-2"></i> {{ roleText }}
             </button>
-            <ul v-if="dropdownOpen" class="dropdown-menu show" aria-labelledby="role-status">
+            <!-- <ul v-if="dropdownOpen" class="dropdown-menu show" aria-labelledby="role-status">
                 <li v-for="role in filteredRoles" :key="role.name">
                     <a href="#" class="dropdown-item"
                        @click.prevent="updateRole(role)">
                         <i :class="role.icon"></i> {{ role.name }}
                     </a>
                 </li>
-            </ul>
+            </ul> -->
         </div>
         <div v-else>
             <i :class="roleIcon" class="mr-2"></i> {{ 'Super Admin' }}

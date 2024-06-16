@@ -30,11 +30,11 @@ export async function useCreateMembershipRequest(payload: MembershipRequestPaylo
 export async function useUpdateMembershipRequest(
     payload: MembershipRequestPayload,
     meeting:string,
-    board: string,
+    schedule: string,
 ) {
     const client = useClient();
 
-    await client.post(MembershipsRoute() + '/update/meeting/' + meeting + '/board/' + board, {
+    await client.post(MembershipsRoute() + '/update/meeting/' + meeting + '/schedule/' + schedule, {
         json: payload,
     }).json();
 }

@@ -9,19 +9,19 @@ use Illuminate\Notifications\Notification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 
-class BoardMemberRoleNotification extends Notification implements ShouldQueue
+class BoardMemberPositionNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
     protected $user;
     protected $board;
-    protected $Role;
+    protected $position;
 
-    public function __construct(User $user, Board $board, string $tempMemberRole)
+    public function __construct(User $user, Board $board, string $tempMemberPosition)
     {
         $this->user = $user;
         $this->board = $board;
-        $this->Role = $tempMemberRole;
+        $this->position = $tempMemberPosition;
 
         // dd($user, $board);/
     }
@@ -34,7 +34,7 @@ class BoardMemberRoleNotification extends Notification implements ShouldQueue
     public function toArray($notifiable)
     {
         return [
-            'message' => "Hi {$this->user->full_name}, your role in this {$this->board->name} (board) has Been Updaqte.",
+            'message' => "Hi {$this->user->full_name}, your p in this {$this->board->name} (board) has Been Updaqte.",
             'board_id' => $this->board->id,
             'both'       => false,
         ];
@@ -44,7 +44,7 @@ class BoardMemberRoleNotification extends Notification implements ShouldQueue
     {
         return (new MailMessage)
             ->greeting('Hello ' . $notifiable->full_name . '!')
-            ->line("Your role in this {$this->board->name} (board) has Been Updated.")
+            ->line("Your position in this {$this->board->name} (board) has Been Updated.")
             ->action('View Board', url(config('app.url') . '/board/' . $this->board->id));
     }
 }

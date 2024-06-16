@@ -5,15 +5,22 @@ declare(strict_types=1);
 namespace App\Repository;
 
 use App\Enums\HeldEnum;
+use App\Enums\CloseEnum;
 use App\Enums\StatusEnum;
 use Illuminate\Support\Facades\Log;
+use App\Models\Module\Member\Member;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Module\Meeting\Meeting;
 use App\Models\Module\Meeting\Schedule;
 use App\Repository\Contracts\ScheduleInterface;
+use App\Repository\Contracts\MembershipInterface;
 
 class ScheduleRepository extends BaseRepository implements ScheduleInterface
 {
+    public function __construct(
+        private readonly MembershipInterface $membershipRepository,
+    ) {
+    }
     // Implement the methods
     public function getAll()
     {
@@ -34,8 +41,9 @@ class ScheduleRepository extends BaseRepository implements ScheduleInterface
 
         return $schedule;
     }
-    public function createSchedule(Meeting|string $meeting, array $payload): void
+    public function createSchedule(Meeting|string $meeting, Member|string $member, array $payload): void
     {
+
         $schedules = $payload['schedules'];
         foreach ($schedules as $scheduleData) {
             $schedule = new Schedule();
@@ -45,7 +53,11 @@ class ScheduleRepository extends BaseRepository implements ScheduleInterface
             $schedule->start_time = $scheduleData['start_time'];
             $schedule->end_time   = $scheduleData['end_time'];
             $schedule->meeting_id = is_string($meeting) ? $meeting : $meeting->id; // Handle both string and object
+            $schedule->closestatus = CloseEnum::Default->value;
             $schedule->save();
+            if ($schedule->save()) {
+                $this->membershipRepository->create($meeting, $member, $schedule, $payload);
+            }
         }
     }
 
@@ -59,6 +71,7 @@ class ScheduleRepository extends BaseRepository implements ScheduleInterface
                 // If found, create a new instance of the Schedule model
                 $schedule->status      = $scheduleData['status'];
                 $schedule->heldstatus  = $scheduleData['heldstatus'];
+                // $schedule->closestatus = CloseEnum::Default->value;
             }
 
 
@@ -67,12 +80,16 @@ class ScheduleRepository extends BaseRepository implements ScheduleInterface
                 $schedule = new Schedule();
                 $schedule->status  = StatusEnum::Inactive->value;
                 $schedule->heldstatus  = HeldEnum::Default->value;
+                $schedule->closestatus = CloseEnum::Default->value;
             }
             $schedule->date       = $scheduleData['date'];
             $schedule->start_time = $scheduleData['start_time'];
             $schedule->end_time   = $scheduleData['end_time'];
             $schedule->meeting_id = is_string($meeting) ? $meeting : $meeting->id; // Handle both string and object
             $schedule->save();
+            // if ($schedule->save()) {
+            //     $this->membershipRepository->create($schedule, $member, $payload);
+            // }
         }
     }
     public function update(Schedule|string $schedule, array $payload): Schedule
@@ -116,5 +133,15 @@ class ScheduleRepository extends BaseRepository implements ScheduleInterface
         }
 
         return $schedule->delete();
+    }
+    public function closeSchedule(Schedule|string $schedule): bool
+    {
+        if (!($schedule instanceof Schedule)) {
+            $schedule = Schedule::findOrFail($schedule);
+            $schedule->closestatus = CloseEnum::Closed->value;
+            $schedule->save();
+        }
+
+        return $schedule;
     }
 }

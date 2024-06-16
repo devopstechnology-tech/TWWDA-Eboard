@@ -33,7 +33,7 @@ class Profile extends BaseModel
         'establishment',
         'title',
         'appointing_authority',
-        'appointnment_date',
+        'appointment_date',
         'appointment_letter',
         'appointment_end_date',
         'serving_term',

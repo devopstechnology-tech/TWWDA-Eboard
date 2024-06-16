@@ -18,6 +18,7 @@ const handleUnexpectedError = useUnexpectedErrorHandler();
 const route = useRoute();
 const action = ref('create');
 const meetingId = route.params.meetingId as string;
+const scheduleId = route.params.scheduleId as string;
 
 const schema = yup.object({
     id: yup.string().required(),
@@ -80,7 +81,7 @@ const onSubmit = handleSubmit(async (values, {resetForm}) => {
             invite_status: null,
         };
         if (action.value === 'create') {
-            await useCreateAttendanceRSVPRequest(payload, meetingId);
+            await useCreateAttendanceRSVPRequest(payload, scheduleId);
         } else if(action.value === 'rsvp') {
             await useUpdateAttendanceRSVPRequest(payload, payload.id);    
         } else if(action.value === 'attendance') {
@@ -98,9 +99,9 @@ const onSubmit = handleSubmit(async (values, {resetForm}) => {
 });
 const getMeetingAttendances = () => {
     return useQuery({
-        queryKey: ['getMeetingAttendancesKey', meetingId],
+        queryKey: ['getMeetingAttendancesKey', scheduleId],
         queryFn: async () => {
-            const response = await useGetMeetingAttendancesRequest(meetingId, {paginate: 'false'});
+            const response = await useGetMeetingAttendancesRequest(scheduleId, {paginate: 'false'});
             return response.data;
         },
     });
@@ -122,7 +123,7 @@ onUnmounted(() => {
 });
 
 function handleMeetingUpdated(event) {
-    if (event.detail.meetingId === meetingId) {
+    if (event.detail.scheduleId === scheduleId) {
         fetchMeetingAttendances();
     }
 }

@@ -24,9 +24,9 @@ class MembershipController extends Controller
 
         return $this->response(Response::HTTP_OK, __('messages.records-fetched'), $memberships, Membership::class);
     }
-    public function updatemeetingboardmemberships(UpdateMembershipRequest $request, $meeting, $board): JsonResponse
+    public function updatemeetingboardmemberships(UpdateMembershipRequest $request, $meeting, $schedule): JsonResponse
     {
-        $memberships = $this->membershipRepository->updateMeetingBoardMemberships($meeting, $board, $request->validated());
+        $memberships = $this->membershipRepository->updateMeetingBoardMemberships($meeting, $schedule, $request->validated());
 
         return $this->response(Response::HTTP_OK, __('messages.records-fetched'), $memberships, Membership::class);
     }

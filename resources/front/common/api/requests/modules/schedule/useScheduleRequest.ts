@@ -29,9 +29,15 @@ export async function useCreateScheduleRequest(payload: ScheduleRequestPayload, 
 export async function useUpdateScheduleRequest(payload: ScheduleRequestPayload, id: string | null) {
     const client = useClient();
 
-    await client.post(scheduleRoute() + '/update/schedule/' + id, {
+    await client.post(scheduleRoute() + '/update/' + id, {
         json: payload,
     }).json();
+}
+//close meeting in minutes
+export async function useGetCloseMeetingRequest(id: string | null) {
+    const client = useClient();
+
+    await client.post(scheduleRoute() + '/close/' + id).json();
 }
 
 

@@ -38,9 +38,9 @@ class DetailMinute extends BaseModel
     {
         return $this->belongsTo(SubAgenda::class, 'subagenda_id');
     }
-    public function subdetailminute()
+    public function subdetailminutes()
     {
-        return $this->hasOne(SubDetailMinute::class, 'detail_minute_id');
+        return $this->hasMany(SubDetailMinute::class, 'detail_minute_id');
     }
     public function minutereview()
     {

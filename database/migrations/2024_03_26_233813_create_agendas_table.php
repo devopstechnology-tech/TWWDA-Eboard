@@ -17,7 +17,7 @@ return new class () extends Migration {
             $table->string('title')->nullable();
             $table->string('description')->nullable();
             $table->string('duration')->nullable();
-            $table->string('meeting_id')->nullable();
+            $table->string('schedule_id')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });

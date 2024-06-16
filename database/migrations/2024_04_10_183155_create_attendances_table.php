@@ -19,7 +19,7 @@ return new class() extends Migration
         Schema::create('attendances', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->string('location')->nullable();
-            $table->string('meeting_id')->nullable();
+            $table->string('schedule_id')->nullable();
             $table->string('membership_id')->nullable();
             $table->string('invite_status')->default(InviteEnum::Default->value); //accept reject  invited
             $table->string('rsvp_status')->default(RSVPEnum::Default->value); //signed or unsigned

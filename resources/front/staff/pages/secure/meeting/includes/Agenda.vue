@@ -7,13 +7,13 @@ import {computed, defineEmits,defineProps,inject,onMounted, ref} from 'vue';
 import {useRoute} from 'vue-router';
 import * as yup from 'yup';
 import {
-    agendasSaveImportedMeetingAgendas,
-    fetchlatestMeetingAgendas,
+    agendasSaveImportedMeetingScheduleAgendas,
+    fetchlatestMeetingScheduleAgendas,
     useCreateAgendaRequest,
     useCreateSubAgendaRequest,
     useDeleteAgendaRequest,
     useDeleteSubAgendaRequest,
-    useGetMeetingAgendasRequest,
+    useGetMeetingScheduleAgendasRequest,
     useUpdateAgendaRequest,
     useUpdateSubAgendaRequest,
 } from '@/common/api/requests/modules/agenda/useAgendaRequest';
@@ -56,7 +56,8 @@ const agendaction = ref('');
 const actionitem = ref('');
 const boardId = route.params.boardId as string;
 const meetingId = route.params.meetingId as string;
-const importedAgendaMeetingId = ref('');
+const scheduleId = route.params.scheduleId as string;
+const importedAgendascheduleId = ref('');
 const agendaId = ref<string | null>(null);
 const selectedMembershipIds = ref<string[]>([]);
 const allMemberships = ref<Membership[]>([]);
@@ -75,7 +76,7 @@ const editingChildIndex = ref(-1);
 const {errorMessage} = useField('assignees');
 //oneagnda
 const agendaschema = yup.object({
-    meeting_id: yup.mixed().required(),
+    schedule_id: yup.mixed().required(),
     title: yup.string().required(),
     duration: yup.number().nullable(),
     description: yup.string().nullable(),
@@ -89,7 +90,7 @@ const {
     setFieldValue,
     values,
 } = useForm<{
-    meeting_id: string;
+    schedule_id: string;
     title: string;
     duration: number | null,
     description: string | null,
@@ -100,7 +101,7 @@ const {
 }>({
     validationSchema: agendaschema,
     initialValues: {
-        meeting_id: meetingId,
+        schedule_id: scheduleId,
         title: '',
         duration: null,
         description:null,
@@ -153,7 +154,7 @@ const enableEditing = (pIndex, cIndex, agenda:Agenda, item:string) => {
 
     // defaultpopulation
     setFieldValue('title',  agenda.title);
-    setFieldValue('meeting_id', meetingId);
+    setFieldValue('schedule_id', scheduleId);
     setFieldValue('duration', agenda.duration);
     setFieldValue('description', agenda.description);
 
@@ -168,12 +169,11 @@ const enableEditing = (pIndex, cIndex, agenda:Agenda, item:string) => {
 };
 
 const onSubmit = handleSubmit(async (values, {resetForm}) => {
-    console.log('1, useUpdateSubAgendaRequest', 'update child', editingChildIndex.value);
     try {
         if (action.value === 'create') {
             const payload: AgendaRequestPayload = {
                 title: values.title,
-                meeting_id: values.meeting_id,
+                schedule_id: values.schedule_id,
                 duration: null,
                 description: null,
                 agenda_id: null,
@@ -184,17 +184,16 @@ const onSubmit = handleSubmit(async (values, {resetForm}) => {
             {
                 const agenda_id = currentParentId.value ? currentParentId.value.toString() : null;
                 payload.agenda_id = agenda_id,
-                await useCreateSubAgendaRequest(payload, meetingId);
+                await useCreateSubAgendaRequest(payload, scheduleId);
             }
             else if(isAddingNewParent.value)
             {
-                await useCreateAgendaRequest(payload, meetingId);
+                await useCreateAgendaRequest(payload, scheduleId);
             }
         } else {
-            console.log('3 useUpdateSubAgendaRequest', 'update child', editingChildIndex.value);
             const payload: AgendaRequestPayload = {
                 title: values.title,
-                meeting_id: values.meeting_id,
+                schedule_id: values.schedule_id,
                 duration: values.duration,
                 description: values.description,
                 agenda_id: null,
@@ -202,19 +201,17 @@ const onSubmit = handleSubmit(async (values, {resetForm}) => {
                 children: [],
             };
             if(editingChildIndex.value !== -1){
-                // update child
-                console.log('useUpdateSubAgendaRequest', 'update child', editingChildIndex.value);
                 payload.assignees = values.assignees;
                 const agenda_id = agendaId.value ? agendaId.value.toString() : null;
                 payload.agenda_id = agenda_id,
-                await useUpdateSubAgendaRequest(payload, meetingId);
+                await useUpdateSubAgendaRequest(payload, scheduleId);
             }
             else if(editingParentIndex.value !== -1){
                 // update parent
                 payload.assignees = values.assignees;
                 const agenda_id = agendaId.value ? agendaId.value.toString() : null;
                 payload.agenda_id = agenda_id,
-                await useUpdateAgendaRequest(payload, meetingId);
+                await useUpdateAgendaRequest(payload, scheduleId);
             }
 
             // if (selectedBoard.value?.id) {
@@ -225,7 +222,7 @@ const onSubmit = handleSubmit(async (values, {resetForm}) => {
             //     );
             // }
         }
-        await fetchMeetingAgendas();
+        await fetchMeetingScheduleAgendas();
         resetForm();
         cancelEditing();
     } catch (err) {
@@ -312,7 +309,7 @@ const deleteAgenda = async () =>{
     }else{
         await useDeleteSubAgendaRequest(id);
     }  
-    await fetchMeetingAgendas();
+    await fetchMeetingScheduleAgendas();
     cancelEditing();
 };
 
@@ -322,7 +319,7 @@ const startAgenda = async (val:string) => {
     }else if(val ==='previous'){        
         fetchFunction.value = 'custom';
         agendaction.value = val;
-        await fetchMeetingAgendas();
+        await fetchMeetingScheduleAgendas();
     }
 };
 
@@ -330,31 +327,30 @@ const startAgenda = async (val:string) => {
 const resetAgendaStartChoice = async () => { 
     if(agendaction.value ==='previous'){
         fetchFunction.value = 'default';
-        await fetchMeetingAgendas();
+        await fetchMeetingScheduleAgendas();
     }
     agendaction.value = ''; 
 };
 const SaveImportedAgendas = async () => {
-    const meeting_id = importedAgendaMeetingId.value;    
+    const schedule_id = importedAgendascheduleId.value;    
     resetAgendaStartChoice();
-    await agendasSaveImportedMeetingAgendas(meeting_id, meetingId);
+    await agendasSaveImportedMeetingScheduleAgendas(schedule_id, scheduleId);
     saveagendasModal.value?.close();
-    importedAgendaMeetingId.value = '';  
+    importedAgendascheduleId.value = '';  
     fetchFunction.value ='default'; 
     agendaction.value='';
-    await fetchMeetingAgendas();
+    await fetchMeetingScheduleAgendas();
 };
 
-const getMeetingAgendas = () => {
+const getMeetingScheduleAgendas = () => {
     return useQuery({
-        queryKey: ['getMeetingAgendasKey', meetingId],
+        queryKey: ['getMeetingScheduleAgendasKey', scheduleId],
         queryFn: async () => {
-            console.log('fetchFunction.value', fetchFunction.value);
             let response;
             if (fetchFunction.value === 'custom') {
-                response = await fetchlatestMeetingAgendas({paginate: 'false'});
+                response = await fetchlatestMeetingScheduleAgendas({paginate: 'false'});
                 if (response.data && response.data.length > 0) {
-                    importedAgendaMeetingId.value = response.data[0].meeting_id;
+                    importedAgendascheduleId.value = response.data[0].schedule_id;
                     saveagendasModal.value?.showModal();
                 } else {
                     notify({
@@ -365,14 +361,14 @@ const getMeetingAgendas = () => {
                     fetchFunction.value = 'default';
                 }
             } else if (fetchFunction.value === 'default') {
-                response = await useGetMeetingAgendasRequest(meetingId, {paginate: 'false'});
+                response = await useGetMeetingScheduleAgendasRequest(scheduleId, {paginate: 'false'});
             }
             return response?.data || []; // Ensure that response.data is always an array
         },
     });
 };
 
-const {isLoading, data: Agendas, refetch: fetchMeetingAgendas} = getMeetingAgendas();
+const {isLoading, data: Agendas, refetch: fetchMeetingScheduleAgendas} = getMeetingScheduleAgendas();
 
 // Calculate total remaining time for agendas
 const FetchedSchedule = computed(() => {
@@ -382,11 +378,6 @@ const FetchedSchedule = computed(() => {
 const getmemberships = async () => {
     const response = await useGetMembershipsRequest(meetingId, boardId, {paginate: 'false'});
     allMemberships.value = response.data;
-};
-
-const getMeetingSchedule = async () => {
-    const response = await useGetMeetingScheduleRequest(meetingId);
-    schedule.value = response.data;
 };
 
 const handleManageMembersClick = () => {
@@ -399,7 +390,6 @@ const handleManageMembersClick = () => {
 
 onMounted(() => {
     getmemberships();
-    // getMeetingSchedule();
     window.addEventListener('refetchMemberships', getmemberships);
 });
 </script>

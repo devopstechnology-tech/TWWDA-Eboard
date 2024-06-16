@@ -54,10 +54,12 @@ use App\Repository\MeetingRepository;
 use App\Repository\ProfileRepository;
 use App\Repository\SettingRepository;
 use App\Models\Module\Meeting\Meeting;
+use App\Models\Module\Member\Position;
 use App\Models\Module\Poll\Sub\Option;
 use App\Models\System\LoginLogHistory;
 use App\Models\System\PasswordHistory;
 use App\Repository\ConflictRepository;
+use App\Repository\PositionRepository;
 use App\Repository\ScheduleRepository;
 use App\Models\Module\Meeting\Schedule;
 use App\Repository\CommitteeRepository;
@@ -108,6 +110,7 @@ use App\Repository\Contracts\SettingInterface;
 use App\Models\Module\Committe\CommitteeMember;
 use App\Models\Module\Meeting\Agenda\SubAgenda;
 use App\Repository\Contracts\ConflictInterface;
+use App\Repository\Contracts\PositionInterface;
 use App\Repository\Contracts\ScheduleInterface;
 use App\Repository\SubAgendaAssigneeRepository;
 use App\Repository\Contracts\CommitteeInterface;
@@ -156,6 +159,7 @@ class AppServiceProvider extends ServiceProvider
             'profile' => Profile::class,
             'board' => Board::class,
             'member' => Member::class,
+            'position' => Position::class,
             'committee' => Committee::class,
             'folder' => Folder::class,
             'membership' => Membership::class,
@@ -213,6 +217,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(ModificationInterface::class, ModificationRepository::class);
         $this->app->singleton(NotificationInterface::class, NotificationRepository::class);
         $this->app->singleton(MemberInterface::class, MemberRepository::class);
+        $this->app->singleton(PositionInterface::class, PositionRepository::class);
         $this->app->singleton(MembershipInterface::class, MembershipRepository::class);
         $this->app->singleton(CommitteeInterface::class, CommitteeRepository::class);
         $this->app->singleton(CommitteeMemberInterface::class, CommitteeMemberRepository::class);

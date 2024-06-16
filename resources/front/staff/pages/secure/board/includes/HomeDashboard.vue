@@ -338,61 +338,6 @@ const {isLoading, data, refetch: fetchMeetings} = getMeetings(boardId);
 
 const currentStatus = ref('published');
 
-// const filteredMeetings = computed(() => {
-//     if (!data.value) return []; // Check if data is not loaded
-
-//     if (currentStatus.value === 'past') {
-//         const now = new Date();
-//         return data.value.filter(meeting => {
-//             const meetingDate = new Date(meeting.created_at); // Assuming you have a `date` field in your meetings
-//             return meetingDate < now;
-//         });
-//     } else {
-//         return data.value.filter(meeting => meeting.status.toLowerCase() === currentStatus.value);
-//     }
-// });
-// const filteredMeetings = computed(() => {
-//     if (!data.value) return []; // Check if data is not loaded
-
-//     const now = new Date();
-
-//     // Filter meetings based on status or created date
-//     const filtered = data.value.filter(meeting => {
-//         if (currentStatus.value === 'past') {
-//             const meetingDate = new Date(meeting.created_at);
-//             return meetingDate < now;
-//         } else {
-//             return meeting.status.toLowerCase() === currentStatus.value;
-//         }
-//     });
-
-//     // Process each filtered meeting
-//     return filtered.map(meeting => {
-//         if (meeting.schedules && meeting.schedules.length > 0) {
-//             // Sort schedules to find the nearest upcoming one
-//             const sortedSchedules = [...meeting.schedules].sort((a, b) => {
-//                 const dateA = new Date(`${a.date} ${a.start_time}`);
-//                 const dateB = new Date(`${b.date} ${b.start_time}`);
-//                 return dateA.getTime() - dateB.getTime();
-//             });
-
-//             const nearestSchedule = sortedSchedules.find(schedule => new Date(`${schedule.date} ${schedule.start_time}`) >= now) || sortedSchedules[0];
-
-//             // Create a new meeting object with the nearest schedule
-//             const updatedMeeting = {
-//                 ...meeting,
-//                 nearestSchedule: nearestSchedule, // Add nearest schedule to meeting
-//                 schedules: sortedSchedules.filter(schedule => schedule.id !== nearestSchedule.id), // Remove the nearest schedule from the schedules array
-//             };
-
-//             return updatedMeeting;
-//         } else {
-//             // If no schedules, return the meeting as is
-//             return meeting;
-//         }
-//     });
-// });
-
 const filteredMeetings = computed(() => {
     if (!data.value) return []; // Check if data is not loaded
 
@@ -436,7 +381,9 @@ const filteredMeetings = computed(() => {
             const updatedMeeting = {
                 ...meeting,
                 nearestSchedule, // Add nearest schedule to meeting
-                schedules: sortedSchedules.filter(schedule => schedule.id !== nearestSchedule.id), // Retain all schedules including past ones
+                schedules: sortedSchedules.filter(
+                    schedule => schedule.id !== nearestSchedule.id,
+                ), // Retain all schedules including past ones
             };
 
             return updatedMeeting;
@@ -474,85 +421,7 @@ const onPublish = async (id: string) => {
     await fetchMeetings();
 };
 
-// // Schedule schema
-// const scheduleschem = yup.object({
-//     id: yup.string().required(),
-//     date: yup.string().required(),
-//     start_time: yup.string().required(),
-//     end_time: yup.string().required(),
-//     status:yup.string().nullable(),
-//     heldstatus:yup.string().nullable(),
-//     meeting_id: yup.string().nullable(),
-// });
-
-// // Schedule form
-// const {
-//     handleSubmit: handleScheduleSubmit,
-//     setErrors: setScheduleErrors,
-//     setFieldValue: setScheduleFieldValue,
-//     values: scheduleValues,
-// } = useForm<{
-//     id:string;
-//     date:string;
-//     start_time:string;
-//     end_time:string;
-//     status:string|null;
-//     heldstatus:string|null;
-//     meeting_id:string|null;
-// }>({
-//     validationSchema: scheduleschem,
-//     initialValues: {
-//         id: '',
-//         date: '',
-//         start_time: '',
-//         end_time: '',
-//         status: null,
-//         heldstatus: null,
-//         meeting_id: null,
-//     },
-// });
-
-// const openEditScheduleModal = (schedule: Schedule) => {  
-//     schedulereseting();  
-//     setScheduleFieldValue('id', schedule.id);
-//     setScheduleFieldValue('date', schedule.date);
-//     setScheduleFieldValue('start_time', schedule.start_time);
-//     setScheduleFieldValue('end_time', schedule.end_time);
-//     setScheduleFieldValue('status', schedule.status);
-//     setScheduleFieldValue('heldstatus', schedule.heldstatus);
-//     setScheduleFieldValue('meeting_id', schedule.meeting_id);
-//     action.value = 'edit';
-//     showCreate.value = true;
-//     ScheduleModal.value?.showModal();
-// };
-// function schedulereseting(){
-//     setScheduleFieldValue('id', '');
-//     setScheduleFieldValue('date', '');
-//     setScheduleFieldValue('start_time', '');
-//     setScheduleFieldValue('end_time', '');
-//     setScheduleFieldValue('status', null);
-//     setScheduleFieldValue('heldstatus', null);
-//     setScheduleFieldValue('meeting_id', null);    
-// }
-
-// // Schedule submit handler
-// const onScheduleSubmit = handleScheduleSubmit(async (scheduleValues) => {
-//     console.log('schedule values', scheduleValues);
-//     try {
-//         // Submit the schedule here
-//         // For example:
-//         // await useCreateScheduleRequest(values);
-//     } catch (err) {
-//         if (err instanceof ValidationError) {
-//             setScheduleErrors(err.messages);
-//         } else {
-//             handleUnexpectedError(err);
-//         }
-//     }
-// });
-
 </script>
-
 <style scoped>
 </style>
 <template>
@@ -617,7 +486,8 @@ const onPublish = async (id: string) => {
                                     :to="{ name: 'BoardMeetingDetails',
                                            params: {
                                                boardId: boardId,
-                                               meetingId: meeting.id
+                                               meetingId: meeting.id,
+                                               scheduleId: meeting.nearestSchedule.id
                                            }
                                     }"
                                     class="product-title">
@@ -634,7 +504,8 @@ const onPublish = async (id: string) => {
                                             :to="{ name: 'BoardMeetingDetails',
                                                    params: {
                                                        boardId: boardId,
-                                                       meetingId: meeting.id
+                                                       meetingId: meeting.id,
+                                                       scheduleId: meeting.nearestSchedule.id
                                                    }
                                             }"
                                             class="text-green-500
@@ -661,10 +532,10 @@ const onPublish = async (id: string) => {
                                      v-if="meeting?.nearestSchedule">
                                     <div>
                                         <span class="text-primary bg-primary font-bold ml-2 mr-2">
-                                            Upcoming Meeting Schedule on {{formatDate(meeting.nearestSchedule.date)}}
+                                            Upcoming {{formatDate(meeting.nearestSchedule.date)}}
                                         </span>
                                         ||
-                                        Start: <span class="text-primary font-bold ml-2 mr-2">
+                                        <!-- Start: <span class="text-primary font-bold ml-2 mr-2">
                                             {{meeting.nearestSchedule.start_time}}
                                         </span>
                                         ||
@@ -676,7 +547,7 @@ const onPublish = async (id: string) => {
                                             {{ getTimeDuration(meeting.nearestSchedule.start_time,
                                                                meeting.nearestSchedule.end_time, 'hours') }}
                                         </span>
-                                        ||
+                                        || -->
                                         When: <span class="text-primary font-bold ml-2 mr-2">
                                             {{ FormattedAgo(meeting.nearestSchedule.date) }}
                                         </span>
@@ -697,6 +568,8 @@ const onPublish = async (id: string) => {
                                     </span>
                                
                                 </div>
+                                <div class="text-bold text-red" v-if="meeting.schedules.length">Other Schedules</div>
+                                <div class="text-bold text-red" v-else>no Other Recuring Schdedules</div>
                                 <div :class="['row', 'border-top', 'border-bottom', 'border-warning', 
                                               'd-flex', 'justify-content-between', 'align-items-center', 
                                               isPast(schedule.date) ? 'bg-gray' : '']"
@@ -707,7 +580,7 @@ const onPublish = async (id: string) => {
                                             {{formatDate(schedule.date)}}
                                         </span>
                                         ||
-                                        Start: <span class="text-primary font-bold ml-2 mr-2">
+                                        <!-- Start: <span class="text-primary font-bold ml-2 mr-2">
                                             {{schedule.start_time}}
                                         </span>
                                         ||
@@ -718,7 +591,7 @@ const onPublish = async (id: string) => {
                                         Duration: <span class="text-primary font-bold ml-2 mr-2">
                                             {{ getTimeDuration(schedule.start_time, schedule.end_time, 'hours') }}
                                         </span>
-                                        ||
+                                        || -->
                                         When: <span class="text-primary font-bold ml-2 mr-2">
                                             {{ FormattedAgo(schedule.date) }}
                                         </span> 
@@ -735,8 +608,19 @@ const onPublish = async (id: string) => {
                                                 @click.prevent="openEditScheduleMeetingModal(meeting, schedule)">
                                             Postpone
                                         </button>
-                                    </span>
-                               
+                                        <router-link
+                                            :to="{ name: 'BoardMeetingDetails',
+                                                   params: {
+                                                       boardId: boardId,
+                                                       meetingId: meeting.id,
+                                                       scheduleId: schedule.id
+                                                   }
+                                            }"
+                                            class="  mr-2
+                                                hover:text-info transition duration-150 ease-in-out">
+                                            <i class="far fa-eye"></i>
+                                        </router-link>
+                                    </span>                              
                                 </div>
                             </div>
                         </li>
@@ -793,7 +677,6 @@ const onPublish = async (id: string) => {
                 <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
                 <div class="overflow-auto p-4" style="max-height: 80vh;"
                     :style="action == 'schedule' ? 'height:500px;':''">
-
                     <div class="grid grid-cols-3 md:grid-cols-3 gap-2 p-2">
                         <div class="col-span-3">
                             <form novalidate @submit.prevent="onSubmit" class="">

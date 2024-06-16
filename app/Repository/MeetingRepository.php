@@ -26,7 +26,6 @@ class MeetingRepository extends BaseRepository implements MeetingInterface
     // Implement the methods
     public function __construct(
         private readonly ScheduleInterface $scheduleRepository,
-        private readonly MembershipInterface $membershipRepository,
         private readonly BoardInterface $boardRepository,
         private readonly CommitteeInterface $committeeRepository,
         private readonly FolderInterface $folderRepository,
@@ -35,11 +34,11 @@ class MeetingRepository extends BaseRepository implements MeetingInterface
     public function relationships()
     {
         return [
-            'attendances.membership',
+            // 'attendances.membership',
             'owner',
             'schedules',
             'meetingable', // Add this to handle polymorphic relation
-            'agendas',      // Assuming you want to load agendas associated with the meetings
+            // 'agendas',      // Assuming you want to load agendas associated with the meetings
             'folders',      // Assuming you want to load agendas associated with the meetings
         ];
     }
@@ -168,8 +167,7 @@ class MeetingRepository extends BaseRepository implements MeetingInterface
                 "Meeting Archive",
             ];
             $this->folderRepository->createMeetingInitialFolder($meeting, $boardcommittee, $DefaultfolderNames);
-            $this->scheduleRepository->createSchedule($meeting, $payload);
-            $this->membershipRepository->create($meeting, $member, $payload);
+            $this->scheduleRepository->createSchedule($meeting, $member, $payload);
         }
         return $meeting;
     }

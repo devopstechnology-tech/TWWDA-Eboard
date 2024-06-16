@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {useQuery} from '@tanstack/vue-query';
-import {FieldArrayContext,useField, useFieldArray, useForm} from 'vee-validate';
+import {FieldArrayContext, useField, useFieldArray, useForm} from 'vee-validate';
 import {computed, onMounted, ref} from 'vue';
 import {useRoute, useRouter} from 'vue-router';
 import * as yup from 'yup';
@@ -9,17 +9,20 @@ import {
     useDeleteUserRequest,
     useGetUsersRequest,
     useUpdateUserRequest,
+    useUpdateUserRoleRequest,
 } from '@/common/api/requests/modules/user/useUserRequest';
+import {useGetRolesRequest} from '@/common/api/requests/roleperm/useRolesRequest';
 import FormEmailsInput from '@/common/components/FormEmailsInput.vue';
 import FormInput from '@/common/components/FormInput.vue';
 import LoadingComponent from '@/common/components/LoadingComponent.vue';
 import RadioButton from '@/common/components/RadioButton.vue';
 import useUnexpectedErrorHandler from '@/common/composables/useUnexpectedErrorHandler';
-import {formattedDateTime,loadAvatar,} from '@/common/customisation/Breadcrumb';
+import {formattedDateTime, loadAvatar} from '@/common/customisation/Breadcrumb';
 import ValidationError from '@/common/errors/ValidationError';
+import {Role} from '@/common/parsers/roleParser';
 import {AcceptInviteRequestPayload, User, UserRequestPayload} from '@/common/parsers/userParser';
 import useAuthStore from '@/common/stores/auth.store';
-
+import UserRole from '@/staff/pages/secure/user/includes/UserRole.vue';
 
 const authStore = useAuthStore();
 
@@ -29,20 +32,28 @@ const action = ref('create');
 const UserModal = ref<HTMLDialogElement | null>(null);
 const UsersModal = ref<HTMLDialogElement | null>(null);
 const handleUnexpectedError = useUnexpectedErrorHandler();
+
 // oneagnda
 const createUserSchema = yup.object({
+    id: yup.string().nullable(),
     email: yup.string().required('Email is required'),
     role: yup.string().required('Role is required'),
 });
 const {
-    handleSubmit: handleSubmitCreate,
+    handleSubmit,
     setErrors,
     setFieldValue,
-    values: createValues,
-    errors: createErrors,
-}  = useForm({
+    values,
+    errors,
+} = useForm<{
+    id: string;
+    role: string;
+    email: string;
+
+}>({
     validationSchema: createUserSchema,
     initialValues: {
+        id: '',
         email: '',
         role: '',
     },
@@ -55,15 +66,17 @@ const openCreateUserModal = () => {
     UserModal.value?.showModal();
 };
 
-const onSubmitCreate  = handleSubmitCreate(async (values, {resetForm}) => {
-    console.log('ddd');
+const onSubmit = handleSubmit(async (values, {resetForm}) => {
     try {
+        const payload: UserRequestPayload = {
+            id: values.id,
+            email: values.email,
+            role: values.role,
+        };
         if (action.value === 'create') {
-            const payload: UserRequestPayload = {
-                email: values.email,
-                role: values.role,
-            };
             await useCreateUserRequest(payload);
+        } else if (action.value === 'role') {
+            await useUpdateUserRoleRequest(payload, payload.id);
         }
         await fetchUsers();
         resetCreateForm();
@@ -76,55 +89,8 @@ const onSubmitCreate  = handleSubmitCreate(async (values, {resetForm}) => {
         }
     }
 });
-// Define the schema for editing a user
-// const editUserSchema = yup.object({
-//     first: yup.string().required('First name is required'),
-//     last: yup.string().required('Last name is required'),
-//     id_number: yup.string().required('ID number is required'),
-//     email: yup.string().email('Invalid email format').required('Email is required'),
-//     phone: yup.string().required('Phone number is required'),
-//     password: yup.string().nullable(),
-// });
-// const {
-//     handleSubmit: handleSubmitEdit,
-//     setErrors: setEditErrors,
-//     setFieldValue: setEditFieldValue,
-//     values: editValues,
-//     errors: editErrors,
-// } = useForm<{
-//     first: string;
-//     last: string;
-//     id_number: string;
-//     email: string;
-//     phone: string;
-//     password: string | null;
-// }>({
-//     validationSchema: editUserSchema,
-//     initialValues: {
-//         first:'',
-//         last:'',
-//         id_number:'',
-//         email:'',
-//         phone:'',
-//         password:'',
-//     },
-// });
 
-// const openEditUserModal = (user:User) => {
-//     selectedUser.value = user;
-//     userId.value = user.id;
-//     // Set field values here
-//     setEditFieldValue('first', user.first);
-//     setEditFieldValue('last', user.last);
-//     setEditFieldValue('id_number', user.id_number);
-//     setEditFieldValue('email', user?.email);
-//     setEditFieldValue('phone', user.phone);
-//     setEditFieldValue('password', user.password);
-//     action.value = 'edit';
-//     showCreate.value = true;
-//     UsersModal.value?.showModal();
-// };
-const openUserProfile = (user:User) => {
+const openUserProfile = (user: User) => {
     router.push({
         name: 'ProfileDetails',  // The name of the route to navigate to
         params: {
@@ -133,59 +99,23 @@ const openUserProfile = (user:User) => {
         },
     });
 };
-// const  onSubmitEdit = handleSubmitEdit (async (editValues, {resetForm}) => {
-//     try {
-//         console.log('ddd');
-//         const payload: AcceptInviteRequestPayload = {
-//             id: userId.value ? userId.value.toString() : null,
-//             first: editValues.first,
-//             last: editValues.last,
-//             id_number: editValues.id_number,
-//             email: editValues.email,
-//             phone: editValues.phone,
-//             password: editValues.password,
-//             token: null,
-//         };
-//         console.log('payload',payload);
-//         await useUpdateUserRequest(payload);
 
-//         await fetchUsers();
-//         UsersModal.value?.close();
-//         resetEditForm();
-//     } catch (err) {
-//         if (err instanceof ValidationError) {
-//             setEditErrors(err.messages);
-//         } else {
-//             handleUnexpectedError(err);
-//         }
-//     }
-// });
 const resetCreateForm = () => {
+    setFieldValue('id', '');
     setFieldValue('email', '');
     setFieldValue('role', '');
     showCreate.value = false;
-    // Ensure other state resets if necessary
 };
-const resetEditForm = () => {
-    setEditFieldValue('first', '');
-    setEditFieldValue('last', '');
-    setEditFieldValue('id_number', '');
-    setEditFieldValue('email', '');
-    setEditFieldValue('phone', '');
-    setEditFieldValue('password', '');
-    showCreate.value = false; // This might be better renamed or independently managed
-};
+
 const customroles = [
     {name: 'Member', value: 'default'},
     {name: 'Admin', value: 'admin'},
     {name: 'Observer', value: 'observer'},
 ];
 
-
 const Customroles = computed(() => {
     return customroles;
 });
-
 
 onMounted(async () => {
     window.dispatchEvent(new CustomEvent('updateTitle', {detail: 'Users'}));
@@ -201,8 +131,34 @@ const getUsers = () => {
 };
 const {isLoading, data: Users, refetch: fetchUsers} = getUsers();
 
+const handleRoleUpdated = (event: { userId: string; userEmail: string; role: string }) => {
+    resetCreateForm();
+    action.value = 'role';
+    setFieldValue('id', event.userId);
+    setFieldValue('role', event.role);
+    setFieldValue('email', event.userEmail);
+    onSubmit();
+};
 
+// Fetch roles once and pass to child components
+const allRoles = ref<Role[]>([]);
+const getRoles = async () => {
+    const data = await useGetRolesRequest({paginate: 'false'});
+    allRoles.value = data.data;
+};
+onMounted(async () => {
+    await getRoles();
+});
+const onDeleteUser = async (id: string) => {
+    await useDeleteUserRequest(id);
+    await fetchUsers();
+};
+
+window.addEventListener('fetchUsersData', () => {
+    fetchUsers();
+});
 </script>
+
 <template>
     <div class="card-header flex items-center">
         <div class="flex items-center flex-1 w-full">
@@ -216,69 +172,62 @@ const {isLoading, data: Users, refetch: fetchUsers} = getUsers();
             </button>
         </div>
     </div>
-    <div class="card" v-for="(user, idx) in Users" :key="user.id">
-        <div class="card-body flex" >
-            <div class="avatar avatar-xl mr-5">
-                <a href="" aria-label="Open Cynthia Muriithi User Profile">
-                    <img
-                        :src="loadAvatar(user.profile.avatar)"
-                        class="avatar-img min-w-[82px] w-[82px] rounded-full"
-                        role="img"
-                        data-uw-rm-alt="ALT"
-                    />
-                </a>
-            </div>
-            <div class="mr-5">
-                <h3 class="name mb-0 flex items-center text-bold text-primary mb-2">
-                    <a href="" @click.prevent="openUserProfile(user)">
-                        {{ user.full_name }}
-                    </a>
-                    <button  type="button" @click.prevent="openUserProfile(user)" title="" class="mx-2 btn btn-sm btn-icontext-green-500
-                            hover:text-green-700 transition duration-150 ease-in-out btn-icon">
-                        <i class="far fa-eye"></i>
-                    </button>
-                </h3>
-                <div class="inline icons !items-start mb-2">
-                    <div class="flex flex-wrap gap-1" v-if="user.membs">
-                        <i class="fa fa-users mr-2"></i>
-                        <span v-for="memmberin in user.membs" :key="memmberin.id" v-if="memmberin?.board">
-                            <router-link :to="{ name: 'BoardDetails', params: { boardId: memmberin?.board.id } }"
-                                         class="rounded-[9px] flex items-center justify-center
-                                px-2 text-sm w-fit bg-gray-200 text-bold text-info">
-                                {{ memmberin.board.name }}
-                            </router-link>
-                        </span>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-3 col-md-4 col-sm-6 mb-3" v-for="(user, idx) in Users" :key="user.id">
+                <div class="card card-outline card-primary h-100">
+                    <div class="card-body box-profile">
+                        <div class="text-center">
+                            <!-- Image and User Info Column -->
+                            <div class="avatar avatar-md mb-3">
+                                <a href="" aria-label="Open {{ user.full_name }} User Profile">
+                                    <img
+                                        :src="loadAvatar(user.profile.avatar)"
+                                        class="profile-user-img img-fluid img-circle"
+                                        role="img"
+                                        data-uw-rm-alt="ALT"
+                                    />
+                                </a>
+                            </div>
+                            <h3 class="profile-username text-center text-primary">
+                                <a href="" @click.prevent="openUserProfile(user)">
+                                    {{ user.full_name }}
+                                </a>
+                                <button type="button" @click.prevent="openUserProfile(user)" 
+                                        title="" class="mx-2 btn btn-sm btn-primary">
+                                    <i class="far fa-eye"></i>
+                                </button>
+                                <button v-show="user.role !== 'Super Admin'" 
+                                        type="button" @click.prevent="onDeleteUser(user.id)" 
+                                        title="" class="mx-2 btn btn-sm btn-primary">
+                                    <i class="fa fa-trash mr-1"></i>
+                                </button>
+                            </h3>
+                            <p class="text-muted text-center text-bold">{{ user.role }}</p>
+                        </div>
+                        <!-- Action Column -->
+                        <div class="mt-3">
+                            <div class="text-bold text-danger text-center mb-1" v-show="user.role !== 'Super Admin'">
+                                Roles
+                            </div>
+                            <div class="text-center">
+                                <UserRole
+                                    :user="user"
+                                    :roles="allRoles"
+                                    :disableRemoteRole="0"
+                                    @role-updated="handleRoleUpdated"
+                                />
+                            </div>
+                        </div>
+                        <!-- Last Updated Column -->
+                        <div class="mt-3">
+                            <div class="text-bold text-danger text-center mb-1">
+                                Last Updated
+                            </div>
+                            <p class="text-center text-primary text-small">{{ formattedDateTime(user.updated_at, null) }}</p>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="ml-auto flex flex-col justify-between items-end mb-2">
-                <div class="social-icons flex text-bold text-danger" v-show="!idx > 0">
-                    Account Role
-                </div>
-                <p class="whitespace-nowrap">{{ user.role }}</p>
-            </div>
-            <div class="ml-auto flex flex-col items-end mb-2">
-                <div class="social-icons flex text-bold text-danger"  v-show="!idx > 0">
-                    Board Role
-                </div>
-                <div class="social-icons flex text-bold text-danger"  v-show="user.role !== 'Super Admin'">
-                    Potential Roles: Can be
-                </div>
-                <div class="lex text-bold text-primary"  v-show="user.role !== 'Super Admin'">
-                    <ul class="">
-                        <li class="whitespace-nowrap" v-for="rolename in user.rolenames" :key="rolename">
-                            - {{ rolename }}
-                        </li>
-                    </ul>
-                </div>
-            </div>
-            <div class="ml-auto flex flex-col justify-between items-end mb-2">
-                <div class="social-icons flex text-bold text-danger" v-show="!idx > 0">
-                    Last Updated
-                </div>
-                <p class="whitespace-nowrap">
-                    <span class="text-primary text-bold">{{ formattedDateTime(user.updated_at, null) }}</span>
-                </p>
             </div>
         </div>
     </div>
@@ -395,39 +344,38 @@ const {isLoading, data: Users, refetch: fetchUsers} = getUsers();
             </div>
         </dialog>
     </div>
-
 </template>
 
-
-<style  scoped>
+<style scoped>
 .tags {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  padding: 5px 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    padding: 5px 0;
 }
 
 .tag {
-  background-color: #e1e1e1;
-  border-radius: 5px;
-  padding: 5px 10px;
-  margin-right: 5px;
-  display: flex;
-  align-items: center;
+    background-color: #e1e1e1;
+    border-radius: 5px;
+    padding: 5px 10px;
+    margin-right: 5px;
+    display: flex;
+    align-items: center;
 }
 
 .tag button {
-  background: none;
-  border: none;
-  color: red;
-  cursor: pointer;
-  margin-left: 5px;
+    background: none;
+    border: none;
+    color: red;
+    cursor: pointer;
+    margin-left: 5px;
 }
 
 input {
-  flex-grow: 1;
-  padding: 5px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
+    flex-grow: 1;
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
 }
+
 </style>

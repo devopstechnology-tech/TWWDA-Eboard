@@ -1,17 +1,53 @@
 <script setup lang="ts">
-import {onMounted,ref} from 'vue';
+import {onMounted,ref, watch, watchEffect} from 'vue';
 import {useRoute,useRouter} from 'vue-router';
 // Import your API function
 import {loadDefaultCover,loadDefaultUserIcon} from '@/common/customisation/Breadcrumb';
+import {DASHBOARD} from '../../../../common/constants/staffRouteNames';
+import DeletedUsers from './includes/DeletedUsers.vue';
 import Everyone from './includes/Everyone.vue';
-import { DASHBOARD } from '../../../../common/constants/staffRouteNames';
 const route = useRoute();
 const router = useRouter();
 
 function goBack() {
     router.back();
 }
+const currentTab = ref('users');
+const previousTab = ref('');
 
+const tabs = [
+    {id: 'users', name: 'All Users', component: Everyone},
+    {id: 'trashed', name: 'Trashed Users', component: DeletedUsers},
+];
+
+const setActiveTab = (tabId: string) => {
+    previousTab.value = currentTab.value; // Store the current tab in previousTab before updating currentTab
+    currentTab.value = tabId;
+};
+
+watch(currentTab, (newTab:string, oldTab:string) => {
+    // Emit event to child components to fetch data
+    if (newTab === 'users' || newTab === 'trashed') {
+        window.dispatchEvent(new CustomEvent('fetchUsersData'));
+    }
+});
+
+watchEffect(() => {
+    if (route.query.previousTab) {
+        previousTab.value = route.query.previousTab as string;
+    }
+    if (route.query.currentTab) {
+        currentTab.value = route.query.currentTab as string;
+    }
+});
+watchEffect(() => {
+    if (route.query.previousTab) {
+        previousTab.value = route.query.previousTab as string;
+    }
+    if (route.query.currentTab) {
+        currentTab.value = route.query.currentTab as string;
+    }
+});
 </script>
 
 <template>
@@ -41,44 +77,29 @@ function goBack() {
                         <div class="card-outline card-outline-tabs">
                             <div class="card-header p-0 border-bottom-0">
                                 <ul class="nav nav-tabs" id="custom-tabs-four-tab" role="tablist">
-                                    <li class="nav-item">
-                                        <a class="nav-link active" id="custom-tabs-four-everyone-tab" data-toggle="pill"
-                                           href="#custom-tabs-four-everyone" role="tab"
-                                           aria-controls="custom-tabs-four-everyone" aria-selected="true">Everyone</a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link" id="custom-tabs-four-unacceptedinvitations-tab" data-toggle="pill"
-                                           href="#custom-tabs-four-unacceptedinvitations" role="tab"
-                                           aria-controls="custom-tabs-four-unacceptedinvitations" aria-selected="false">
-                                            Unaccepted Invitations
-                                        </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link" id="custom-tabs-four-unsentinvitations-tab" data-toggle="pill"
-                                           href="#custom-tabs-four-unsentinvitations" role="tab"
-                                           aria-controls="custom-tabs-four-unsentinvitations" aria-selected="false">
-                                            Unsent Invitations
+                                    <li class="nav-item" v-for="tab in tabs" :key="tab.id">
+                                        <a class="nav-link" 
+                                           :class="{ 'active': currentTab === tab.id }" 
+                                           @click="setActiveTab(tab.id)">
+                                            {{ tab.name }}
                                         </a>
                                     </li>
                                 </ul>
                             </div>
                             <div class="card-body">
                                 <div class="tab-content" id="custom-tabs-four-tabContent">
-                                    <div class="tab-pane fade active show" id="custom-tabs-four-everyone"
-                                         role="tabpanel" aria-labelledby="custom-tabs-four-everyone-tab">
-                                        <Everyone/>
-                                    </div>
-                                    <div class="tab-pane fade" id="custom-tabs-four-unacceptedinvitations"
-                                         role="tabpanel" aria-labelledby="custom-tabs-four-unacceptedinvitations-tab">
-                                         <!-- <UnacceptedInvitation/> -->
-                                    </div>
-                                    <div class="tab-pane fade" id="custom-tabs-four-unsentinvitations"
-                                         role="tabpanel" aria-labelledby="custom-tabs-four-unsentinvitations-tab">
-                                         <!-- <UnsentInvitation/> -->
+                                    <div v-for="tab in tabs" 
+                                         :key="tab.id" class="tab-pane fade" 
+                                         :class="{ 'show active': currentTab === tab.id }" 
+                                         :id="tab.id" role="tabpanel">
+                                        <component 
+                                            :is="tab.component" 
+                                            @change-tab="setActiveTab" 
+                                            @memberships-updated="handleMembershipsUpdated" 
+                                        />
                                     </div>
                                 </div>
                             </div>
-                            <!-- /.card -->
                         </div>
                     </div>
                     <!-- /.info-box-content -->

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Repository;
 
+use App\Repository\BaseRepository;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Module\Meeting\Agenda;
 use App\Http\Resources\AgendaResource;
@@ -28,11 +29,10 @@ class AgendaRepository extends BaseRepository implements AgendaInterface
         return $this->subagendaassigneeRepository ??= resolve(SubAgendaAssigneeInterface::class);
     }
 
-
     public function relationships()
     {
         return [
-            'meeting',
+            'schedule',
             'children.assignees.user',
             'assignees.user',
             'assignees.member',
@@ -47,7 +47,6 @@ class AgendaRepository extends BaseRepository implements AgendaInterface
             'with' => $this->relationships(),
         ];
 
-
         return $this->indexResource(Agenda::class, AgendaResource::class, $filters);
     }
 
@@ -59,16 +58,16 @@ class AgendaRepository extends BaseRepository implements AgendaInterface
 
         return $agenda;
     }
-    public function getMeetingAgendas($meeting)
+    public function getScheduleAgendas($schedule)
     {
         $filters = [
-            'meeting_id' => $meeting,
+            'schedule_id' => $schedule,
             'with' => $this->relationships(),
             'orderBy' => ['field' => 'created_at', 'direction' => 'asc']
         ];
         return $this->indexResource(Agenda::class, AgendaResource::class, $filters);
     }
-    public function getLatestMeetingAgendas()
+    public function getLatestScheduleAgendas()
     {
         // Get the latest agenda by creation date
         $latestAgenda = Agenda::orderBy('created_at', 'desc')->first();
@@ -77,7 +76,7 @@ class AgendaRepository extends BaseRepository implements AgendaInterface
         $filters = [];
         if ($latestAgenda) {
             $filters = [
-                'meeting_id' => $latestAgenda->meeting_id,
+                'schedule_id' => $latestAgenda->schedule_id,
                 'with' => $this->relationships(),
                 'orderBy' => ['field' => 'created_at', 'direction' => 'asc']
             ];
@@ -87,19 +86,18 @@ class AgendaRepository extends BaseRepository implements AgendaInterface
         return $this->indexResource(Agenda::class, AgendaResource::class, $filters);
     }
 
-
     // Implement the methods
 
-    public function AcceptLatestMeetingAgendas($oldmeeting, $newmeeting)
+    public function AcceptLatestScheduleAgendas($oldschedule, $newschedule)
     {
         // dd($payload);
-        $agendas = Agenda::with($this->relationships())->where('meeting_id', $oldmeeting)->get()->toArray();
-        // $subagendas = SubAgenda::where('agenda_id', $oldmeeting)->get()->pluck('title')->toArray();
+        $agendas = Agenda::with($this->relationships())->where('schedule_id', $oldschedule)->get()->toArray();
+        // $subagendas = SubAgenda::where('agenda_id', $oldschedule)->get()->pluck('title')->toArray();
 
         foreach ($agendas as $oldagenda) {
             $agenda = new Agenda();
             $agenda->title = $oldagenda['title'];
-            $agenda->meeting_id  = $newmeeting;
+            $agenda->schedule_id  = $newschedule;
             $agenda->save();
 
             foreach ($agenda->children as $child) {
@@ -110,12 +108,12 @@ class AgendaRepository extends BaseRepository implements AgendaInterface
             }
         }
     }
-    public function create($meeting, array $payload)
+    public function create($schedule, array $payload)
     {
         // dd($payload);
         $agenda = new Agenda();
         $agenda->title       = $payload['title'];
-        $agenda->meeting_id  = $meeting;
+        $agenda->schedule_id  = $schedule;
         //  $agenda->duration    = $payload['duration'];
         //  $agenda->description = !empty($payload['description'])? $payload['description']: null;
         $agenda->save();
@@ -127,7 +125,7 @@ class AgendaRepository extends BaseRepository implements AgendaInterface
         $agenda = Agenda::findOrFail($payload['agenda_id']);
 
         $agenda->title       = $payload['title'];
-        $agenda->meeting_id  = $payload['meeting_id'];
+        $agenda->schedule_id  = $payload['schedule_id'];
         $agenda->duration    = $payload['duration'];
         $agenda->description = $payload['description'];
         $agenda->save();
@@ -138,7 +136,7 @@ class AgendaRepository extends BaseRepository implements AgendaInterface
         }
         return $agenda;
     }
-    public function createSubAgenda($meeting, array $payload)
+    public function createSubAgenda($schedule, array $payload)
     {
         // dd($payload);
         $agenda = Agenda::findOrFail($payload['agenda_id']);

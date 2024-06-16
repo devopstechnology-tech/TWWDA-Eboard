@@ -6,6 +6,7 @@ namespace App\Models\Module\Meeting;
 
 use App\Traits\Uuids;
 use App\Models\BaseModel;
+use App\Models\Module\Meeting\Schedule;
 use App\Models\Module\Member\Membership;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\Module\Meeting\Agenda\SubAgenda;
@@ -22,12 +23,12 @@ class Agenda extends BaseModel
         'title',
         'description',
         'duration',
-        'meeting_id',
+        'schedule_id',
     ];
 
-    public function meeting()
+    public function schedule()
     {
-        return $this->belongsTo(Meeting::class, 'meeting_id');
+        return $this->belongsTo(Schedule::class, 'schedule_id');
     }
     public function children()
     {

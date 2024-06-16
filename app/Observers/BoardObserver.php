@@ -6,9 +6,11 @@ use App\Models\Role;
 use App\Models\User;
 use App\Enums\PositionEnum;
 use App\Models\Module\Board\Board;
+use App\Models\Module\Member\Position;
 use App\Notifications\BoardUpdateNotification;
 use App\Notifications\BoardNewMemberNotification;
 use App\Notifications\BoardMemberRoleNotification;
+use App\Notifications\BoardMemberPositionNotification;
 
 
 class BoardObserver
@@ -33,8 +35,8 @@ class BoardObserver
         if (!empty($board->tempUserIds)) {
             $this->notifyBoardMembers($board, $board->tempUserIds);
         }
-        if (!empty($board->tempMemberUserId)  && !empty($board->tempMemberRole)) {
-            $this->notifyBoardMemberRoleChange($board, $board->tempMemberUserId, $board->tempMemberRole);
+        if (!empty($board->tempMemberId)  && !empty($board->tempMemberPosition)) {
+            $this->notifyBoardMemberPositionChange($board, $board->tempMemberId, $board->tempMemberPosition);
         }
         if (!empty($board->tempMemberUpdates)) {
             $this->updateBoardMembers($board, $board->tempMemberUpdates);
@@ -65,25 +67,19 @@ class BoardObserver
     {
         //
     }
-    private function notifyBoardMemberRoleChange(Board $board, string $tempMemberUserId, string $tempMemberRole)
+    private function notifyBoardMemberPositionChange(Board $board, string $tempMemberId, string $tempMemberPosition)
     {
-        // Mapping the role to a position
-        $position = $this->mapRoleToPosition($tempMemberRole);
-
         // Updating the member's position based on the mapped position
-        $member = $board->members()->where('user_id', $tempMemberUserId)->first();
+        $member = $board->members()->where('id', $tempMemberId)->first();
 
         if ($member) {
-            $member->position = $position;
+            $member->position_id = $tempMemberPosition;
             $member->save();
 
             // Optionally, notify the member if there's a significant change or reason to notify
             if ($member->save()) {
-                $user = User::find($tempMemberUserId); // Assuming there's a user relationship defined in Member
-                $role = Role::where('name', $tempMemberRole)->pluck('id');
-                // dd($user->full_name, $tempMemberRole, $role);
-                $user->roles()->sync($role);
-                $user->notify(new BoardMemberRoleNotification($user, $board, $tempMemberRole));
+                $user = User::find($member->user_id);
+                $user->notify(new BoardMemberPositionNotification($user, $board, $tempMemberPosition));
             }
         }
     }
@@ -109,7 +105,7 @@ class BoardObserver
         foreach ($membersToRemove as $member_id) {
             $board->members()
                 ->where('user_id', $member_id)
-                ->where('position', '!=', PositionEnum::Owner->value)
+                ->where('position_id', '!=',  Position::where('name', 'Secretary')->first()->id,)
                 ->delete();
         }
 
@@ -117,7 +113,7 @@ class BoardObserver
         foreach ($membersToAdd as $memberId) {
             $member = $board->members()->Create(
                 ['board_id' => $board->id, 'user_id' => $memberId],
-                ['position' => PositionEnum::Member->value] // Assumes a default position enum is used
+                ['position_id' => Position::where('name', 'Board Member')->first()->id,] // Assumes a default position enum is used
             );
 
             // Notify new members
@@ -127,27 +123,27 @@ class BoardObserver
             }
         }
     }
-    function mapRoleToPosition(string $roleName): string
-    {
-        // Mapping of role names to PositionEnum cases, all keys are in lowercase
-        $mapping = [
-            'system'            => PositionEnum::System->value,
-            'admin'             => PositionEnum::Admin->value,
-            'ceo'               => PositionEnum::CEO->value,
-            'company chairman'  => PositionEnum::CompanyChairman->value,
-            'company secretary' => PositionEnum::CompanySecretary->value,
-            'chairperson'       => PositionEnum::Chairperson->value,
-            'secretary'         => PositionEnum::Secretary->value,
-            'member'            => PositionEnum::Member->value,
-            'guest'             => PositionEnum::Guest->value,
-            'owner'             => PositionEnum::Owner->value,  // Observer maps to Default
-            'observer'          => PositionEnum::Default->value,  // Observer maps to Default
-        ];
+    // function mapRoleToPosition(string $roleName): string
+    // {
+    //     // Mapping of role names to PositionEnum cases, all keys are in lowercase
+    //     $mapping = [
+    //         'system'            => PositionEnum::System->value,
+    //         'admin'             => PositionEnum::Admin->value,
+    //         'ceo'               => PositionEnum::CEO->value,
+    //         'company chairman'  => PositionEnum::CompanyChairman->value,
+    //         'company secretary' => PositionEnum::CompanySecretary->value,
+    //         'chairperson'       => PositionEnum::Chairperson->value,
+    //         'secretary'         => PositionEnum::Secretary->value,
+    //         'member'            => PositionEnum::Member->value,
+    //         'guest'             => PositionEnum::Guest->value,
+    //         'owner'             => PositionEnum::Owner->value,  // Observer maps to Default
+    //         'observer'          => PositionEnum::Default->value,  // Observer maps to Default
+    //     ];
 
-        // Convert the input role name to lowercase to ensure case insensitivity
-        $normalizedRoleName = strtolower($roleName);
+    //     // Convert the input role name to lowercase to ensure case insensitivity
+    //     $normalizedRoleName = strtolower($roleName);
 
-        // Return the enum value for the normalized role name or the default value if not found
-        return $mapping[$normalizedRoleName] ?? PositionEnum::Default->value;
-    }
+    //     // Return the enum value for the normalized role name or the default value if not found
+    //     return $mapping[$normalizedRoleName] ?? PositionEnum::Default->value;
+    // }
 }

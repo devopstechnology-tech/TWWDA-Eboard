@@ -11,6 +11,7 @@ use Illuminate\Http\UploadedFile;
 use App\Models\Module\Board\Board;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Resources\BoardResource;
+use App\Models\Module\Member\Position;
 use App\Repository\Actions\ImageAction;
 use App\Repository\Contracts\BoardInterface;
 use App\Repository\Contracts\FolderInterface;
@@ -85,7 +86,7 @@ class BoardRepository extends BaseRepository implements BoardInterface
         if ($board->wasRecentlyCreated) {
             $board->members()->create([
                 'user_id' => $user->id,
-                'position' => PositionEnum::Owner->value,
+                'position_id' => Position::where('name', 'Secretary')->first()->id,
                 'board_id' =>  $board->id,
             ]);
             $DefaultfolderNames = [
@@ -179,14 +180,14 @@ class BoardRepository extends BaseRepository implements BoardInterface
         $board->touch();
         return $board;
     }
-    public function updateMemberRole(Board|string $board, array $payload): Board
+    public function updateMemberPosition(Board|string $board, array $payload): Board
     {
         if (!($board instanceof Board)) {
             $board = Board::findOrFail($board);
         }
 
-        $board->tempMemberUserId = $payload['id'];
-        $board->tempMemberRole   = $payload['role'];
+        $board->tempMemberId = $payload['id'];
+        $board->tempMemberPosition   = $payload['position_id'];
         // dd($board->tempMemberUpdates);
         $board->save();
         $board->touch();

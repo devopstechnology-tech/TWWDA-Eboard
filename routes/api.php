@@ -21,6 +21,7 @@ use App\Http\Controllers\v1\Modules\Meeting\AgendaController;
 use App\Http\Controllers\v1\Modules\Meeting\MinuteController;
 use App\Http\Controllers\v1\Modules\General\AlmanacController;
 use App\Http\Controllers\v1\Modules\Meeting\MeetingController;
+use App\Http\Controllers\v1\Modules\Member\PositionController;
 use App\Http\Controllers\v1\Modules\Meeting\ScheduleController;
 use App\Http\Controllers\v1\Staff\System\ActivityLogController;
 use App\Http\Controllers\v1\Modules\Board\BoardMemberController;
@@ -68,10 +69,14 @@ Route::group(['prefix' => 'v1'], function () {
             Route::post('settings/update/{setting}', [SettingController::class, 'update']);
             // api/v1/users
             Route::get('users', [UsersController::class, 'index']);
+            Route::get('users/trashedusers', [UsersController::class, 'trashedusers']);
             Route::get('users/{user}', [UsersController::class, 'show']);
             Route::post('users/create', [UsersController::class, 'store']);
             Route::post('users/update/{user}', [UsersController::class, 'update']);
+            Route::post('users/role/update/{user}', [UsersController::class, 'updaterole']);
             Route::post('users/delete/{user}', [UsersController::class, 'destroy']);
+            Route::post('users/restore/delete/{user}', [UsersController::class, 'restore']);
+            Route::post('users/force/delete/{user}', [UsersController::class, 'force']);
 
             //////////////////////////// profiel/////////////////
             Route::get('profiles/{profile}', [ProfileController::class, 'show']);
@@ -85,8 +90,11 @@ Route::group(['prefix' => 'v1'], function () {
             // members
             Route::get('members/board/{board}', [MemberController::class, 'getboardmembers']);
             Route::post('members/board/update/members/{board}', [MemberController::class, 'updateboardmembers']);
-            Route::post('members/board/update/member/role/{board}', [MemberController::class, 'updateboardmemberrole']);
+            Route::post('members/board/update/member/position/{board}', [MemberController::class, 'updateboardmemberposition']);
 
+
+            // positions
+            Route::get('positions', [PositionController::class, 'index']);
             //////////////////////////// Committee/////////////////
             Route::apiResource('committees', CommitteeController::class);
             Route::post('committees/members/{committee}', [CommitteeController::class, 'updatememmbers']);
@@ -95,23 +103,28 @@ Route::group(['prefix' => 'v1'], function () {
 
             ///////////////////////////////board meeting//////////////////
             Route::apiResource('agendas', AgendaController::class);
-            Route::get('agendas/meeting/previous', [AgendaController::class, 'latestmeetingagendas']); //ageands for specific meeting
-            Route::get('agendas/meeting/previous/accept/{oldmeeting}/{newmeeting}', [AgendaController::class, 'acceptlatestmeetingagendas']); //ageands for specific meeting
-            Route::get('agendas/meeting/{meeting}', [AgendaController::class, 'meetingagendas']); //ageands for specific meeting
-            Route::post('agendas/meeting/create/{meeting}', [AgendaController::class, 'store']); //ageands for specific meeting
-            Route::post('agendas/meeting/create/subagenda/{meeting}', [AgendaController::class, 'createsubagenda']); //ageands for specific meeting
-            Route::post('agendas/meeting/update/agenda/{meeting}', [AgendaController::class, 'update']); //ageands for specific meeting
-            Route::post('agendas/meeting/update/agenda/subagenda/{meeting}', [AgendaController::class, 'updatesubagenda']); //ageands for specific meeting
-            Route::post('agendas/meeting/delete/agenda/subagenda/{subagenda}', [AgendaController::class, 'deletesubagenda']); //ageands for specific meeting
-            Route::post('agendas/meeting/delete/agenda/{agenda}', [AgendaController::class, 'deleteagenda']); //ageands for specific meeting
+            Route::get('agendas/schedule/previous', [AgendaController::class, 'latestscheduleagendas']); //ageands for specific schedule
+            Route::get('agendas/schedule/previous/accept/{oldschedule}/{newschedule}', [AgendaController::class, 'acceptlatestscheduleagendas']); //ageands for specific schedule
+            Route::get('agendas/schedule/{schedule}', [AgendaController::class, 'scheduleagendas']); //ageands for specific schedule
+            Route::post('agendas/schedule/create/{schedule}', [AgendaController::class, 'store']); //ageands for specific schedule
+            Route::post('agendas/schedule/create/subagenda/{schedule}', [AgendaController::class, 'createsubagenda']); //ageands for specific schedule
+            Route::post('agendas/schedule/update/agenda/{schedule}', [AgendaController::class, 'update']); //ageands for specific schedule
+            Route::post('agendas/schedule/update/agenda/subagenda/{schedule}', [AgendaController::class, 'updatesubagenda']); //ageands for specific schedule
+            Route::post('agendas/schedule/delete/agenda/subagenda/{subagenda}', [AgendaController::class, 'deletesubagenda']); //ageands for specific schedule
+            Route::post('agendas/schedule/delete/agenda/{agenda}', [AgendaController::class, 'deleteagenda']); //ageands for specific schedule
+
 
             ///////////////////////////////meeting Minutes//////////////////
             Route::apiResource('minutes', MinuteController::class);
-            Route::get('minutes/meeting/{meeting}', [MinuteController::class, 'meetingminutes']);
-            Route::post('minutes/meeting/create/{meeting}', [MinuteController::class, 'store']);
-            Route::post('minutes/meeting/create/subminute/{meeting}', [MinuteController::class, 'createsubminute']);
-            Route::post('minutes/meeting/update/minute/{meeting}', [MinuteController::class, 'update']);
-            Route::post('minutes/meeting/update/minute/subminute/{meeting}', [MinuteController::class, 'updatesubminute']);
+            Route::get('minutes/schedule/{schedule}', [MinuteController::class, 'meetingminutes']);
+            Route::post('minutes/schedule/create/{schedule}', [MinuteController::class, 'store']);
+            Route::post('minutes/schedule/create/subminute/{schedule}', [MinuteController::class, 'createsubminute']);
+            Route::post('minutes/schedule/update/minute/{meeting}', [MinuteController::class, 'update']);
+            Route::post('minutes/schedule/update/minute/subminute/{meeting}', [MinuteController::class, 'updatesubminute']);
+            Route::patch('minutes/schedule/ceo/approval/{minutes}', [MinuteController::class, 'ceoapproval']);
+            Route::patch('minutes/schedule/publish/{minutes}', [MinuteController::class, 'publish']);
+            Route::patch('minutes/schedule/signatures/{minutes}', [MinuteController::class, 'signatures']);
+            Route::delete('minutes/schedule/delete/{minutes}', [MinuteController::class, 'destroy']);
 
 
 
@@ -138,17 +151,18 @@ Route::group(['prefix' => 'v1'], function () {
             Route::post('schedules/show/{schedule}', [ScheduleController::class, 'show']);
             Route::post('schedules', [ScheduleController::class, 'store']);
             Route::patch('schedules/update/{schedule}', [ScheduleController::class, 'update']);
+            Route::post('schedules/close/{schedule}', [ScheduleController::class, 'close']);
             Route::delete('schedules/{schedule}', [ScheduleController::class, 'destroy']);
 
 
 
             //////////////////////////// memberships/////////////////
             Route::get('memberships/meeting/{meeting}/board/{board}', [MembershipController::class, 'getmeetingboardmemberships']);
-            Route::post('memberships/update/meeting/{meeting}/board/{board}', [MembershipController::class, 'updatemeetingboardmemberships']);
+            Route::post('memberships/update/meeting/{meeting}/schedule/{schedule}', [MembershipController::class, 'updatemeetingboardmemberships']);
 
             // api/v1/attendances
             Route::get('attendances', [AttendanceController::class, 'index']);
-            Route::get('attendances/meeting/{attendance}', [AttendanceController::class, 'show']);
+            Route::get('attendances/schedule/{schedule}', [AttendanceController::class, 'show']);
             Route::post('attendances/create/{meeting}', [AttendanceController::class, 'store']);
             Route::post('attendances/update/{attendance}', [AttendanceController::class, 'update']);
             Route::post('attendances/delete/{attendance}', [AttendanceController::class, 'destroy']);
@@ -236,11 +250,7 @@ Route::group(['prefix' => 'v1'], function () {
 
 
 // php artisan make:model Module/Member/Attendance -m
-// php artisan make:request SubAgendaAssignee -u
-// php artisan make:controller v1/Modules/Agenda/SubAgendaAssigneeController
-// php artisan make:Repository SubAgendaAssignee
-// php artisan make:resource SubAgendaAssignee
-// php artisan make:request AgendaAssignee -u
-// php artisan make:controller v1/Modules/Agenda/AgendaAssigneeController
-// php artisan make:Repository AgendaAssignee
-// php artisan make:resource AgendaAssignee
+// php artisan make:request Position -u
+// php artisan make:controller v1/Modules/Member/PositionController
+// php artisan make:Repository Position
+// php artisan make:resource Position

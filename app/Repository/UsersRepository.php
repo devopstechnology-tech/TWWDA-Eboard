@@ -6,6 +6,7 @@ namespace App\Repository;
 
 use App\Models\Role;
 use App\Models\User;
+use App\Traits\Types;
 use App\Data\Credentials;
 use App\Models\System\Otp;
 use App\Enums\ChangePasswordEnum;
@@ -19,6 +20,7 @@ use Illuminate\Auth\Access\AuthorizationException;
 
 class UsersRepository extends BaseRepository implements UsersInterface
 {
+    use Types;
     private $profileRepository;
     private $userRepository;
 
@@ -84,6 +86,20 @@ class UsersRepository extends BaseRepository implements UsersInterface
             // 'board_id' => $board,
             'with' => $this->relationships(),
             'orderBy' => ['field' => 'created_at', 'direction' => 'asc']
+        ];
+        return $this->indexResource(User::class, UsersResource::class, $filters);
+    }
+    public function getTrashedUsers()
+    {
+        // $baseUrl = config('app.url');
+        // $parsedUrl = parse_url($baseUrl);
+        // $fullUrl = config('app.url');
+        // dd($fullUrl);
+        $filters = [
+            // 'board_id' => $board,
+            'with' => $this->relationships(),
+            'orderBy' => ['field' => 'created_at', 'direction' => 'asc'],
+            'includeDeleted' => 'only', // Options are 'with', 'only', or not set (to exclude)
         ];
         return $this->indexResource(User::class, UsersResource::class, $filters);
     }
@@ -171,13 +187,63 @@ class UsersRepository extends BaseRepository implements UsersInterface
 
         return $user;
     }
-
-    public function deleteUser(User $user): ?bool
+    public function updateRole(User|string $user, array $payload): User
     {
+        if (!($user instanceof User)) {
+            $user = User::findOrFail($user);
+        }
+        // Map the role to the type
+        $type = Types::mapRoleToType($payload['role']);
+
+        // Update thse user type and role
+        $user->type = $type;
+        $user->role = $payload['role'];
+        $user->save();
+        $user->fresh();
+        $role = Role::where('name', $payload['role'])->pluck('id');
+        $user->roles()->sync($role);
+        return $user;
+    }
+
+
+    public function deleteUser($user)
+    {
+        // Ensure we're working with the correct User instance
+        $user = User::withoutApproval()->findOrFail($user);
+
+        // Detach roles
+        // $user->roles->each(function ($role) {
+        //     $role->users()->detach($role->id);
+        // });
+        // Perform the delete operation
+        $deleted = $user->delete();
+        if ($deleted) {
+            $user = $user->fresh();
+            return !is_null($user->deleted_at);
+        }
+
+        return false;
+    }
+    public function forceDeleteUser($user)
+    {
+        $user = User::withoutApproval()->withTrashed()->findOrFail($user);
+
         $user->roles->each(function ($role) {
             $role->users()->detach($role->id);
         });
 
-        return $user->delete();
+        $deleted = $user->forceDelete();
+        return $deleted;
+    }
+    public function restoreUser($user)
+    {
+        $user = User::withoutApproval()->withTrashed()->findOrFail($user);
+        $restored = $user->restore();
+        if ($restored) {
+            $user = $user->fresh();
+            return is_null($user->deleted_at);
+        }
+
+        return false;
     }
 }

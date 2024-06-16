@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace App\Repository;
 
-use App\Http\Resources\MinuteResource;
-use App\Models\Module\Meeting\Minute;
-use App\Repository\Contracts\DetailMinuteInterface;
-use App\Repository\Contracts\MembershipInterface;
-use App\Repository\Contracts\MinuteInterface;
+use App\Enums\PublishEnum;
+use App\Enums\ApprovalEnum;
+use App\Repository\BaseRepository;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Module\Meeting\Minute;
+use App\Http\Resources\MinuteResource;
+use App\Repository\Contracts\MinuteInterface;
+use App\Repository\Contracts\MembershipInterface;
+use App\Repository\Contracts\DetailMinuteInterface;
 
 class MinuteRepository extends BaseRepository implements MinuteInterface
 {
@@ -22,23 +25,22 @@ class MinuteRepository extends BaseRepository implements MinuteInterface
     public function relationships()
     {
         return [
-                'detailminutes',
-                'detailminutes.subdetailminute',
-                'meeting',
-                'board',
-                'committee',
-                'membership'
-            ];
+            'detailminutes.subdetailminutes',
+            'schedule.meeting',
+            'board',
+            'committee',
+            'author'
+        ];
     }
     public function getAll()
     {
         // Adjust the implementation based on your actual logic
         // For example, using a hypothetical MinuteResource for transformation
         $filters = [
-           'owner_id' => Auth::user()->id,
+            'owner_id' => Auth::user()->id,
             'with' => $this->relationships(),
             'orderBy' => ['field' => 'created_at', 'direction' => 'asc']
-           ];
+        ];
         return $this->indexResource(Minute::class, MinuteResource::class, $filters);
     }
 
@@ -51,73 +53,93 @@ class MinuteRepository extends BaseRepository implements MinuteInterface
         return $minute;
     }
 
-    public function getMeetingMinutes($meeting)
+    public function getScheduleMinutes($schedule)
     {
-        // Filters array with additional key for eager loading
-        $filters = [
-            'meeting_id' => $meeting,
-            'with' => $this->relationships(),
-            'orderBy' => ['field' => 'created_at', 'direction' => 'asc']
-              // This 'with' key could be handled in indexResource for eager loading
-        ];
-        return $this->indexResource(Minute::class, MinuteResource::class, $filters);
+        $minute = Minute::with($this->relationships())->where('schedule_id', $schedule)->first();
+        return MinuteResource::make($minute);
     }
 
     // Implement the methods
 
-    public function create($meeting, array $payload)
+    public function create($schedule, array $payload): Minute
     {
-        if (isset($payload['minute_id']) && !empty($payload['minute_id'])) {
-            $minute = Minute::findOrFail($payload['minute_id']);
-        } else {
-            $minute = new Minute();
-            $minute->meeting_id     = $meeting;
-            $minute->board_id       = $payload['board_id'];
-            $minute->committee_id   = $payload['committee_id'];
-            $minute->membership_id  = $this->membershipRepository->getAuthMembership()->id;
-            $minute->save();
-        }
+        $minute = isset($payload['minute_id']) && !empty($payload['minute_id'])
+            ? Minute::findOrFail($payload['minute_id'])
+            : new Minute();
 
-        if($minute) {
-            $this->detailminuteRepository->create($minute, $payload);
-        }
+        $minute->schedule_id = $schedule;
+        $minute->membership_id = $this->membershipRepository->getAuthMembership()->id;
+        $minute->status = PublishEnum::Default->value;
+        $minute->approvalstatus = ApprovalEnum::Default->value;
+        $minute->save();
+
+        $this->detailminuteRepository->create($minute, $payload);
+
         return $minute;
     }
 
     public function update($minute, array $payload): Minute
     {
         $minute = Minute::findOrFail($payload['minute_id']);
-        if($minute) {
+        if ($minute) {
             $this->detailminuteRepository->update($minute, $payload);
         }
         return $minute;
     }
-    public function createsubminute($meeting, array $payload)
+    public function createSubMinute($schedule, array $payload): Minute
     {
-        // dd($payload);
+        $minute = Minute::findOrFail($payload['minute_id']);
+        $this->detailminuteRepository->createSubMinute($minute, $payload);
 
-        $minute = Minute::findOrFail($payload['minute_id']);
-        if($minute) {
-            $this->detailminuteRepository->createSubMinute($minute, $payload);
-        }
         return $minute;
     }
-    public function updateSubMinute($subminute, array $payload)
+    public function updateSubMinute($subminute, array $payload): Minute
     {
         $minute = Minute::findOrFail($payload['minute_id']);
-        if($minute) {
-            $this->detailminuteRepository->updateSubMinute($minute, $payload);
-        }
+        $this->detailminuteRepository->updateSubMinute($minute, $payload);
+
         return $minute;
     }
-    public function delete(Minute|string $minute): bool
+    public function ceoApprovalMinute(Minute|string $minute): bool
+    {
+        if (!($minute instanceof Minute)) {
+            $minute = Minute::findOrFail($minute);
+        }
+        $minute->approvalstatus = ApprovalEnum::Approved->value;
+
+        return $minute->save();
+    }
+    public function AcceptceoApprovalMinute(Minute|string $minute): bool
+    {
+        if (!($minute instanceof Minute)) {
+            $minute = Minute::findOrFail($minute);
+        }
+        $minute->approvalstatus = ApprovalEnum::Approved->value;
+
+        return $minute->save();
+    }
+    public function publishMinute(Minute|string $minute): bool
+    {
+        if (!($minute instanceof Minute)) {
+            $minute = Minute::findOrFail($minute);
+        }
+        $minute->status = PublishEnum::Published->value;
+
+        return $minute->save();
+    }
+    public function signaturesMinute(Minute|string $minute): bool
+    {
+        if (!($minute instanceof Minute)) {
+            $minute = Minute::findOrFail($minute);
+        }
+        return $minute->delete();
+    }
+    public function deleteMinute(Minute|string $minute): bool
     {
         if (!($minute instanceof Minute)) {
             $minute = Minute::findOrFail($minute);
         }
 
         return $minute->delete();
-    }// Implement the methods
-
-
+    }
 }

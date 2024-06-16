@@ -12,6 +12,7 @@ use App\Models\Module\Member\Member;
 use App\Http\Requests\UpdateMemberRequest;
 use App\Repository\Contracts\MemberInterface;
 use App\Http\Requests\UpdateMemberRoleRequest;
+use App\Http\Requests\UpdateMemberPositionRequest;
 
 class MemberController extends Controller
 {
@@ -30,9 +31,9 @@ class MemberController extends Controller
 
         return $this->response(Response::HTTP_OK, __('messages.record-updated'), $member);
     }
-    public function updateboardmemberrole(UpdateMemberRoleRequest $request, Board $board): JsonResponse
+    public function updateboardmemberposition(UpdateMemberPositionRequest $request, Board $board): JsonResponse
     {
-        $member = $this->memberRepository->updateMemberRole($board, $request->validated());
+        $member = $this->memberRepository->updateMemberPosition($board, $request->validated());
 
         return $this->response(Response::HTTP_OK, __('messages.record-updated'), $member);
     }

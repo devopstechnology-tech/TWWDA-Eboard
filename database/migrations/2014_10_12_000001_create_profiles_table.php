@@ -34,7 +34,7 @@ return new class extends Migration
             $table->string('establishment')->nullable();
             $table->string('title')->nullable();
             $table->string('appointing_authority')->nullable();
-            $table->string('appointnment_date')->nullable();
+            $table->string('appointment_date')->nullable();
             $table->string('appointment_letter')->nullable();
             $table->string('appointment_end_date')->nullable();
             $table->string('serving_term')->nullable();

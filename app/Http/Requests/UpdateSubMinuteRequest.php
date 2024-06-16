@@ -12,7 +12,7 @@ class UpdateSubMinuteRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'meeting_id'   => RuleSet::create()->required()->string(),
+            'schedule_id'   => RuleSet::create()->required()->string(),
             'board_id'     => RuleSet::create()->nullable()->string(),
             'committee_id' => RuleSet::create()->nullable()->string(),
             'membership_id' => RuleSet::create()->nullable()->string(),

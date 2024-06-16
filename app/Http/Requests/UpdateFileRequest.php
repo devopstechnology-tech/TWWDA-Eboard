@@ -17,7 +17,7 @@ class UpdateFileRequest extends FormRequest
             'folder_id' => Ruleset::create()->required()->string(),
             'name' => Ruleset::create()->required()->string(),
             'type' => Ruleset::create()->required()->string(),
-            'fileupload' => Ruleset::create()->required(),
+            'fileupload' => RuleSet::create()->required()->file()->max(409600), // 400MB in kilobytes
         ];
     }
 }

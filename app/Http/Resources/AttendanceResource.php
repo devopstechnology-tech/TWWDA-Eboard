@@ -18,7 +18,7 @@ class AttendanceResource extends BaseResource
             'invite_status' => $this->resource->invite_status,
             'rsvp_status' => $this->resource->rsvp_status,
             'attendance_status' => $this->resource->attendance_status,
-            'meeting_id' => $this->resource->meeting_id,
+            'schedule_id' => $this->resource->schedule_id,
             'membership_id' => $this->resource->membership_id,
             'membership' => $this->resource->membership,
             'meeting' => $this->resource->meeting,

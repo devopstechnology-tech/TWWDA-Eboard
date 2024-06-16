@@ -75,14 +75,14 @@ function goBack() {
     router.push({
         name: 'BoardDetails',
         params: {
-            boardId,
+            boardId:boardId,
         },
     });
 }
 // Define a reactive reference for storing meeting data
 const boardId = route.params.boardId as string;
 const meetingId = route.params.meetingId as string;
-const allAgendas = ref<Agenda[]>([]);
+const scheduleId = route.params.scheduleId as string;
 const meeting = ref<Meeting>();
 const MinuteTemplateSelectionmodal = ref<HTMLDialogElement | null>(null);//constants
 const handleUnexpectedError = useUnexpectedErrorHandler();
@@ -165,27 +165,28 @@ const handleRsvpUpdated = (event: { attendeeId: string; status: string }) => {
 
 const filteredAttendances = ref([]);
 
-watchEffect(() => {
-    const attendances = authStore.user.value?.membership?.attendances || [];
-    filteredAttendances.value = attendances.filter(attendance => attendance.meeting_id === meetingId);
-});
+// watchEffect(() => {
+//     const attendances = authStore.user.value?.membership?.attendances || [];
+//     filteredAttendances.value = attendances.filter(attendance => attendance.meeting_id === meetingId);
+// });
 
-watchEffect(() => {
-    if (route.query.previousTab) {
-        currentTab.value = route.query.previousTab as string;
-    }
-});
-const Attendee = computed(() => {
-    return filteredAttendances.value ? filteredAttendances.value[0] : null;
-});
+// watchEffect(() => {
+//     if (route.query.previousTab) {
+//         currentTab.value = route.query.previousTab as string;
+//     }
+// });
+// const Attendee = computed(() => {
+//     return filteredAttendances.value ? filteredAttendances.value[0] : null;
+// });
 
 const openMinuteTemplateSelectionModal = () => {
     // MinuteTemplateSelectionmodal.value?.showModal();
     router.push({
         name: 'BoardMeetingMinutes',
         params: {
-            boardId,
-            meetingId,
+            boardId:boardId,
+            meetingId:meetingId,
+            scheduleId:scheduleId,
         },
         query: {
             defaultMinutes: 'true',
@@ -205,54 +206,7 @@ onMounted(async () => {
     }
 });
 
-// Define an interface for agenda items
-interface AgendaItem {
-    id: string;
-    title: string;
-    children?: AgendaItem[];
-}
 
-// Define the initial agenda structure
-const defaultAgenda: AgendaItem[] = [
-    {id: '1', title: 'Welcome',
-     children: [
-         {id: '1.1', title: 'Call to Order'},
-         {id: '1.2', title: 'Reading of the mission and vision'},
-        ],
-    },
-    {id: '2', title: 'Changes to the Agenda'},
-    {id: '3', title: 'Approval of Minutes'},
-    {id: '4', title: 'Committee Reports',
-     children: [
-         {id: '4.1', title: 'Executive Director'},
-         {id: '4.2', title: 'Finance'},
-         {id: '4.3', title: 'Governance'},
-         {id: '4.4', title: 'Marketing'},
-         {id: '4.5', title: 'Fundraising'},
-         {id: '4.6', title: 'Programs'},
-        ],
-    },
-    {id: '5', title: 'Old Business'},
-    {id: '6', title: 'New Business'},
-    {id: '7', title: 'Comments, Announcements, and Other Business'},
-    {id: '8', title: 'Next Meeting Date'},
-    {id: '9', title: 'Adjournment'},
-];
-
-// Function to populate the default agenda
-function populateDefaultAgenda(): AgendaItem[] {
-    return defaultAgenda;
-}
-
-const Agendas = computed(() => {
-    return allAgendas;
-});
-const getAgendas = async () => {
-    const response = await useGetMeetingAgendasRequest(meetingId, {paginate: 'false'});
-    allAgendas.value = response.data;
-};
-
-console.log('Agendas', Agendas);
 </script>
 <template>
     <div class="container-fluid" v-if="meeting">
@@ -317,11 +271,11 @@ console.log('Agendas', Agendas);
                         </button>
                     </div>
                     <div class="flex justify-center btn-sm">
-                        <MeetingRsvp
+                        <!-- <MeetingRsvp
                             :attendee="Attendee"
                             :disableRemoteRsvp="0"
                             @rsvp-updated="handleRsvpUpdated"
-                        />
+                        /> -->
                     </div>
                 </div>
             </div>

@@ -18,7 +18,7 @@ class UpdateAttendanceRequest extends FormRequest
             'location' => RuleSet::create()->sometimes(),
             'rsvp_status' => RuleSet::create()->sometimes(),
             'attendance_status' => RuleSet::create()->sometimes(),
-            'meeting_id' => RuleSet::create()->sometimes(),
+            'schedule_id' => RuleSet::create()->sometimes(),
             'membership_id' => RuleSet::create()->sometimes(),
         ];
     }

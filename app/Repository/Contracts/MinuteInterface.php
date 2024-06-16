@@ -11,16 +11,16 @@ interface MinuteInterface
     // Define your methods here
     public function getAll();
 
-    public function getMeetingMinutes($meeting);
+    public function getScheduleMinutes($schedule);
     public function get(Minute|string $minute): Minute;
-    public function create($meeting, array $payload);
+    public function create($schedule, array $payload);
 
     public function update(Minute|string $minute, array $payload): Minute;
-    public function createsubminute($meeting, array $payload);
+    public function createsubminute($schedule, array $payload);
     public function updatesubminute($subminute, array $payload);
 
-
-    public function delete(Minute|string $minute): bool;
-
-
+    public function ceoApprovalMinute(Minute|string $minute): bool;
+    public function publishMinute(Minute|string $minute): bool;
+    public function signaturesMinute(Minute|string $minute): bool;
+    public function deleteMinute(Minute|string $minute): bool;
 }

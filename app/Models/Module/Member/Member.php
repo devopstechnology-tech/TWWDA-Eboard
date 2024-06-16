@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Traits\Uuids;
 use App\Models\BaseModel;
 use App\Models\Module\Board\Board;
+use App\Models\Module\Member\Position;
 use App\Models\Module\Committe\Committee;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -23,7 +24,7 @@ class Member extends BaseModel
         'board_id',
         'committee_id',
         'guest_id',
-        'position',
+        'position_id',
         'user_id',
     ];
 
@@ -35,6 +36,10 @@ class Member extends BaseModel
     public function memberships()
     {
         return $this->hasMany(Membership::class);
+    }
+    public function position()
+    {
+        return $this->belongsTo(Position::class, 'position_id');
     }
     public function board()
     {
@@ -50,6 +55,7 @@ class Member extends BaseModel
     }
     public function user()
     {
-        return $this->belongsTo(User::class, 'user_id');
+        return $this->belongsTo(User::class, 'user_id')
+            ->with('profile');
     }
 }
