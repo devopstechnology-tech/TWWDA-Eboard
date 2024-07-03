@@ -94,6 +94,9 @@ class BoardObserver
     }
     protected function updateBoardMembers(Board $board, array $newMemberIds)
     {
+
+        $defaultPositionId = Position::where('name', 'Board Member')->first()->id;
+        $SpecificPositionId = Position::where('name', 'Secretary')->first()->id;
         // Fetch existing member IDs for comparison
         $existingMemberIds = $board->members->pluck('user_id')->toArray();
 
@@ -102,19 +105,23 @@ class BoardObserver
         $membersToRemove = array_diff($existingMemberIds, $newMemberIds);
 
         // Remove members not included in the new list
-        foreach ($membersToRemove as $member_id) {
+        foreach ($membersToRemove as $memberId) {
             $board->members()
-                ->where('user_id', $member_id)
-                ->where('position_id', '!=',  Position::where('name', 'Secretary')->first()->id,)
+                ->where('user_id', $memberId)
+                ->where('position_id', '!=', $SpecificPositionId)
                 ->delete();
         }
 
         // Add new members or update existing ones
-        foreach ($membersToAdd as $memberId) {
-            $member = $board->members()->Create(
-                ['board_id' => $board->id, 'user_id' => $memberId],
-                ['position_id' => Position::where('name', 'Board Member')->first()->id,] // Assumes a default position enum is used
+        foreach ($newMemberIds as $memberId) {
+            $member = $board->members()->firstOrNew(
+                ['user_id' => $memberId],
+                ['board_id' => $board->id]
             );
+
+            // Set position_id to 'Board Member' if member is new
+            $member->position_id = $member->exists ? $member->position_id : $defaultPositionId;
+            $member->save();
 
             // Notify new members
             if ($member->wasRecentlyCreated) {
@@ -123,27 +130,4 @@ class BoardObserver
             }
         }
     }
-    // function mapRoleToPosition(string $roleName): string
-    // {
-    //     // Mapping of role names to PositionEnum cases, all keys are in lowercase
-    //     $mapping = [
-    //         'system'            => PositionEnum::System->value,
-    //         'admin'             => PositionEnum::Admin->value,
-    //         'ceo'               => PositionEnum::CEO->value,
-    //         'company chairman'  => PositionEnum::CompanyChairman->value,
-    //         'company secretary' => PositionEnum::CompanySecretary->value,
-    //         'chairperson'       => PositionEnum::Chairperson->value,
-    //         'secretary'         => PositionEnum::Secretary->value,
-    //         'member'            => PositionEnum::Member->value,
-    //         'guest'             => PositionEnum::Guest->value,
-    //         'owner'             => PositionEnum::Owner->value,  // Observer maps to Default
-    //         'observer'          => PositionEnum::Default->value,  // Observer maps to Default
-    //     ];
-
-    //     // Convert the input role name to lowercase to ensure case insensitivity
-    //     $normalizedRoleName = strtolower($roleName);
-
-    //     // Return the enum value for the normalized role name or the default value if not found
-    //     return $mapping[$normalizedRoleName] ?? PositionEnum::Default->value;
-    // }
 }

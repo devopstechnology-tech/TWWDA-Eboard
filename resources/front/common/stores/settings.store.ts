@@ -5,6 +5,7 @@ import {settingsRoute} from '@/common/api/settings_routes';
 import {LOCAL_SETTINGS} from '@/common/constants/localStorageKeys';
 import {Settings, settingsParser, singleSettingResponse} from '@/common/parsers/settingsParser';
 
+
 export const useSettingsStore = defineStore('settings', () => {
     const settings = ref<Settings | null>(null);
 

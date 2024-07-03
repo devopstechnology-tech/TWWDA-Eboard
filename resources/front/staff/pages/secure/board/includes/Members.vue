@@ -14,7 +14,7 @@ import {
     useUpdateMemberPositionRequest,
     useUpdateMemberRequest,
 } from '@/common/api/requests/modules/member/useMemberRequest';
-import {useGetPositionsRequest} from '@/common/api/requests/modules/member/usePositionRequest';
+import {useGetBoardPositionsRequest} from '@/common/api/requests/modules/member/usePositionRequest';
 import{useGetStaffsRequest}from '@/common/api/requests/staff/useStaffRequest';
 import FormDateInput from '@/common/components/FormDateInput.vue';
 import FormDateTimeInput from '@/common/components/FormDateTimeInput.vue';
@@ -27,19 +27,23 @@ import SimpleTable from '@/common/components/Tables/SimpleTable.vue';
 import useUnexpectedErrorHandler from '@/common/composables/useUnexpectedErrorHandler';
 import {
     formattedDate,
+    formattedDateTime, 
     loadAvatar,
     loadImage,    mapIconToRole,
     test,
     truncateDescription,
-    formattedDateTime, 
 } from '@/common/customisation/Breadcrumb';
 import ValidationError from '@/common/errors/ValidationError';
 import {Member, MemberEditParams,MemberPositionRequestPayload,MemberRequestPayload,SelectedResult} from '@/common/parsers/memberParser';
 import {Position} from '@/common/parsers/positionParser';
 import {User} from '@/common/parsers/userParser';
+import useAuthStore from '@/common/stores/auth.store';
 import {Meta} from '@/common/types/types';
 import MemberPosition from '@/staff/pages/secure/board/includes/MemberPosition.vue';
 import Multiselect from '@@/@vueform/multiselect';
+
+
+const authStore = useAuthStore();
 
 //constants
 const route = useRoute();
@@ -190,7 +194,7 @@ const {isLoading, data: Members, refetch: fetchBoardMembers} = getBoardMembers()
 // Fetch positions once and pass to child components
 const allPositions = ref<Position[]>([]);
 const getPositions = async () => {
-    const data = await useGetPositionsRequest({paginate: 'false'});
+    const data = await useGetBoardPositionsRequest({paginate: 'false'});
     allPositions.value = data.data;
 };
 onMounted(async () => {
@@ -243,39 +247,25 @@ const roleIcon = ((roleType:string) => {
                     <div class="card card-outline card-primary h-100">
                         <div class="card-body box-profile">
                             <div class="text-center">
-                                <!-- Image and User Info Column -->
-                                <!-- <div class="avatar avatar-md mb-3">
-                                    <a href="" >
-                                        <img
-                                            class="profile-user-img img-fluid img-circle"
-                                            :src="loadAvatar(member.user.profile.avatar)"
-                                            role="img"
-                                            data-uw-rm-alt="ALT"
-                                        />
-                                    </a>
-                                </div> -->
                                 <h3 class="profile-username text-center text-primary">
-                                    <a href="" @click.prevent="openUserProfile(member.user)">
+                                    <a href="" @click.prevent="
+                                        authStore?.user?.id === member.user.id? openUserProfile(member.user):''">
                                         {{ member.user.full_name }}
                                     </a>
-                                    <button type="button" @click.prevent="openUserProfile(member.user)"
+                                    <button v-if="authStore.hasPermission(['view board member profile'])"
+                                            type="button" @click.prevent="openUserProfile(member.user)"
                                             title="" class="mx-2 btn btn-sm btn-primary">
                                         <i class="far fa-eye"></i>
                                     </button>
-                                    <!-- <button v-show="member.user.role !== 'Super Admin'" 
-                                            type="button" @click.prevent="onDeleteMember(member.id)"
-                                            title="" class="mx-2 btn btn-sm btn-primary">
-                                        <i class="fa fa-trash mr-1"></i>
-                                    </button> -->
                                 </h3>
                                 <p class="text-muted text-center text-bold">{{ member.position.name }}</p>
                             </div>
                             <!-- Action Column -->
-                            <div class="mt-3">
+                            <div class="mt-3" v-if="authStore.hasPermission(['assign board position'])">
                                 <div class="text-bold text-danger text-center mb-1" >
                                     Position
                                 </div>
-                                <div class="text-center">
+                                <div class="text-center" >
                                     <MemberPosition
                                         :member="member"
                                         :positions="allPositions"
@@ -284,12 +274,23 @@ const roleIcon = ((roleType:string) => {
                                     />
                                 </div>
                             </div>
+                            <div class="mt-3" v-else>
+                                <div class="text-bold text-danger text-center mb-1" >
+                                    Position
+                                </div>
+                                <div class="text-center" >
+                                    <i :class="'mr-2 fa ' + member.position.icon" class="mr-2"></i> 
+                                    {{ member.position.name }}
+                                </div>
+                            </div>
                             <!-- Last Updated Column -->
                             <div class="mt-3">
                                 <div class="text-bold text-danger text-center mb-1">
                                     Last Updated
                                 </div>
-                                <p class="text-center text-primary text-small">{{ formattedDateTime(member.updated_at, null) }}</p>
+                                <p class="text-center text-primary text-small">
+                                    {{ formattedDateTime(member.updated_at, null) }}
+                                </p>
                             </div>
                         </div>
                     </div>

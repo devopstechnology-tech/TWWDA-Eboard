@@ -6,47 +6,44 @@ namespace App\Permissions;
 
 class MinutePermissions
 {
-    public const VIEW = [
-        'name' => 'view Minute',
-        'type' => 'member',
-        'description' => 'Allows a user of type `member` to view Minute',
-    ];
-
     public const CREATE = [
-        'name' => 'create Minute',
-        'type' => 'secretary',
-        'description' => 'Allows a user of type `secretary` to create Minute',
+        'name' => 'create minutes',
+        'type' => ['system', 'admin', 'ceo', 'companychairman', 'companysecretary'],
+        'description' => 'Allows a user to create minutes',
     ];
 
     public const EDIT = [
-        'name' => 'edit Minute',
-        'type' => 'secretary',
-        'description' => 'Allows a user of type `secretary` to edit Minute',
+        'name' => 'edit minutes',
+        'type' => ['system', 'admin', 'ceo', 'companychairman', 'companysecretary'],
+        'description' => 'Allows a user to edit minutes',
     ];
 
-    public const DELETE = [
-        'name' => 'delete Minute',
-        'type' => 'system',
-        'description' => 'Allows a user of type `system` to delete Minute',
+    public const VIEW = [
+        'name' => 'view minutes',
+        'type' => ['system', 'admin', 'ceo', 'companychairman', 'companysecretary', 'chairperson', 'secretary', 'member', 'guest'],
+        'description' => 'Allows a user to view minutes',
     ];
+
+    public const SEND_APPROVAL = [
+        'name' => 'send approve minutes',
+        'type' => ['system', 'admin', 'ceo', 'companysecretary'],
+        'description' => 'Allows a user to send minutes for approval minutes',
+    ];
+
     public const APPROVE = [
-        'name' => 'approve Minute',
-        'type' => 'chairperson',
-        'description' => 'Allows a user of type `chairperson` to approve Minute',
+        'name' => 'approve minutes',
+        'type' => ['system', 'admin', 'ceo', 'companysecretary'],
+        'description' => 'Allows a user to approve minutes',
     ];
-    public const SIGN = [
-        'name' => 'sign Minute',
-        'type' => 'ceo',
-        'description' => 'Allows a user of type `ceo` to sign Minute',
-    ];
+
     public static function allPermissions(): array
     {
         return [
-            self::VIEW,
             self::CREATE,
             self::EDIT,
-            self::DELETE,self::APPROVE,
-self::SIGN,
+            self::VIEW,
+            self::SEND_APPROVAL,
+            self::APPROVE,
         ];
     }
 }

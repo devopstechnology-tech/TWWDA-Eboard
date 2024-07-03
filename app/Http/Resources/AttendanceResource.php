@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Resources;
 
+use App\Http\Resources\MediaResource;
 use Sourcetoad\EnhancedResources\Formatting\Attributes\Format;
 use Sourcetoad\EnhancedResources\Formatting\Attributes\IsDefault;
 
@@ -22,6 +23,8 @@ class AttendanceResource extends BaseResource
             'membership_id' => $this->resource->membership_id,
             'membership' => $this->resource->membership,
             'meeting' => $this->resource->meeting,
+            // 'media' =>  MediaResource::collection($this->whenLoaded('media')),
+            'media' => MediaResource::collection($this->resource->media ?? collect()),
         ];
     }
 

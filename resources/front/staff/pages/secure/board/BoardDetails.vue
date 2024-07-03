@@ -1,15 +1,18 @@
 <script setup lang="ts">
-import {onMounted,ref} from 'vue';
-import {useRoute,useRouter} from 'vue-router';
+import {onMounted, ref} from 'vue';
+import {useRoute, useRouter} from 'vue-router';
 import {useGetSingleBoardRequest} from '@/common/api/requests/modules/board/useBoardRequest'; // Import your API function
-import {loadCover, loadIcon,truncateDescription} from '@/common/customisation/Breadcrumb';
+import {loadCover, loadIcon, truncateDescription} from '@/common/customisation/Breadcrumb';
 import {Board} from '@/common/parsers/boadParser';
+import useAuthStore from '@/common/stores/auth.store';
 import Discussion from './includes/Discussion.vue';
 import Documents from './includes/Documents.vue';
 import Goals from './includes/Goals.vue';
 import HomeDashboard from './includes/HomeDashboard.vue';
 import Members from './includes/Members.vue';
 import TaskPolls from './includes/TaskPolls.vue';
+const authStore = useAuthStore();
+// v-if="authStore.hasPermission(['edit board'])"
 
 // Define a reactive reference for storing board data
 const board = ref<Board>();
@@ -37,7 +40,6 @@ onMounted(async () => {
         console.error('Error fetching board data:', error);
     }
 });
-
 </script>
 
 <template>
@@ -46,23 +48,31 @@ onMounted(async () => {
         <div class="card card-widget widget-user shadow-lg" v-if="board">
             <!-- Add the bg color to the header using any of the bg-* classes -->
             <div class="widget-user-header text-white"
-                 :style="{ background: `url(${loadCover(board.cover)}) center center` }"
-                 style="height: 250px;">
-                 
+                 :style="{ backgroundImage: `url(${loadCover(board.cover)})`, backgroundPosition: 'center center', backgroundSize: 'cover', backgroundRepeat: 'no-repeat' }"
+                 style="height: 250px; width: 100%; position: relative;">
+                <!-- Optional overlay for better readability -->
+                <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5);"></div>
+                <!-- Content goes here -->
             </div>
-            <div class="card-footer" >
+
+            <div class="card-footer">
                 <div class="">
-                    <span class="info-box-icon bg-danger"
-                          style="left: 4%; margin-left: -45px; position: absolute; top: 190px;">
-                        <img class="img-square" :src="loadIcon(board.icon)" alt="User Avatar"
+                    <div class="widget-user-image" 
+                         style="left: 4%; 
+                        margin-left: -45px; 
+                        position: absolute; 
+                        top: 190px;">
+                        <img class="img-circle elevation-2" 
+                             :src="loadIcon(board.icon)" 
+                             alt="User Avatar" 
                              style="width:128px; height: 128px">
-                    </span>
+                    </div>
                     <div class="ml-3 flex-1" style=" margin-top: -28px;">
                         <a href="" @click.prevent="goBack()"
-                           class="mb-2 lg:mb-0 text-blue-primary" style="margin-left: 131px; margin-top: -44px;">
+                           class="mb-2 lg:mb-0 text-blue-primary" style="margin-left: 140px; margin-top: -44px;">
                             <i class="fas fa-chevron-left fa-xs"></i> Boards
                         </a>
-                        <h3 class="h2 mb-2 lg:mb-0" style="margin-left: 131px;">
+                        <h3 class="h2 mb-2 lg:mb-0" style="margin-left: 150px;">
                             {{ board.name }}
                         </h3>
                         <div class="card-outline card-outline-tabs">
@@ -73,7 +83,7 @@ onMounted(async () => {
                                            href="#custom-tabs-four-home" role="tab"
                                            aria-controls="custom-tabs-four-home" aria-selected="true">Meetings</a>
                                     </li>
-                                    <li class="nav-item">
+                                    <li class="nav-item" v-if="authStore.hasPermission(['view folders'])">
                                         <a class="nav-link" id="custom-tabs-four-documents-tab" data-toggle="pill"
                                            href="#custom-tabs-four-documents" role="tab"
                                            aria-controls="custom-tabs-four-documents" aria-selected="false">
@@ -148,5 +158,3 @@ onMounted(async () => {
         <!-- /.widget-user -->
     </div>
 </template>
-
-

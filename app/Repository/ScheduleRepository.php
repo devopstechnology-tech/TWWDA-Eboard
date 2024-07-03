@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Repository;
 
+use Carbon\Carbon;
 use App\Enums\HeldEnum;
 use App\Enums\CloseEnum;
 use App\Enums\StatusEnum;
@@ -12,6 +13,7 @@ use App\Models\Module\Member\Member;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Module\Meeting\Meeting;
 use App\Models\Module\Meeting\Schedule;
+use App\Http\Resources\ScheduleResource;
 use App\Repository\Contracts\ScheduleInterface;
 use App\Repository\Contracts\MembershipInterface;
 
@@ -21,16 +23,22 @@ class ScheduleRepository extends BaseRepository implements ScheduleInterface
         private readonly MembershipInterface $membershipRepository,
     ) {
     }
+
+    public function relationships()
+    {
+        return [
+            'meeting',
+        ];
+    }
+
     // Implement the methods
     public function getAll()
     {
-        // Adjust the implementation based on your actual logic
-        // For example, using a hypothetical ScheduleResource for transformation
         $filters = [
-            'user_id' => Auth::user()->id,
+            'with' => $this->relationships(),
             'orderBy' => ['field' => 'id', 'direction' => 'asc']
         ];
-        return $this->indexResource(Schedule::class, $filters);
+        return $this->indexResource(Schedule::class, ScheduleResource::class, $filters);
     }
 
     public function get(Schedule|string $schedule): Schedule
@@ -134,11 +142,12 @@ class ScheduleRepository extends BaseRepository implements ScheduleInterface
 
         return $schedule->delete();
     }
-    public function closeSchedule(Schedule|string $schedule): bool
+    public function closeSchedule(Schedule|string $schedule)
     {
         if (!($schedule instanceof Schedule)) {
             $schedule = Schedule::findOrFail($schedule);
             $schedule->closestatus = CloseEnum::Closed->value;
+            $schedule->end_time   = Carbon::now()->format('g:i a'); // Example: '5:47 p.m.'
             $schedule->save();
         }
 

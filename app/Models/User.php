@@ -30,6 +30,8 @@ use App\Models\System\PasswordHistory;
 use App\Models\Module\Member\Membership;
 use Illuminate\Notifications\Notifiable;
 use App\Models\Module\Committe\Committee;
+use App\Models\Module\Discussion\Sub\Chat;
+use App\Models\Module\Discussion\Discussion;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Auth\Passwords\CanResetPassword;
@@ -39,6 +41,7 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use App\Models\Module\Discussion\Sub\DiscussionAssignee;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
@@ -330,5 +333,25 @@ class User extends BaseModel implements AuthenticatableContract, AuthorizableCon
         //        }
 
         return true;
+    }
+    
+    public function discussions()
+    {
+        return $this->hasMany(Discussion::class, 'user_id');
+    }
+
+    public function sentChats()
+    {
+        return $this->hasMany(Chat::class, 'assignee_sender_id');
+    }
+
+    public function receivedChats()
+    {
+        return $this->hasMany(Chat::class, 'assignee_receiver_id');
+    }
+
+    public function discussionAssignees()
+    {
+        return $this->morphMany(DiscussionAssignee::class, 'assignee');
     }
 }

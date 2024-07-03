@@ -9,7 +9,8 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Spatie\Permission\PermissionRegistrar;
 
-return new class () extends Migration {
+return new class() extends Migration
+{
     public function up(): void
     {
         $tableNames = config('permission.table_names');
@@ -24,39 +25,38 @@ return new class () extends Migration {
         }
 
         Schema::create($tableNames['permissions'], function (Blueprint $table) {
-            // $table->bigIncrements('id');
             $table->uuid('id')->primary();
-            $table->string('name');       // For MySQL 8.0 use string('name', 125);
+            $table->string('name');
             $table->string('guard_name');
             $table->string('class')->nullable();
             $table->string('action')->nullable();
-            $table->text('description')->nullable(); // For MySQL 8.0 use string('guard_name', 125);
-
-            $table->string('type')->default(Permission::$type_default);
+            $table->text('description')->nullable();
+            $table->json('type');
             $table->timestamps();
             $table->softDeletes();
 
-            $table->unique(['name', 'guard_name', 'type']);
+            // Add a generated column to index the JSON type column
+            $table->string('type_generated')->virtualAs('JSON_UNQUOTE(JSON_EXTRACT(`type`, "$[0]"))');
+            $table->unique(['name', 'guard_name', 'type_generated'], 'permissions_name_guard_name_type_unique');
         });
 
         Schema::create($tableNames['roles'], function (Blueprint $table) {
-            // $table->bigIncrements('id');
             $table->uuid('id')->primary();
-            $table->string('name');       // For MySQL 8.0 use string('name', 125);
-            $table->string('guard_name'); // For MySQL 8.0 use string('guard_name', 125);
+            $table->string('name');
+            $table->string('guard_name');
             $table->string('type')->default(Role::$type_default);
-            $table->softDeletes();
             $table->timestamps();
+            $table->softDeletes();
             $table->unique(['name', 'guard_name', 'type']);
-
         });
 
         Schema::create($tableNames['model_has_permissions'], function (Blueprint $table) use ($tableNames, $columnNames) {
             $table->uuid(PermissionRegistrar::$pivotPermission);
-
             $table->string('model_type');
             $table->uuid($columnNames['model_morph_key']);
+            $table->string('guard_name'); // Added guard_name
             $table->index([$columnNames['model_morph_key'], 'model_type'], 'model_has_permissions_model_id_model_type_index');
+            $table->softDeletes();
 
             $table->foreign(PermissionRegistrar::$pivotPermission)
                 ->references('id')
@@ -67,15 +67,15 @@ return new class () extends Migration {
                 [PermissionRegistrar::$pivotPermission, $columnNames['model_morph_key'], 'model_type'],
                 'model_has_permissions_permission_model_type_primary'
             );
-
         });
 
         Schema::create($tableNames['model_has_roles'], function (Blueprint $table) use ($tableNames, $columnNames) {
             $table->uuid(PermissionRegistrar::$pivotRole);
-
             $table->string('model_type');
             $table->uuid($columnNames['model_morph_key']);
+            $table->string('guard_name'); // Added guard_name
             $table->index([$columnNames['model_morph_key'], 'model_type'], 'model_has_roles_model_id_model_type_index');
+            $table->softDeletes();
 
             $table->foreign(PermissionRegistrar::$pivotRole)
                 ->references('id')
@@ -86,7 +86,6 @@ return new class () extends Migration {
                 [PermissionRegistrar::$pivotRole, $columnNames['model_morph_key'], 'model_type'],
                 'model_has_roles_role_model_type_primary'
             );
-
         });
 
         Schema::create($tableNames['role_has_permissions'], function (Blueprint $table) use ($tableNames) {

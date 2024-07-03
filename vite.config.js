@@ -19,6 +19,11 @@ export default defineConfig({
         vue({
             base: null,
             includeAbsolute: false,
+            template: {
+                compilerOptions: {
+                  isCustomElement: (tag) => tag.includes('i-')
+                }
+              },
         }),
         copy({
             targets: [

@@ -9,6 +9,7 @@ import FormDateTimeInput from '@/common/components/FormDateTimeInput.vue';
 import FormInput from '@/common/components/FormInput.vue';
 import FormUpload from '@/common/components/FormUpload.vue';
 import useUnexpectedErrorHandler from '@/common/composables/useUnexpectedErrorHandler';
+import FormQuillEditor from '@/common/components/FormQuillEditor.vue';
 // Import your API function
 import {
     formatDate,
@@ -25,7 +26,7 @@ import {User} from '@/common/parsers/userParser';
 import useAuthStore from '@/common/stores/auth.store';
 import queryClient from '@/queryClient';
 const authStore = useAuthStore();
-
+// v-if="authStore.hasPermission(['view meeting'])"
 
 // Get the route instance
 const route = useRoute();
@@ -457,7 +458,7 @@ const {isLoading, data: fetchedProfile, refetch: fetchProfile} = getProfile();
                                                     class="col-md-6 mb-2 w-full text-sm  tracking-wide"
                                                     placeholder="Enter your Email"
                                                     type="email"
-                                                    :disabled="true"
+                                                    :disabled="false"
                                                 />
                                                 <FormInput
                                                     direction="up"
@@ -541,14 +542,14 @@ const {isLoading, data: fetchedProfile, refetch: fetchProfile} = getProfile();
                                                     placeholder="Enter your Gender"
                                                     type="text"
                                                 />
-                                                <FormInput
-                                                    :labeled="true"
-                                                    direction="up"
+                                                <FormQuillEditor
                                                     label="About"
                                                     name="about"
-                                                    class="col-md-6 w-full text-sm  tracking-wide col-md-6 mb-2"
+                                                    theme="snow"
                                                     placeholder="Enter your About"
-                                                    type="text"
+                                                    toolbar="full"
+                                                    contentType="html"
+                                                    class="col-md-12 w-full text-sm  tracking-wide col-md-6 mb-2"
                                                 />
                                             </div>
 

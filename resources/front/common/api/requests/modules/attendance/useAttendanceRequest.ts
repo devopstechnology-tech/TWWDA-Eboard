@@ -50,6 +50,14 @@ export async function useUpdateAttendanceRSVPRequest(
     });
     return response.json();
 }
+export async function useSendAttendancesReminder(
+    attendanceid:string,
+){
+    const client = useClient();
+    const response = await 
+    client.post(AttendancesRoute() + '/reminder/'+ attendanceid);
+    return response.json();
+}
 export async function useUpdateAttendanceSignatureRequest(
     payload: AttendanceRequestPayload, 
     attendanceid:string,

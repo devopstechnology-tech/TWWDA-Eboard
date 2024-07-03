@@ -18,5 +18,5 @@ interface ScheduleInterface
     public function update(Schedule|string $schedule, array $payload): Schedule;
     public function delete(Schedule|string $schedule): bool;
 
-    public function closeSchedule(Schedule|string $schedule): bool;
+    public function closeSchedule(Schedule|string $schedule);
 }

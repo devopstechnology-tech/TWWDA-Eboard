@@ -6,35 +6,41 @@ namespace App\Permissions;
 
 class FolderPermissions
 {
-    public const VIEW = [
-        'name' => 'view Folder',
-        'type' => 'observer',
-        'description' => 'Allows a user of type `observer` to view Folder',
+    public const CREATE_FOLDERS = [
+        'name' => 'create folders',
+        'type' => ['system', 'admin', 'ceo', 'companychairman', 'companysecretary', 'chairperson', 'secretary'],
+        'description' => 'Allows a user to create folders',
+    ];
+    public const CREATE_DROPZONE = [
+        'name' => 'create dropzone',
+        'type' => ['system', 'admin', 'ceo', 'companychairman', 'companysecretary', 'chairperson', 'secretary'],
+        'description' => 'Allows a user to create a dropzone for document uploads',
+    ];
+    public const EDIT_FOLDERS = [
+        'name' => 'edit folders',
+        'type' => ['system', 'admin', 'ceo', 'companychairman', 'companysecretary', 'chairperson', 'secretary'],
+        'description' => 'Allows a user to edit folders',
+    ];
+    public const VIEW_FOLDERS = [
+        'name' => 'view folders',
+        'type' => ['system', 'admin', 'ceo', 'companychairman', 'companysecretary', 'chairperson', 'secretary', 'member', 'guest'],
+        'description' => 'Allows a user to view folders',
+    ];
+    public const DELETE_FOLDERS = [
+        'name' => 'delete folders',
+        'type' => ['system', 'admin', 'ceo', 'companychairman', 'companysecretary', 'chairperson', 'secretary'],
+        'description' => 'Allows a user to delete folders',
     ];
 
-    public const CREATE = [
-        'name' => 'create Folder',
-        'type' => 'member',
-        'description' => 'Allows a user of type `member` to create Folder',
-    ];
 
-    public const EDIT = [
-        'name' => 'edit Folder',
-        'type' => 'admin',
-        'description' => 'Allows a user of type `admin` to edit Folder',
-    ];
-
-    public const DELETE = [
-        'name' => 'delete Folder',
-        'type' => 'system',
-        'description' => 'Allows a user of type `system` to delete Folder',
-    ];
     public static function allPermissions(): array
     {
         return [
-            self::VIEW,
-            self::CREATE,
-            self::EDIT,
-            self::DELETE,        ];
+            self::CREATE_FOLDERS,
+            self::CREATE_DROPZONE,
+            self::EDIT_FOLDERS,
+            self::VIEW_FOLDERS,
+            self::DELETE_FOLDERS,
+        ];
     }
 }

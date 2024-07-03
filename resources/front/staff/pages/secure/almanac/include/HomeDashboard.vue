@@ -25,7 +25,7 @@ import {
 import{useGetStaffsRequest}from '@/common/api/requests/staff/useStaffRequest';
 import FormDateTimeInput from '@/common/components/FormDateTimeInput.vue';
 import FormInput from '@/common/components/FormInput.vue';
-import FormTextBox from '@/common/components/FormTextBox.vue';
+import FormQuillEditor from '@/common/components/FormQuillEditor.vue';
 import FormUpload from '@/common/components/FormUpload.vue';
 import LoadingComponent from '@/common/components/LoadingComponent.vue';
 import useUnexpectedErrorHandler from '@/common/composables/useUnexpectedErrorHandler';
@@ -45,7 +45,11 @@ import {
 } from '@/common/customisation/Breadcrumb';
 import ValidationError from '@/common/errors/ValidationError';
 import {Almanac, AlmanacRequestPayload} from '@/common/parsers/almanacParser';
+import useAuthStore from '@/common/stores/auth.store';
 
+
+const authStore = useAuthStore();
+// v-if="authStore.hasPermission(['view meeting'])"
 //constants
 const showCreate = ref(false);
 const action = ref('create');
@@ -302,321 +306,339 @@ onMounted(async() => {
 <style scoped>
 </style>
 <template>
-    <div class="row">
-        <div class="col-md-12">
-            <div class="card card-widget">
-                <div class="card-header">
-                    <h1 class="h2 mb-2 lg:mb-0">Almanacs</h1>
-                    <div class="card-tools">
-                        <button type="button" class="btn btn-tool"
-                                :class="{ 'btn-info': currentStatus === 'approved' }"
-                                @click="filterAlmanacs('approved')">
-                            Approved
-                        </button>
-                        <button type="button" class="btn btn-tool"
-                                :class="{ 'btn-info': currentStatus === 'unapproved' }"
-                                @click="filterAlmanacs('unapproved')">
-                            UnApproved
-                        </button>
-                        <button type="button" class="btn btn-tool"
-                                :class="{ 'btn-info': currentStatus === 'ongoing' }"
-                                @click="filterAlmanacs('ongoing')">
-                            Ongoing
-                        </button>
-                        <button type="button" class="btn btn-tool"
-                                :class="{ 'btn-info': currentStatus === 'past' }"
-                                @click="filterAlmanacs('past')">
-                            Past
-                        </button>
-                        <button type="button" class="btn btn-tool"
-                                :class="{ 'btn-info': currentStatus === 'scheduled' }"
-                                @click="filterAlmanacs('scheduled')">
-                            Scheduled
-                        </button>
-                        <button type="button" class="btn btn-tool"
-                                :class="{ 'btn-info': currentStatus === 'held' }"
-                                @click="filterAlmanacs('held')">
-                            Held
-                        </button>
-                        <button type="button" class="btn btn-tool"
-                                :class="{ 'btn-info': currentStatus === 'postponed' }"
-                                @click="filterAlmanacs('postponed')">
-                            Postponed
-                        </button>
-                        <button type="button" class="btn btn-tool"
-                                :class="{ 'btn-info': currentStatus === 'cancelled' }"
-                                @click="filterAlmanacs('cancelled')">
-                            Cancelled
-                        </button> 
-                        <button type="button" @click.prevent="openImportAlmanacModal" 
-                                class="mr-1 ml-1 btn btn-sm btn-primary">
-                            Import
-                        </button>
-                        <button type="button" @click.prevent="openCreateAlmanacModal" class="btn btn-tool">
-                            <i class="fas fa-plus mr-2"></i>
-                        </button>
-                    </div>
+    <div class="container-fluid" v-if="authStore.hasPermission(['view almanac'])">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card card-widget">
+                    <div class="card-header">
+                        <h1 class="h2 mb-2 lg:mb-0">Almanacs</h1>
+                        <div class="card-tools">
+                            <button type="button" class="btn btn-tool"
+                                    :class="{ 'btn-info': currentStatus === 'approved' }"
+                                    @click="filterAlmanacs('approved')">
+                                Approved
+                            </button>
+                            <button type="button" class="btn btn-tool"
+                                    :class="{ 'btn-info': currentStatus === 'unapproved' }"
+                                    @click="filterAlmanacs('unapproved')">
+                                UnApproved
+                            </button>
+                            <button type="button" class="btn btn-tool"
+                                    :class="{ 'btn-info': currentStatus === 'ongoing' }"
+                                    @click="filterAlmanacs('ongoing')">
+                                Ongoing
+                            </button>
+                            <button type="button" class="btn btn-tool"
+                                    :class="{ 'btn-info': currentStatus === 'past' }"
+                                    @click="filterAlmanacs('past')">
+                                Past
+                            </button>
+                            <button type="button" class="btn btn-tool"
+                                    :class="{ 'btn-info': currentStatus === 'scheduled' }"
+                                    @click="filterAlmanacs('scheduled')">
+                                Scheduled
+                            </button>
+                            <button type="button" class="btn btn-tool"
+                                    :class="{ 'btn-info': currentStatus === 'held' }"
+                                    @click="filterAlmanacs('held')">
+                                Held
+                            </button>
+                            <button type="button" class="btn btn-tool"
+                                    :class="{ 'btn-info': currentStatus === 'postponed' }"
+                                    @click="filterAlmanacs('postponed')">
+                                Postponed
+                            </button>
+                            <button type="button" class="btn btn-tool"
+                                    :class="{ 'btn-info': currentStatus === 'cancelled' }"
+                                    @click="filterAlmanacs('cancelled')">
+                                Cancelled
+                            </button> 
+                            <button v-if="authStore.hasPermission(['upload almanac'])"
+                                    type="button" @click.prevent="openImportAlmanacModal" 
+                                    class="mr-1 ml-1 btn btn-sm btn-primary">
+                                Import
+                            </button>
+                            <button v-if="authStore.hasPermission(['create almanac'])"
+                                    type="button" @click.prevent="openCreateAlmanacModal" 
+                                    class="btn btn-tool">
+                                <i class="fas fa-plus mr-2"></i>
+                            </button>
+                        </div>
 
                     <!-- /.card-tools -->
-                </div>
-                <!-- /.card-header -->
-                <div class="card-body">
-                    <ul class="products-list product-list-in-card pl-2 pr-2"  v-if="filteredAlmanacs.length > 0">
-                        <li class="item" 
-                            v-for="almanac in filteredAlmanacs" :key="almanac.id">
-                            <div class="row">
-                                <div class="col-md-1">
-                                    <div class="calendar-icon w-full flex flex-col items-center 
+                    </div>
+                    <!-- /.card-header -->
+                    <div class="card-body">
+                        <ul class="products-list product-list-in-card pl-2 pr-2"  v-if="filteredAlmanacs.length > 0">
+                            <li class="item" 
+                                v-for="almanac in filteredAlmanacs" :key="almanac.id">
+                                <div class="row">
+                                    <div class="col-md-1">
+                                        <div class="calendar-icon w-full flex flex-col items-center 
                                         justify-center mt-1 calendaheight">
-                                        <div class="month customonth">
-                                            {{getMonthAbbreviation(almanac.start)}}
-                                        </div>
-                                        <div class="day font-medium customday">
-                                            <span>{{getDayFromDate(almanac.start)}}</span>
-                                        </div>
-                                        <div class="year font-medium customyear">
-                                            <span>{{getYearFromDate(almanac.start)}}</span>
+                                            <div class="month customonth">
+                                                {{getMonthAbbreviation(almanac.start)}}
+                                            </div>
+                                            <div class="day font-medium customday">
+                                                <span>{{getDayFromDate(almanac.start)}}</span>
+                                            </div>
+                                            <div class="year font-medium customyear">
+                                                <span>{{getYearFromDate(almanac.start)}}</span>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="col-md-11">
-                                    <div class="col-md-12 text-black ">                                        
-                                        <h2 class="h2 mb-2 lg:mb-0 font-bold">{{ almanac.type }}</h2>
+                                    <div class="col-md-11">
+                                        <div class="col-md-12 text-black ">                                        
+                                            <h2 class="h2 mb-2 lg:mb-0 font-bold">{{ almanac.type }}</h2>
+                                        </div>
+                                        <div class="col-md-12 text-black font-medium">
+                                            <p  v-html="almanac.purpose "></p>
+                                        </div>                                    
                                     </div>
-                                    <div class="col-md-12 text-black font-medium">
-                                        <p class=" text-primary font-bold">
-                                            {{ almanac.purpose }}
-                                        </p>
-                                        {{almanac.start}}
-                                    </div>                                    
                                 </div>
-                            </div>
-                            <div class="row border-top border-bottom border-warning 
+                                <div class="row border-top border-bottom border-warning 
                                 d-flex justify-content-between align-items-center">
-                                <div>
-                                    Start: <span class="text-primary font-bold ml-2 mr-2">
-                                        {{ formatDate(almanac.start) }}
+                                    <div>
+                                        Start: <span class="text-primary font-bold ml-2 mr-2">
+                                            {{ formatDate(almanac.start) }}
+                                        </span>
+                                        ||
+                                        End: <span class="text-primary font-bold ml-2 mr-2">
+                                            {{ formatDate(almanac.end) }}
+                                        </span>
+                                        ||
+                                        Duration: <span class="text-primary font-bold ml-2 mr-2">
+                                            {{ getDuration(almanac.start,almanac.end, 'days') }}
+                                        </span>
+                                        ||
+                                        When: <span class="text-primary font-bold ml-2 mr-2">
+                                            {{ FormattedAgo(almanac.start,almanac.end, 'days') }}
+                                        </span>
+                                        ||
+                                        Budget: <span class="text-primary font-bold ml-2 mr-2">
+                                            {{ formatMoney(almanac.budget,"Kshs")  }}
+                                        </span>
+                                        ||
+                                        Held Status: <span class="text-primary font-bold ml-2 mr-2">
+                                            {{almanac.held  }}
+                                        </span>
+                                        ||
+                                        Status: <span class="text-primary font-bold ml-2 mr-2">
+                                            {{almanac.status  }}
+                                        </span>
+                                    </div>
+                                    <span v-if="authStore.hasPermission(['edit almanac'])">
+                                        <button v-if="authStore.hasPermission(['edit almanac'])"
+                                                class="btn btn-sm btn-primary font-bold ml-2 mr-2 mt-1 mb-1" 
+                                                @click.prevent="openEditAlmanacModal(almanac)">
+                                            Edit
+                                        </button>
+                                        <button v-if="authStore.hasPermission(['publish almanac']) 
+                                                    && currentStatus !== 'approved'"
+                                                class="btn btn-sm btn-warning 
+                                                font-bold ml-2 mr-2 mt-1 mb-1" 
+                                                @click.prevent="onApprovePublish(almanac.id)">
+                                            Approve
+                                        </button>
+                                        <button v-if="authStore.hasPermission(['mark held almanac']) 
+                                                    && currentStatus !== 'held'" 
+                                                class="btn btn-sm btn-warning 
+                                                font-bold ml-2 mr-2 mt-1 mb-1" 
+                                                @click.prevent="onHeld(almanac.id)">
+                                            Held
+                                        </button>
+                                        <button v-if="authStore.hasPermission(['cancel almanac']) 
+                                                    && currentStatus !== 'cancelled'" 
+                                                class="btn btn-sm btn-warning 
+                                                font-bold ml-2 mr-2 mt-1 mb-1" 
+                                                @click.prevent="onCancelled(almanac.id)">
+                                            Cancelled
+                                        </button>
+                                        <button v-if="authStore.hasPermission(['postpone almanac']) 
+                                                    && currentStatus !== 'postponed'" 
+                                                class="btn btn-sm btn-warning 
+                                                font-bold ml-2 mr-2 mt-1 mb-1" 
+                                                @click.prevent="onPostponed(almanac.id)">
+                                            Postponed
+                                        </button>
                                     </span>
-                                    ||
-                                    End: <span class="text-primary font-bold ml-2 mr-2">
-                                        {{ formatDate(almanac.end) }}
-                                    </span>
-                                    ||
-                                    Duration: <span class="text-primary font-bold ml-2 mr-2">
-                                        {{ getDuration(almanac.start,almanac.end, 'days') }}
-                                    </span>
-                                    ||
-                                    When: <span class="text-primary font-bold ml-2 mr-2">
-                                        {{ FormattedAgo(almanac.start,almanac.end, 'days') }}
-                                    </span>
-                                    ||
-                                    Budget: <span class="text-primary font-bold ml-2 mr-2">
-                                        {{ formatMoney(almanac.budget,"Kshs")  }}
-                                    </span>
-                                    ||
-                                    Held Status: <span class="text-primary font-bold ml-2 mr-2">
-                                        {{almanac.held  }}
-                                    </span>
-                                    ||
-                                    Status: <span class="text-primary font-bold ml-2 mr-2">
-                                        {{almanac.status  }}
-                                    </span>
-                                </div>
-                                <span>
-                                    <button class="btn btn-sm btn-primary font-bold ml-2 mr-2 mt-1 mb-1" 
-                                            @click.prevent="openEditAlmanacModal(almanac)">
-                                        Edit
-                                    </button>
-                                    <button v-if="currentStatus !== 'approved'" class="btn btn-sm btn-warning 
-                                        font-bold ml-2 mr-2 mt-1 mb-1" 
-                                            @click.prevent="onApprovePublish(almanac.id)">
-                                        Approve
-                                    </button>
-                                    <button v-if="currentStatus !== 'held'" class="btn btn-sm btn-warning 
-                                        font-bold ml-2 mr-2 mt-1 mb-1" 
-                                            @click.prevent="onHeld(almanac.id)">
-                                        Held
-                                    </button>
-                                    <button v-if="currentStatus !== 'cancelled'" class="btn btn-sm btn-warning 
-                                        font-bold ml-2 mr-2 mt-1 mb-1" 
-                                            @click.prevent="onCancelled(almanac.id)">
-                                        Cancelled
-                                    </button>
-                                    <button v-if="currentStatus !== 'postponed'" class="btn btn-sm btn-warning 
-                                        font-bold ml-2 mr-2 mt-1 mb-1" 
-                                            @click.prevent="onPostponed(almanac.id)">
-                                        Postponed
-                                    </button>
-                                </span>
                                
-                            </div>
+                                </div>
 
-                        </li>
-                    </ul>
-                    <div v-else>
-                        No almanacs found for {{ currentStatus }}
+                            </li>
+                        </ul>
+                        <div v-else>
+                            No almanacs found for {{ currentStatus }}
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-    <div class="flex justify-center items-center min-h-screen">
-        <dialog id="almanacImportmodal" class="modal w-full max-w-4xl mx-auto p-0" ref="AlmanacImportModal">
-            <form method="dialog" class="modal-box rounded-xl relative bg-white shadow-xl">
-                <h3 class="font-bold text-lg text-center">
-                    Meeting Spreadsheet Import & Export
-                </h3>
-                <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+        <div class="flex justify-center items-center min-h-screen">
+            <dialog id="almanacImportmodal" class="modal w-full max-w-4xl mx-auto p-0" ref="AlmanacImportModal">
+                <form method="dialog" class="modal-box rounded-xl relative bg-white shadow-xl">
+                    <h3 class="font-bold text-lg text-center">
+                        Meeting Spreadsheet Import & Export
+                    </h3>
+                    <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
 
-                <div class="overflow-auto p-4" style="max-height: 80vh;"> <!-- Scrollable Area -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <!-- Instructions Column -->
-                        <div class="card">
-                            <div class="card-header">
-                                <h3 class="card-title font-bold">Instructions for Preparing and Uploading CSV File</h3>
-                            </div>
-                            <div class="card-body">
-                                <div class="font-bold text-primary mb-3">Download Template for Import</div>
-                                <button @click.prevent="DownloadAlmanacSample" class="btn btn-primary btn-sm mb-3">
-                                    Download CSV Template
-                                </button>
-                                <ul>
-                                    <li>1. Open the downloaded CSV and review the format.</li>
-                                    <li>2. Fill in your data as per the column headings, ensuring correct date formats.</li>
-                                    <li>3. For meetings that were approve, the status place "approved" else use "unapproved" small caps.</li>
-                                    <li>4. Delete the initial sample row from the file.</li>
-                                    <li>5. Save your file in CSV format.</li>
-                                    <li>6. Upload your file using the button below.</li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="card">
-                            <div class="card-body">
-                                <form novalidate @submit.prevent="onSubmit">
-                                    <FormUpload
-                                        :labeled="true"
-                                        label="Upload Completed CSV File"
-                                        name="fileupload"
-                                        class="w-full text-sm text-white tracking-wide"
-                                        placeholder="Select CSV file"
-                                        type="file"
-                                        accept=".csv, application/vnd.ms-excel, text/csv"
-                                        @change="coverChangeIcon"
-                                    />
-                                    <div v-if="fileDetails && fileDetails.name" class="mt-3">
-                                        <div class="mb-2">
-                                            <img v-if="fileDetails.previewUrl"
-                                                 :src="fileDetails.previewUrl"
-                                                 alt="File Preview"
-                                                 class="w-1/4 mb-2">
-                                        </div>
-                                        <p><strong>File Name: </strong> 
-                                            <span> {{ fileDetails.name }}</span>
-                                        </p>
-                                        <p><strong>File Size: </strong> 
-                                            <span> {{ formatFileSize(fileDetails.size) }}</span>
-                                        </p>
-                                        <p><strong>Type: </strong> 
-                                            <span>{{ fileDetails.type }}</span>
-                                        </p>
-                                        <p><strong>Last Modified: </strong> 
-                                            <span> {{ formatTime(fileDetails.lastModifiedDate) }}</span>
-                                        </p>
-                                    </div>
-                                    <button type="submit" class="btn btn-primary btn-md mt-3 w-full">
-                                        Upload CSV
+                    <div class="overflow-auto p-4" style="max-height: 80vh;"> <!-- Scrollable Area -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <!-- Instructions Column -->
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3 class="card-title font-bold">Instructions for Preparing and Uploading CSV File</h3>
+                                </div>
+                                <div class="card-body">
+                                    <div class="font-bold text-primary mb-3">Download Template for Import</div>
+                                    <button @click.prevent="DownloadAlmanacSample" class="btn btn-primary btn-sm mb-3">
+                                        Download CSV Template
                                     </button>
-                                </form>
-                            </div>                            
+                                    <ul>
+                                        <li>1. Open the downloaded CSV and review the format.</li>
+                                        <li>2. Fill in your data as per the column headings, ensuring correct date formats.</li>
+                                        <li>3. For meetings that were approve, the status place "approved" else use "unapproved" small caps.</li>
+                                        <li>4. Delete the initial sample row from the file.</li>
+                                        <li>5. Save your file in CSV format.</li>
+                                        <li>6. Upload your file using the button below.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="card">
+                                <div class="card-body">
+                                    <form novalidate @submit.prevent="onSubmit">
+                                        <FormUpload
+                                            :labeled="true"
+                                            label="Upload Completed CSV File"
+                                            name="fileupload"
+                                            class="w-full text-sm text-white tracking-wide"
+                                            placeholder="Select CSV file"
+                                            type="file"
+                                            accept=".csv, application/vnd.ms-excel, text/csv"
+                                            @change="coverChangeIcon"
+                                        />
+                                        <div v-if="fileDetails && fileDetails.name" class="mt-3">
+                                            <div class="mb-2">
+                                                <img v-if="fileDetails.previewUrl"
+                                                     :src="fileDetails.previewUrl"
+                                                     alt="File Preview"
+                                                     class="w-1/4 mb-2">
+                                            </div>
+                                            <p><strong>File Name: </strong> 
+                                                <span> {{ fileDetails.name }}</span>
+                                            </p>
+                                            <p><strong>File Size: </strong> 
+                                                <span> {{ formatFileSize(fileDetails.size) }}</span>
+                                            </p>
+                                            <p><strong>Type: </strong> 
+                                                <span>{{ fileDetails.type }}</span>
+                                            </p>
+                                            <p><strong>Last Modified: </strong> 
+                                                <span> {{ formatTime(fileDetails.lastModifiedDate) }}</span>
+                                            </p>
+                                        </div>
+                                        <button type="submit" class="btn btn-primary btn-md mt-3 w-full">
+                                            Upload CSV
+                                        </button>
+                                    </form>
+                                </div>                            
+                            </div>
                         </div>
                     </div>
-                </div>
-            </form>
-        </dialog>
-    </div>
-    <div class="flex justify-center items-center min-h-screen">
-        <dialog id="almanacmodal" class="modal w-full max-w-4xl mx-auto p-0" ref="AlmanacModal">
-            <form method="dialog" class="modal-box rounded-xl relative bg-white shadow-xl">
-                <h3 class="font-bold text-lg text-center">
-                    {{ action == 'create' ? 'Create Almanac' : 'Edit Almanac' }}
-                </h3>
-                <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" >✕</button>
+                </form>
+            </dialog>
+        </div>
+        <div class="flex justify-center items-center min-h-screen">
+            <dialog id="almanacmodal" class="modal w-full max-w-4xl mx-auto p-0" ref="AlmanacModal">
+                <form method="dialog" class="modal-box rounded-xl relative bg-white shadow-xl">
+                    <h3 class="font-bold text-lg text-center">
+                        {{ action == 'create' ? 'Create Almanac' : 'Edit Almanac' }}
+                    </h3>
+                    <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" >✕</button>
             
-                <div class="overflow-auto p-4" style="max-height: 80vh;">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 p-2">
-                        <!-- Almanac form -->
-                        <div class="col-span-2">
-                            <form novalidate @submit.prevent="onSubmit" class="">
-                                <div class="flex flex-wrap -mx-2">
-                                    <div class="w-full md:w-1/2 px-1 md:px-2 mb-4">
-                                        <FormInput
-                                            :labeled="true"
-                                            label="Meeting Type"
-                                            name="type"
-                                            placeholder="Enter Meeting Type"
-                                            type="text"/>
+                    <div class="overflow-auto p-4" style="max-height: 80vh;">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 p-2">
+                            <!-- Almanac form -->
+                            <div class="col-span-2">
+                                <form novalidate @submit.prevent="onSubmit" class="">
+                                    <div class="flex flex-wrap -mx-2">
+                                        <div class="w-full md:w-1/2 px-1 md:px-2 mb-4">
+                                            <FormInput
+                                                :labeled="true"
+                                                label="Meeting Type"
+                                                name="type"
+                                                placeholder="Enter Meeting Type"
+                                                type="text"/>
+                                        </div>
+                                        <div class="w-full md:w-1/2 px-1 md:px-2 mb-4">
+                                            <FormInput
+                                                :labeled="true"
+                                                label="Meeting Budget (KShs)"
+                                                name="budget"
+                                                placeholder="Enter Meeting Budget (KShs)"
+                                                type="number"
+                                            />
+                                        </div>
                                     </div>
-                                    <div class="w-full md:w-1/2 px-1 md:px-2 mb-4">
-                                        <FormInput
-                                            :labeled="true"
-                                            label="Meeting Budget (KShs)"
-                                            name="budget"
-                                            placeholder="Enter Meeting Budget (KShs)"
-                                            type="number"
-                                        />
-                                    </div>
-                                </div>
-                                <div class="flex flex-wrap -mx-2">
-                                    <div class="w-full md:w-1/2 px-2 mb-2">
-                                        <!-- <FormDateTimeInput
+                                    <div class="flex flex-wrap -mx-2">
+                                        <div class="w-full md:w-1/2 px-2 mb-2">
+                                            <!-- <FormDateTimeInput
                                             label="Meeting Start Day & Time"
                                             name="start"
                                             :flow="['month']"
                                             placeholder="Enter Meeting Start Day & Time"
                                         /> -->
-                                        <FormDateTimeInput
-                                            :label="'Meeting Start Day & Time'"
-                                            :name="'start'"
-                                            mode="date-picker"
-                                            modeltype="dd-MM-yyyy"
-                                            :enabletimepicker="false"
-                                            placeholder="Meeting Start Day"
-                                        />
-                                    </div>
-                                    <div class="w-full md:w-1/2 px-2 mb-2">
-                                        <!-- <FormDateTimeInput
+                                            <FormDateTimeInput
+                                                :label="'Meeting Start Day & Time'"
+                                                :name="'start'"
+                                                mode="date-picker"
+                                                modeltype="dd-MM-yyyy"
+                                                :enabletimepicker="false"
+                                                placeholder="Meeting Start Day"
+                                            />
+                                        </div>
+                                        <div class="w-full md:w-1/2 px-2 mb-2">
+                                            <!-- <FormDateTimeInput
                                             label="Meeting End Time"
                                             name="end"
                                             :flow="['month']"
                                             placeholder="Enter Meeting End Day & Time"
                                         /> -->
-                                        <FormDateTimeInput
-                                            :label="'Meeting End Time'"
-                                            :name="'end'"
-                                            mode="date-picker"
-                                            modeltype="dd-MM-yyyy"
-                                            :enabletimepicker="false"
-                                            placeholder="Meeting End Day"
-                                        />
+                                            <FormDateTimeInput
+                                                :label="'Meeting End Time'"
+                                                :name="'end'"
+                                                mode="date-picker"
+                                                modeltype="dd-MM-yyyy"
+                                                :enabletimepicker="false"
+                                                placeholder="Meeting End Day"
+                                            />
+                                        </div>
                                     </div>
-                                </div>
-                                <FormTextBox
-                                    :labeled="true"
-                                    label="Meeting Purpose"
-                                    name="purpose"
-                                    placeholder="Enter Meeting Purpose"
-                                    :rows="2"
-                                />
-                                <button type="submit" class="btn btn-primary btn-md w-full mt-6">
-                                    {{ action == 'create' ? 'Create Almanac' : 'Edit Almanac' }}
-                                </button>
-                            </form>
+                                    <FormQuillEditor
+                                        label="Meeting Purpose"
+                                        name="purpose"
+                                        theme="snow"
+                                        placeholder="Enter Meeting Purpose"
+                                        toolbar="full"
+                                        contentType="html"
+                                        class="col-span-3"
+                                    />
+                                    <button type="submit" class="btn btn-primary btn-md w-full mt-6">
+                                        {{ action == 'create' ? 'Create Almanac' : 'Edit Almanac' }}
+                                    </button>
+                                </form>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </form>
-        </dialog>
+                </form>
+            </dialog>
+        </div>
     </div>
+    <div class="container-fluid" v-else>
+        <p class="m-0">
+            <span class="h3  text-primary text-bold text-danger">Sorry, You are not Authorised to view this page</span>
+        </p>
+    </div>     
 </template>
 <style scoped>
 
@@ -624,22 +646,7 @@ onMounted(async() => {
   background-color: #17a2b8;
   color: #fff;
 }
-.calendaheight{
-    height: 100px!important;
-    margin-bottom: 5px!important;
-}
-.customonth{
-    margin-top: 10px !important;
-    font-size: 17px !important;
-    color: white !important;
-    margin-bottom: 10px !important;
-}
-.customday{
-    font-size: 24px!important;
-}
-.customyear{
-    font-size: 19px!important;
-}
+
 
 
 .products-list .product-info {

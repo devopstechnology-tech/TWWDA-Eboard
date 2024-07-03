@@ -4,19 +4,19 @@
             <button :class="['btn btn-primary dropdown-toggle text-truncate w-100', positionClass]" type="button"
                     @click="toggleDropdown"
                     aria-haspopup="true" :aria-expanded="dropdownOpen">
-                <i :class="positionIcon" class="mr-2"></i> {{ props.member?.position.name }}
+                <i :class="'mr-2 fa ' + props.member?.position.icon" class="mr-2"></i> {{ props.member?.position.name }}
             </button>
             <ul v-if="dropdownOpen" class="dropdown-menu show justify-content" aria-labelledby="role-status">
-                <li v-for="position in filteredPositions" :key="position.name">
+                <li v-for="position in Positions" :key="position.name">
                     <a href="#" class="dropdown-item"
                        @click.prevent="updateRole(position)">
-                        <i :class="position.icon" class="mr-2"></i> {{ position.name }}
+                        <i :class="'mr-2 fa ' +  position.icon" class="mr-2"></i> {{ position.name }}
                     </a>
                 </li>
             </ul>
         </div>
         <div v-else class="text-center">
-            <i :class="positionIcon" class="mr-2"></i> {{ props.member?.position.name }}
+            <i :class="'mr-2 fa ' + props.member?.position.icon" class="mr-2"></i> {{ props.member?.position.name }}
         </div>
     </div>
 </template>
@@ -57,41 +57,15 @@ const updateRole = (position: Position) => {
     emit('position-updated', {memberId: props.member.id, positionId: position.id});
     dropdownOpen.value = false;
 };
-
-const positionText = computed(() => props.member.position.name || 'Select Position');
 const positionClass = computed(() => `bg-${props.member?.position.name.toLowerCase()} text-white`);
-const positionIcon = computed(() => {
-    const position = props.member?.position.name;
-    return `mr-2 fa ${mapIconToRole(position)}`;
-});
 
 const dropdownAvailable = computed(() => {
     return props.member?.position.name;
 });
 
-const filteredPositions = computed(() => {
-    return props.positions.filter(position => position.name !== 'System').map(position => ({
-        ...position,
-        icon: `mr-2 fa ${mapIconToRole(position.name)}`,
-    }));
+const Positions = computed(() => {
+    return props.positions;
 });
-
-const mapIconToRole = (name: string) => {
-    // console.log('name',name);
-    const iconMap: { [key: string]: string } = {
-        chairperson: 'fa-users',
-        'vice-chairperson': 'fa-user-friends',
-        secretary: 'fa-user-circle',
-        treasurer: 'fa-user-tie',
-        'board member': 'fa-chess-rook',
-        'executive director': 'fa-user-cog',
-        'committee chair': 'fa-chair',
-        'advisory board member': 'fa-comments',
-        'member-at-large': 'fa-user-alt',
-        'emeritus board member': 'fa-user-graduate',
-    };
-    return iconMap[name.toLowerCase()] || 'fa-user';
-};
 
 </script>
 

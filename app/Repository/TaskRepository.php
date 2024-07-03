@@ -25,7 +25,7 @@ class TaskRepository extends BaseRepository implements TaskInterface
     public function relationships()
     {
         return [
-            'board',
+            'meeting',
             'meeting',
             'committee',
             'taskassignees.user',

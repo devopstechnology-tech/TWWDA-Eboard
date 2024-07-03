@@ -16,6 +16,8 @@ class PositionResource extends BaseResource
             // Base resource fields here
             'id' => $this->resource->getRouteKey(),
             'name' => $this->resource->name,
+            'model' => $this->resource->model,
+            'icon' => $this->resource->icon,
             'description' => $this->resource->description,
             'active' => $this->resource->active,
             'created_at' => $this->resource->created_at,

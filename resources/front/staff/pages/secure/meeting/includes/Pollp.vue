@@ -16,16 +16,18 @@ import {
 import FormDateTimeInput from '@/common/components/FormDateTimeInput.vue';
 import FormDynamicInput from '@/common/components/FormDynamicInput.vue';
 import FormInput from '@/common/components/FormInput.vue';
+import FormQuillEditor from '@/common/components/FormQuillEditor.vue';
 import FormSelect from '@/common/components/FormSelect.vue';
-import FormTextBox from '@/common/components/FormTextBox.vue';
 import useUnexpectedErrorHandler from '@/common/composables/useUnexpectedErrorHandler';
 import ValidationError from '@/common/errors/ValidationError';
 import {Membership, SelectedResult} from '@/common/parsers/membershipParser';
 import {Option} from '@/common/parsers/optionParser';
 import {PollAssignee} from '@/common/parsers/pollassigneeParser';
 import {Poll, PollRequestPayload} from '@/common/parsers/PollParser';
+import useAuthStore from '@/common/stores/auth.store';
 import Multiselect from '@@/@vueform/multiselect';
 
+const authStore = useAuthStore();
 const route = useRoute();
 const showCreate = ref(false);
 const action = ref('create');
@@ -425,7 +427,7 @@ const getMeetingPolls = () => {
         },
     });
 };
-const {isLoading, data: Polls, refetch: fetchMeetingPolls} = getMeetingPolls();
+const {isLoading:isLoadingMeetingPolls, data: Polls, refetch: fetchMeetingPolls} = getMeetingPolls();
 onMounted(async () => {
     // window.dispatchEvent(new CustomEvent('updateTitle', {detail: 'Meeting Tasks'}));
     fetchMemberships();
@@ -437,236 +439,279 @@ onMounted(async () => {
 <style scoped>
 </style>
 <template>
-    <div class="card h-full">
-        <div class="card-header flex items-center">
-            <div class="flex items-center flex-1 w-full">
-                <h2 class="card-header-title h3">
-                    Meeting Polls
-                </h2>
+    <div v-if="authStore.hasPermission(['view poll'])">
+        <div class="card h-full">
+            <div class="card-header flex items-center">
+                <div class="flex items-center flex-1 w-full">
+                    <h2 class="card-header-title h3">
+                        Meeting Polls
+                    </h2>
+                </div>
+                <div class="flex items-center space-x-2" v-if="authStore.hasPermission(['create poll'])">
+                    <button type="button" @click.prevent="openCreatePollModal" class="btn btn-tool">
+                        <i class="far fa fa-plus mr-2"></i> <span class="sr-only">Add poll</span>
+                    </button>
+                </div>
             </div>
-            <div class="flex items-center space-x-2">
-                <button type="button" @click.prevent="openCreatePollModal" class="btn btn-tool">
-                    <i class="far fa fa-plus mr-2"></i> <span class="sr-only">Add poll</span>
-                </button>
-            </div>
-        </div>
-        <div id="poll-asignee-list">
-            <table class="table table-striped card-table">
-                <thead>
-                    <tr>
-                        <th scope="col">
-                            <button class="text-bold btn btn-link btn-sm list-sort asc" data-sort="poll-title">
-                                Poll Title
-                            </button>
-                        </th>
-                        <th scope="col">
-                            <button class="text-bold btn btn-link btn-sm list-sort" data-sort="due-date">
-                                Assigned Members
-                            </button>
-                        </th>
-                        <th scope="col">
-                            <button class="text-bold btn btn-link btn-sm list-sort" data-sort="due-date">
-                                Due Date
-                            </button>
-                        </th>
-                        <th scope="col">
-                            <button class="text-bold btn btn-link btn-sm list-sort" data-sort="status">
-                                Status
-                            </button>
-                        </th>
-                        <th scope="col">
-                            <button class="text-bold btn btn-link btn-sm list-sort"
-                                    data-sort="vote-stats">Vote Stats
-                            </button>
-                        </th>
-                        <th scope="col" class="text-bold text-center">Action</th>
-                    </tr>
-                </thead>
-                <tbody class="list">
-                    <tr v-for="(poll, idx) in Polls" :key="idx">
-                        <td class="poll-title" data-name="poll.name"
-                            style="max-width: 200px; word-wrap: break-word;">
-                            <div class="font-weight-bold">{{ poll.question }}</div>
-                            <p style="white-space: normal;">{{ poll.description }}</p>
-                        </td>
-                        <td >
-                            <ul class="list-none m-0 p-0">
-                                <li v-for="(assignees, idx) in poll.pollassignees" :key="assignees.id">
-                                    {{ idx+1 }}. {{ assignees.user.full_name }}
-                                </li>
-                            </ul>
-                        </td>
-                        <td :class="dateBadgeClass(poll.duedate)">
-                            {{ formattedDateTime(poll.duedate) }}
-                            <button v-if="isDueSoon(poll.duedate)" class="btn btn-warning btn-sm" @click="sendReminder">
-                                Send Reminder
-                            </button>
-                        </td>
-                        <td>
-                            <span :class="statusClass(poll.status)">{{ poll.status }}</span>
-                        </td>
-                        <td v-html="calculateVoteStats(poll)"></td>
-                        <td class="text-center">
-                            <button class="btn btn-danger btn-sm"
-                                    @click.prevent="openEditPollModal(poll)">
-                                Edit
-                            </button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-    <div class="flex justify-center items-center min-h-screen">
-        <dialog id="pollmodal" class="modal w-full max-w-4xl mx-auto p-0" ref="PollModal">
-            <form method="dialog" class="modal-box rounded-xl relative bg-white shadow-xl">
-                <h3 class="font-bold text-lg text-center">
-                    {{ action == 'create' ? 'Create Poll' : 'Edit Poll' }}
-                </h3>
-                <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" >✕</button>
-            
-                <div class="overflow-auto p-4" style="max-height: 80vh;">
-                    <div class="grid grid-cols-2 md:grid-cols-2 gap-4 p-2">
-                        <!-- Almanac form -->
-                        <div class="col-span-2">
-                            <form novalidate @submit.prevent="onSubmit" class="">
-                                <FormInput
-                                    :labeled="true"
-                                    label="Poll Question" 
-                                    name="question"
-                                    placeholder="Enter Poll Question"
-                                    type="text"
-                                />
-                                <FormTextBox
-                                    :labeled="true"
-                                    label="Poll description"
-                                    name="description"
-                                    placeholder="Enter Description"
-                                    :rows="2"
-                                />
-                                <div class="flex flex-wrap -mx-2 mt-2">
-                                    <div class="w-full md:w-1/2 px-1 md:px-2">
-                                        <FormSelect
-                                            :labeled="true"
-                                            name="questionoptiontype"
-                                            label="Select Allowed Answers On the Question"
-                                            placeholder="Select Allowed Answers On the Question"
-                                            :options="QuestionOptionTypes"
-                                            @selectedItem="handleQuestionOptionTypeChange"
-                                        />                                         
-                                    </div>
-                                    <div class="w-full md:w-1/2 px-1 md:px-2">
-                                        <FormDateTimeInput
-                                            label="Poll Due Date"
-                                            name="duedate"
-                                            :flow="['month']"
-                                            placeholder="Enter Poll Due Date & Time"
-                                        />
+            <div class="card-container">
+                <div v-if="isLoadingMeetingPolls">Loading Meeting Polls...</div>
+                <div v-else>
+                    <div class="row overflow-auto p-4" style="max-height: 100vh;">
+                        <div class="col-lg-12 col-md-12 col-sm-12 mb-2" v-for="(poll, idx) in Polls" :key="idx">
+                            <div class="card card-outline card-primary h-100">
+                                <div class="card-header">
+                                    <div class="card-tools">
+                                        <button v-if="authStore.hasPermission(['edit poll'])" 
+                                                class="btn btn-tool" 
+                                                @click.prevent="openEditPollModal(poll)">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
                                     </div>
                                 </div>
-                                <div class="flex flex-wrap -mx-2 mt-2">
-                                    <div class="w-full md:w-1/3 px-1 md:px-2 text-center">
-                                        <div >
-                                            <h2 class="font-bold text-sm text-center">Click to Add Options</h2>
-                                            <button @click.prevent="addEmptyOption" class="btn btn-primary h-10 mt-2">
-                                                Add Option
-                                            </button>
-                                        </div>                                        
-                                        <h4 class="text-info font-semibold">Your Options</h4>
-                                        <ul v-if="values.options">
-                                            <li class="text-primary font-bold text-justify" 
-                                                v-for="(option, idx) in values.options" :key="idx">
-                                                {{idx+1}}.{{ option?.title }}
-                                            </li>
-                                        </ul>
-                                    </div>
-                                    <div class="w-full md:w-2/3 px-1 md:px-2 flex flex-col" v-if="values.options">
-                                        <div class="form-group flex items-center mb-2" 
-                                             v-for="(option, index) in values.options" :key="index">
-                                            <FormDynamicInput
-                                                :labeled="true"
-                                                :label="'Title for option ' + (index+1)"
-                                                :name="'options[' + index + '].title'"
-                                                placeholder="Enter title"
-                                                class="flex-grow"
-                                                type="text"                                                     
-                                            />                                            
-                                            <a href="#" class="ml-2 text-red-600 font-bold mt-8" 
-                                               @click.prevent="removeOption(option.id)">
-                                                ✕
-                                            </a>
+                                <div class="card-body">
+                                    <div class="text-primary tex-bold uppercase">
+                                        <strong class="text-primary">Question:</strong>
+                                        <p  class="mt-2 text-primary text-bold">
+                                            {{poll.question}}
+                                        </p>
+                                        <div class="">
+                                            <strong>Answer Options:</strong>
+                                            <div class="row">
+                                                <div class="col-6">
+                                                    <ul class="list-unstyled text-success">
+                                                        <li v-for="(option, idx) in 
+                                                                poll.options.slice(0, Math.ceil(poll.options.length / 2))" 
+                                                            :key="option.id">
+                                                            {{ idx + 1 }}. {{ option.title }}
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                                <div class="col-6">
+                                                    <ul class="list-unstyled text-success">
+                                                        <li v-for="(option, idx) in 
+                                                                poll.options.slice(Math.ceil(poll.options.length / 2))" 
+                                                            :key="option.id">
+                                                            {{ idx + 1 + Math.ceil(poll.options.length / 2) }}. 
+                                                            {{ option.title }}
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="flex flex-wrap -mx-2 mt-2">
-                                    <div class="w-full md:w-1/2 px-1 md:px-2">
-                                        <FormSelect
-                                            :labeled="true"
-                                            name="assigneetype"
-                                            label="Select Assignee Type"
-                                            placeholder="Select Assignee Type"
-                                            :options="AssigneeTypes"
-                                            @selectedItem="handleAssigneeTypeChange"
-                                        /> 
-                                    </div>
-                                    <div class="w-full md:w-1/2 px-1 md:px-2">
-                                        <div v-if="assigneestatus === 'all_members'">
-                                            <h2 class="font-bold text-primary text-sm text-center">
-                                                All Members Will be assiged this Poll
-                                            </h2>
+                                    <div class="d-flex justify-content-between">
+                                        <div>                                                
+                                            <strong>Due Date:</strong>
+                                            <p :class="dateBadgeClass(poll.duedate)">
+                                                {{ formattedDateTime(poll.duedate) }}</p>
+                                        </div>
+                                        <div>
+                                            <strong>Status:</strong>
+                                            <p>
+                                                <span :class="statusClass(poll.status)">{{ poll.status }}</span>
+                                            </p>
+                                        </div>
+                                        <div>
+                                            <strong>Vote:</strong>
+                                            <p>
+                                                <span v-html="calculateVoteStats(poll)"></span>
+                                            </p>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="form-group col-span-3" v-if="assigneestatus === 'individuals'">
-                                    <label class="text-bold font-medium tracking-wide">
-                                        People To Vote
-                                    </label>
-                                    <div :class="[
-                                        'multiselect-container',
-                                        { error: !!pollassigneeserrorMessage },
-                                    ]">
-                                        <Multiselect
-                                            id="pollassignees"
-                                            v-model="selectedMembershipIds"
-                                            mode="tags"
-                                            required
-                                            placeholder="Choose your stack"
-                                            :close-on-select="false"
-                                            :filter-results="false"
-                                            :min-chars="1"
-                                            :resolve-on-load="false"
-                                            :delay="0"
-                                            :searchable="true"
-                                            :options="Memberships"
-                                            :valueProp="'membership_id'"
-                                            :trackBy="'membership_id'"
-                                            :label="'full_name'"
-                                            class="col-span-3"
-                                            :object="true"
-                                            :class="[
-                                                'multiselect-container',
-                                                { error: !!pollassigneeserrorMessage },
-                                            ]" 
-                                            @select="selectedMembers()"
-                                            @deselect="removeselectedUsers()" />
-                                        <div v-if="pollassigneeserrorMessage" class="message"> 
-                                            {{ pollassigneeserrorMessage }} 
-                                        </div>                                        
+                                    <div class="">
+                                        <strong>Assignees:</strong>
+                                        <div class="row">
+                                            <div class="col-6">
+                                                <ul class="list-unstyled">
+                                                    <li v-for="(assignees, idx) in 
+                                                            poll.pollassignees.slice(0, Math.ceil(poll.pollassignees.length / 2))" 
+                                                        :key="assignees.id">
+                                                        {{ idx + 1 }}. {{ assignees.user.full_name }}
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                            <div class="col-6">
+                                                <ul class="list-unstyled">
+                                                    <li v-for="(assignees, idx) in 
+                                                            poll.pollassignees.slice(Math.ceil(poll.pollassignees.length / 2))" 
+                                                        :key="assignees.id">
+                                                        {{ idx + 1 + Math.ceil(poll.pollassignees.length / 2) }}. 
+                                                        {{ assignees.user.full_name }}
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
                                     </div>
+                                    <div>
+                                        <strong>Description:</strong>
+                                        <p v-html="poll.description" class="mt-2"></p>
+                                    </div>                                    
                                 </div>
-                                <div v-if="selectedMembershipIds && selectedMembershipIds.length || 
-                                    assigneestatus === 'all_members'">
-                                    <button type="submit" class="btn btn-primary btn-md w-full mt-6">
-                                        {{ action == 'create' ? 'Create Poll' : 'Edit Poll' }}
-                                    </button>
-                                </div>   
-                            </form>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </form>
-        </dialog>
+            </div>
+        </div>
+        <div class="flex justify-center items-center min-h-screen">
+            <dialog id="pollmodal" class="modal w-full max-w-4xl mx-auto p-0" ref="PollModal">
+                <form method="dialog" class="modal-box rounded-xl relative bg-white shadow-xl">
+                    <h3 class="font-bold text-lg text-center">
+                        {{ action == 'create' ? 'Create Poll' : 'Edit Poll' }}
+                    </h3>
+                    <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" >✕</button>
+            
+                    <div class="overflow-auto p-4" style="max-height: 80vh;">
+                        <div class="grid grid-cols-2 md:grid-cols-2 gap-4 p-2">
+                            <!-- Almanac form -->
+                            <div class="col-span-2">
+                                <form novalidate @submit.prevent="onSubmit" class="">
+                                    <FormInput
+                                        :labeled="true"
+                                        label="Poll Question" 
+                                        name="question"
+                                        placeholder="Enter Poll Question"
+                                        type="text"
+                                    />
+                                    <FormQuillEditor
+                                        label="Poll description"
+                                        name="description"
+                                        theme="snow"
+                                        placeholder="Enter Poll Description"
+                                        toolbar="full"
+                                        contentType="html"
+                                        class="col-span-2"
+                                    />
+                                    <div class="flex flex-wrap -mx-2 mt-2">
+                                        <div class="w-full md:w-1/2 px-1 md:px-2">
+                                            <FormSelect
+                                                :labeled="true"
+                                                name="questionoptiontype"
+                                                label="Select Allowed Answers On the Question"
+                                                placeholder="Select Allowed Answers On the Question"
+                                                :options="QuestionOptionTypes"
+                                                @selectedItem="handleQuestionOptionTypeChange"
+                                            />                                         
+                                        </div>
+                                        <div class="w-full md:w-1/2 px-1 md:px-2">
+                                            <FormDateTimeInput
+                                                label="Poll Due Date"
+                                                name="duedate"
+                                                :flow="['month']"
+                                                placeholder="Enter Poll Due Date & Time"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div class="flex flex-wrap -mx-2 mt-2">
+                                        <div class="w-full md:w-1/3 px-1 md:px-2 text-center">
+                                            <div >
+                                                <h2 class="font-bold text-sm text-center">Click to Add Options</h2>
+                                                <button @click.prevent="addEmptyOption"
+                                                        class="btn btn-primary h-10 mt-2">
+                                                    Add Option
+                                                </button>
+                                            </div>                                        
+                                            <h4 class="text-info font-semibold">Your Options</h4>
+                                            <ul v-if="values.options">
+                                                <li class="text-primary font-bold text-justify" 
+                                                    v-for="(option, idx) in values.options" :key="idx">
+                                                    {{idx+1}}.{{ option?.title }}
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <div class="w-full md:w-2/3 px-1 md:px-2 flex flex-col" v-if="values.options">
+                                            <div class="form-group flex items-center mb-2" 
+                                                 v-for="(option, index) in values.options" :key="index">
+                                                <FormDynamicInput
+                                                    :labeled="true"
+                                                    :label="'Title for option ' + (index+1)"
+                                                    :name="'options[' + index + '].title'"
+                                                    placeholder="Enter title"
+                                                    class="flex-grow"
+                                                    type="text"                                                     
+                                                />                                            
+                                                <a href="#" class="ml-2 text-red-600 font-bold mt-8" 
+                                                   @click.prevent="removeOption(option.id)">
+                                                    ✕
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="flex flex-wrap -mx-2 mt-2">
+                                        <div class="w-full md:w-1/2 px-1 md:px-2">
+                                            <FormSelect
+                                                :labeled="true"
+                                                name="assigneetype"
+                                                label="Select Assignee Type"
+                                                placeholder="Select Assignee Type"
+                                                :options="AssigneeTypes"
+                                                @selectedItem="handleAssigneeTypeChange"
+                                            /> 
+                                        </div>
+                                        <div class="w-full md:w-1/2 px-1 md:px-2">
+                                            <div v-if="assigneestatus === 'all_members'">
+                                                <h2 class="font-bold text-primary text-sm text-center">
+                                                    All Members Will be assiged this Poll
+                                                </h2>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-span-3" v-if="assigneestatus === 'individuals'">
+                                        <label class="text-bold font-medium tracking-wide">
+                                            People To Vote
+                                        </label>
+                                        <div :class="[
+                                            'multiselect-container',
+                                            { error: !!pollassigneeserrorMessage },
+                                        ]">
+                                            <Multiselect
+                                                id="pollassignees"
+                                                v-model="selectedMembershipIds"
+                                                mode="tags"
+                                                required
+                                                placeholder="Choose your stack"
+                                                :close-on-select="false"
+                                                :filter-results="false"
+                                                :min-chars="1"
+                                                :resolve-on-load="false"
+                                                :delay="0"
+                                                :searchable="true"
+                                                :options="Memberships"
+                                                :valueProp="'membership_id'"
+                                                :trackBy="'membership_id'"
+                                                :label="'full_name'"
+                                                class="col-span-3"
+                                                :object="true"
+                                                :class="[
+                                                    'multiselect-container',
+                                                    { error: !!pollassigneeserrorMessage },
+                                                ]" 
+                                                @select="selectedMembers()"
+                                                @deselect="removeselectedUsers()" />
+                                            <div v-if="pollassigneeserrorMessage" class="message"> 
+                                                {{ pollassigneeserrorMessage }} 
+                                            </div>                                        
+                                        </div>
+                                    </div>
+                                    <div v-if="selectedMembershipIds && selectedMembershipIds.length || 
+                                        assigneestatus === 'all_members'">
+                                        <button type="submit" class="btn btn-primary btn-md w-full mt-6">
+                                            {{ action == 'create' ? 'Create Poll' : 'Edit Poll' }}
+                                        </button>
+                                    </div>   
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </dialog>
+        </div>
     </div>
+    <div v-else>
+        <p class="m-0">
+            <span class="h3  text-primary text-bold text-danger">Sorry, You are not Authorised to view this page</span>
+        </p>
+    </div>    
 </template>
 <style lang="scss">
 .danger-color {

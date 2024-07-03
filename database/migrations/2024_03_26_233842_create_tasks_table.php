@@ -18,7 +18,7 @@ return new class() extends Migration
             $table->uuid('id')->primary();
             $table->string('title')->nullable();
             $table->string('duedate')->nullable();
-            $table->string('description')->nullable();
+            $table->longText('description')->nullable();
             $table->string('assigneetype')->nullable();
             $table->string('assigneestatus')->nullable();
             $table->string('meeting_id')->nullable();

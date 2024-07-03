@@ -15,7 +15,9 @@ return new class extends Migration
         Schema::create('positions', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->string('name')->nullable();
-            $table->string('description')->nullable();
+            $table->string('model')->nullable();
+            $table->string('icon')->nullable();
+            $table->longText('description')->nullable();
             $table->string('active')->default(StatusEnum::Active->value); //signed or unsigned
             $table->softDeletes();
             $table->timestamps();

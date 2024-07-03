@@ -15,7 +15,7 @@ class PermissionController extends Controller
 {
     public function index(): JsonResponse
     {
-        $this->authorize('viewAny', Permission::class);
+        // $this->authorize('viewAny', Permission::class);
         $perms = $this->indexResource(Permission::class, PermissionResource::class);
 
         return $this->response(Response::HTTP_OK, __('messages.records-fetched'), $perms, Permission::class);
@@ -23,21 +23,21 @@ class PermissionController extends Controller
 
     public function store(Request $request)
     {
-        $this->authorize('create', Permission::class);
+        // $this->authorize('create', Permission::class);
     }
 
     public function show(Permission $permission)
     {
-        $this->authorize('view', Permission::class);
+        // $this->authorize('view', Permission::class);
     }
 
     public function update(Request $request, Permission $permission)
     {
-        $this->authorize('update', Permission::class);
+        // $this->authorize('update', Permission::class);
     }
 
     public function destroy(Permission $permission)
     {
-        $this->authorize('delete', Permission::class);
+        // $this->authorize('delete', Permission::class);
     }
 }

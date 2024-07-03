@@ -30,26 +30,26 @@ class FolderController extends Controller
 
         return $this->response(Response::HTTP_OK, __('messages.records-fetched'), $folders, Folder::class);
     }
-     //file
-     public function getfile($folder, $media): JsonResponse
-     {
-         $file = $this->folderRepository->getFile($folder, $media);
-         $headers = array(
-             'Content-Type: application/wasm',
-         );
-
-         return $this->response(Response::HTTP_OK, __('messages.file-fetched'), $file, null, $headers);
-     }
-     public function updatefile(UpdateFileRequest $request, $folder, $media): JsonResponse
-     {
-         $file = $this->folderRepository->updateFile($folder, $media, $request->validated());
-         $headers = array(
+    //file
+    public function getfile($folder, $media): JsonResponse
+    {
+        $file = $this->folderRepository->getFile($folder, $media);
+        $headers = array(
             'Content-Type: application/wasm',
         );
 
-         return $this->response(Response::HTTP_OK, __('messages.records-fetched'), $file, null, $headers);
-     }
-//board
+        return $this->response(Response::HTTP_OK, __('messages.file-fetched'), $file, null, $headers);
+    }
+    public function updatefile(UpdateFileRequest $request, $folder, $media): JsonResponse
+    {
+        $file = $this->folderRepository->updateFile($folder, $media, $request->validated());
+        $headers = array(
+            'Content-Type: application/wasm',
+        );
+
+        return $this->response(Response::HTTP_OK, __('messages.records-fetched'), $file, null, $headers);
+    }
+    //board
     public function getboardfolders($board): JsonResponse
     {
         $folders = $this->folderRepository->getBoardFolders($board);
@@ -83,7 +83,7 @@ class FolderController extends Controller
 
 
 
-   //meeting
+    //meeting
 
     public function getmeetingfolders($meeting): JsonResponse
     {
@@ -117,6 +117,4 @@ class FolderController extends Controller
 
         return $this->response(Response::HTTP_OK, __('messages.records-fetched'), $folder, Folder::class);
     }
-
-
 }

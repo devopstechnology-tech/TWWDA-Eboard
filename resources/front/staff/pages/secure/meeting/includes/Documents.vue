@@ -34,6 +34,9 @@ import {
 } from '@/common/customisation/Breadcrumb';
 import ValidationError from '@/common/errors/ValidationError';
 import {Folder, FolderRequestPayload} from '@/common/parsers/FolderParser';
+import useAuthStore from '@/common/stores/auth.store';
+const authStore = useAuthStore();
+// v-if="authStore.hasPermission(['view meeting'])"
 
 const handleUnexpectedError = useUnexpectedErrorHandler();
 
@@ -385,248 +388,295 @@ const resetFolder = () => {
 
 </script>
 <template>
-    <div class="card">
-        <div class="card-header p-3">
-            <div class="row">
-                <div class="col-12">
-                    <div class="row">
-                        <div class="col-lg-9 col-md-8 col-12 mt-2">
-                            <nav aria-label="Breadcrumbs" class="text-sm overflow-hidden">
-                                <ol class="breadcrumb mb-0 bg-warning">
-                                    <li v-for="(crumb, index) in navigationPath" :key="crumb.id" class="breadcrumb-item">
-                                        <a href="#" class="text-gray-800 font-medium" @click.prevent="navigateTo(index)">
-                                            {{ crumb.name }}
-                                        </a>
-                                    </li>
-                                </ol>
-                            </nav>
-                        </div>
-                        <div class="col-lg-3 col-md-4 col-12 ">
-                            <div class="row">
-                                <div class="col-md-6 col-12 mt-2">
-                                    <div class="dropdown">
-                                        <button class="nav-link dropdown-toggle btn btn-secondary btn-block" href="#" id="navbarDropdown"
-                                                type="button" role="button" data-toggle="dropdown" aria-haspopup="true"
-                                                aria-expanded="false">
-                                            <span class="text-warning mr-1">sort by:</span>{{ currentSortName }}
-                                        </button>
-                                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                            <a v-for="option in sortOptions" :key="option.id"
-                                               href="#" class="dropdown-item"
-                                               @click.prevent="applySort(option.id)">
-                                                {{ option.name }}
+    <div v-if="authStore.hasPermission(['view folders'])">
+        <div class="card">
+            <div class="card-header p-3">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="row">
+                            <div class="col-lg-9 col-md-8 col-12 mt-2">
+                                <nav aria-label="Breadcrumbs" class="text-sm overflow-hidden">
+                                    <ol class="breadcrumb mb-0 bg-warning">
+                                        <li v-for="(crumb, index) in navigationPath" :key="crumb.id" 
+                                            class="breadcrumb-item">
+                                            <a href="#" class="text-gray-800 font-medium" 
+                                               @click.prevent="navigateTo(index)">
+                                                {{ crumb.name }}
                                             </a>
+                                        </li>
+                                    </ol>
+                                </nav>
+                            </div>
+                            <div class="col-lg-3 col-md-4 col-12 ">
+                                <div class="row">
+                                    <div class="col-md-6 col-12 mt-2">
+                                        <div class="dropdown">
+                                            <button class="nav-link dropdown-toggle btn btn-secondary btn-block" 
+                                                    href="#" id="navbarDropdown"
+                                                    type="button" role="button" data-toggle="dropdown" 
+                                                    aria-haspopup="true"
+                                                    aria-expanded="false">
+                                                <span class="text-warning mr-1">sort by:</span>{{ currentSortName }}
+                                            </button>
+                                            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                                <a v-for="option in sortOptions" :key="option.id"
+                                                   href="#" class="dropdown-item"
+                                                   @click.prevent="applySort(option.id)">
+                                                    {{ option.name }}
+                                                </a>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="col-md-6 col-12 mt-2">
-                                    <div class="dropdown">
-                                        <button class="nav-link dropdown-toggle btn btn-primary btn-block" href="#" id="navbarDropdown"
+                                    <div class="col-md-6 col-12 mt-2">
+                                        <div class="dropdown">
+                                            <button 
+                                                v-if="authStore.hasPermission([
+                                                    'create folders',
+                                                    'upload documents',
+                                                    'create dropzone',
+                                                ])"
+                                                class="nav-link dropdown-toggle btn btn-primary btn-block" 
+                                                href="#" id="navbarDropdown"
                                                 type="button" role="button" data-toggle="dropdown" aria-haspopup="true"
                                                 aria-expanded="false">
-                                            <i class="fas fa-plus mr-2"></i>
-                                            New
-                                        </button>
-                                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                            <a href="#" @click.prevent="openCreateFolderModal('folder')"
-                                               class="dropdown-item">
-                                                <i class="fas fa-plus"></i> New folder
-                                            </a>
-                                            <a href="#" @click.prevent="openCreateFolderModal('file')"
-                                               class="dropdown-item">
-                                                <i class="fas fa-file-upload"></i> Upload a file
-                                            </a>
+                                                <i class="fas fa-plus mr-2"></i>
+                                                New
+                                            </button>
+                                            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                                <a v-if="authStore.hasPermission([
+                                                       'create folders',
+                                                       'create dropzone',
+                                                   ])"
+                                                   href="#" @click.prevent="openCreateFolderModal('folder')"
+                                                   class="dropdown-item">
+                                                    <i class="fas fa-plus"></i> New folder
+                                                </a>
+                                                <a 
+                                                    v-if="authStore.hasPermission([
+                                                        'upload documents',
+                                                    ])"
+                                                    href="#" @click.prevent="openCreateFolderModal('file')"
+                                                    class="dropdown-item">
+                                                    <i class="fas fa-file-upload"></i> Upload a file
+                                                </a>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="col-12 mt-3">
-                    <div class="input-group input-group-lg">
-                        <input type="search" class="form-control form-control-lg"
-                               placeholder="Type your keywords here"
-                               v-model="searchQuery">
-                        <div class="input-group-append">
-                            <button type="submit" class="btn btn-lg btn-default">
-                                <i class="fa fa-search"></i>
-                            </button>
+                    <div class="col-12 mt-3"  v-if="authStore.hasPermission([
+                        'search documents',
+                    ])">
+                        <div class="input-group input-group-lg">
+                            <input type="search" class="form-control form-control-lg"
+                                   placeholder="Type your keywords here"
+                                   v-model="searchQuery">
+                            <div class="input-group-append">
+                                <button type="submit" class="btn btn-lg btn-default">
+                                    <i class="fa fa-search"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="card-body py-0 px-4 min-h-[300px] relative -top-px z-10">
-            <div class="table-responsive">
-                <table class="table mb-0">
-                    <tbody>
-                        <tr v-for="folder in filteredFolders" :key="folder.id"
-                            class="group bg-white hover:bg-gray-100 cursor-pointer">
-                            <td class="w-28">
-                                <div v-if="folder.type==='folder'" @click.prevent="openFolder(folder)">
-                                    <img v-if="folder.type === 'folder'" :src="loadDefaultFolderSvg(folder.icon)"
-                                         class="img-fluid" alt="Folder Icon" />
-                                </div>
-                                <div v-else>
-                                    <router-link :to="{
-                                                     name: 'MediaDetails',
-                                                     params: {
-                                                         boardId: boardId,
-                                                         meetingId: folder.meetingId,
-                                                         folderId: folder.id,
-                                                         mediaId: folder?.media[0].uuid,
-                                                     }
-                                                 }"
-                                                 class="d-block text-success hover:text-green-700 transition ease-in-out">
-                                        <img :src="getFileExtensionByMimeType(folder.media[0].mime_type)"
-                                             class="img-fluid" alt="File Icon" />
-                                    </router-link>
-                                </div>
-                            </td>
-                            <td>
-                                <div v-if="folder.type === 'folder'">
-                                    <p class="font-weight-bold text-primary text-truncate">
-                                        {{ folder.name }}
-                                    </p>
-                                    <p class="text-sm font-weight-bold text-primary">
-                                        {{ countChildrenTypes(folder).folderCount }}:
-                                        <span class="text-black">Folders</span>
-                                    </p>
-                                    <p class="text-sm font-weight-bold text-primary">
-                                        {{ countChildrenTypes(folder).fileCount }}:
-                                        <span class="text-black">Files</span>
-                                    </p>
-                                </div>
-                                <div v-else>
-                                    <p class="font-weight-bold text-primary text-truncate">
-                                        {{ folder.media[0].file_name }}
-                                    </p>
-                                    <p class="text-sm font-weight-bold text-primary">
-                                        Size: <span class="text-black">{{ formatFileSize(folder.media[0].size) }}</span>
-                                    </p>
-                                </div>
-                            </td>
-                            <td class="w-28">
-                                <p class="font-weight-bold text-primary text-truncate">
-                                    {{ formatDate(folder.created_at) }}
-                                </p>
-                                <p class="text-xs text-primary">
-                                    {{ formatTime(folder.created_at) }}
-                                </p>
-                            </td>
-                            <td class="w-20 text-center">
-                                <div class="flex justify-end space-x-2">
-                                    <a href="#" v-if="folder.type === 'folder'"
-                                        @click.prevent="openEditFolderModal(folder, 'folder')"
-                                       class="text-warning hover:text-blue-700 transition ease-in-out">
-                                        <i class="far fa-edit"></i>
-                                    </a>
-                                    <a href="#" v-else
-                                        @click.prevent="openEditFolderModal(folder, 'file')"
-                                       class="text-warning hover:text-blue-700 transition ease-in-out">
-                                        <i class="far fa-edit"></i>
-                                    </a>
-                                    <router-link v-if="folder.type === 'file'"  :to="{
-                                                     name: 'MediaDetails',
-                                                     params: {
-                                                         boardId: boardId,
-                                                         meetingId: folder.meetingId,
-                                                         folderId: folder.id,
-                                                         mediaId: folder?.media[0].uuid,
-                                                     }
-                                                 }"
-                                                 class="text-success hover:text-green-700 transition ease-in-out">
-                                        <i class="far fa-eye"></i>
-                                    </router-link>
-                                    <a href="#" @click.prevent="remove(folder.id)"
+            <div class="card-body py-0 px-4 min-h-[300px] relative -top-px z-10">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <tbody>
+                            <tr v-for="folder in filteredFolders" :key="folder.id"
+                                class="group bg-white hover:bg-gray-100 cursor-pointer">
+                                <td class="w-28">
+                                    <div v-if="folder.type==='folder'" @click.prevent="openFolder(folder)">
+                                        <img v-if="folder.type === 'folder'" :src="loadDefaultFolderSvg(folder.icon)"
+                                             class="img-fluid" alt="Folder Icon" />
+                                    </div>
+                                    <div v-else>
+                                        <router-link v-if="authStore.hasPermission(['view documents'])"
+                                                     :to="{
+                                                         name: 'MediaDetails',
+                                                         params: {
+                                                             boardId: boardId,
+                                                             meetingId: folder.meetingId,
+                                                             folderId: folder.id,
+                                                             mediaId: folder?.media[0].uuid,
+                                                         }
+                                                     }"
+                                                     class="d-block text-success 
+                                                 hover:text-green-700 transition ease-in-out">
+                                            <img :src="getFileExtensionByMimeType(folder.media[0].mime_type)"
+                                                 class="img-fluid" alt="File Icon" />
+                                        </router-link>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div v-if="folder.type === 'folder'">
+                                        <p class="font-weight-bold text-primary text-truncate">
+                                            {{ folder.name }}
+                                        </p>
+                                        <p class="text-sm font-weight-bold text-primary">
+                                            {{ countChildrenTypes(folder).folderCount }}:
+                                            <span class="text-black">Folders</span>
+                                        </p>
+                                        <p class="text-sm font-weight-bold text-primary">
+                                            {{ countChildrenTypes(folder).fileCount }}:
+                                            <span class="text-black">Files</span>
+                                        </p>
+                                    </div>
+                                    <div v-else>
+                                        <div v-if="authStore.hasPermission(['view documents'])">
+                                            <p class="font-weight-bold text-primary text-truncate">
+                                                {{ folder?.media[0]?.file_name }}
+                                            </p>
+                                            <p class="text-sm font-weight-bold text-primary">
+                                                Size: <span class="text-black">
+                                                    {{ formatFileSize(folder?.media[0]?.size) }}
+                                                </span>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="w-28">
+                                    <div v-if="folder.type === 'folder'">
+                                        <p class="text-xs text-primary text-truncate">
+                                            {{ formattedDateTime(folder.created_at, '') }}
+                                        </p>
+                                    </div>
+                                    <div v-else>
+                                        <div v-if="authStore.hasPermission(['view documents'])">
+                                            <p  class="text-xs text-primary text-truncate">
+                                                {{ formattedDateTime(folder.created_at, '') }}
+                                            </p>
+                                        </div>                                    
+                                    </div>
+                                </td>
+                                <td class="w-20 text-center">
+                                    <div class="flex justify-end space-x-2">
+                                        <div v-if="folder.type === 'folder'">
+                                            <a href="#" v-if="authStore.hasPermission(['edit folders'])"
+                                               @click.prevent="openEditFolderModal(folder, 'folder')"
+                                               class="text-warning hover:text-blue-700 transition ease-in-out">
+                                                <i class="far fa-edit"></i>
+                                            </a>
+                                        <!-- <a href="#" @click.prevent="remove(folder.id)"
                                        class="text-danger hover:text-blue-700 transition ease-in-out">
                                         <i class="fas fa-trash"></i>
-                                    </a>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-    </div>
-    <div class="flex justify-center col-md-6">
-        <dialog id="foldermodal" class="modal" ref="FolderModal">
-            <form method="dialog" class="modal-box rounded-xl">
-                <h3 class="font-bold text-lg justify-center flex">
-                    {{ action === 'create' ? (type === 'folder' ? 'Create Folder' :
-                        'Upload File') : (type === 'folder' ? 'Update Folder' : 'Update File') }}
-                </h3>
-                <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
-                <div class="w-full mt-6 p-2">
-                    <div class="font-thin text-sm flex flex-col items-center gap-6">
-                        <form novalidate @submit.prevent="onSubmit"
-                              class="w-full rounded-xl mx-auto p-1 custom-modal">
-                            <div  class="row">
-                                <FormInput
-                                    :labeled="true"
-                                    :label="type === 'folder'? 'Folder name' : 'Upload File name'"
-                                    name="name"
-                                    class="col-md-12 w-full text-sm  text-white tracking-wide"
-                                    :placeholder="type === 'folder'? 'Folder name' : 'Upload File name'"
-                                    type="text"
-                                />
-                                <div v-if="type === 'file'" class="row mt-2 ml-2">
-                                    <FormUpload
-                                        :labeled="true"
-                                        label="Upload Cover Image for the Board"
-                                        name="fileupload"
-                                        class="w-full text-sm  text-white tracking-wide col-md-12"
-                                        placeholder="Enter Cover Image of the Board"
-                                        type="file"
-                                        :accept="supportedFileTypes.join(', ')"
-                                        @change="coverChangeIcon($event); updateName($event)"
-                                    />
-                                    <div v-if="values.fileupload" class="row mt-2 ml-2">
-                                        <div class="col-md-6">
-                                            <img v-if="fileDetails.previewUrl"
-                                                 :src="fileDetails.previewUrl"
-                                                 alt="File Preview" class="file_attachment"/>
+                                    </a> -->
                                         </div>
-                                        <div class="col-md-6">
-                                            <p><strong>File Name:</strong>
-                                                <span class="text-bold text-primary">
-                                                    {{ fileDetails.name }}
-                                                </span>
-                                            </p>
-                                            <p><strong>File Size:</strong>
-                                                <span class="text-bold text-primary">
-                                                    {{formatFileSize(fileDetails.size)}}
-                                                </span>
-                                            </p>
-                                            <p><strong>Type:</strong>
-                                                <span class="text-bold text-primary">
-                                                    {{ fileDetails.type }}
-                                                </span>
-                                            </p>
-                                            <p><strong>Last Modified:
-                                               </strong>
-                                                <span class="text-bold text-primary">
-                                                    {{formatTime(fileDetails.lastModifiedDate)}}
-                                                </span>
-                                            </p>
+                                        <div v-else>
+                                            <a href="#" v-if="authStore.hasPermission(['edit documents'])"
+                                               @click.prevent="openEditFolderModal(folder, 'file')"
+                                               class="text-warning hover:text-blue-700 transition ease-in-out">
+                                                <i class="far fa-edit"></i>
+                                            </a>
+                                            <router-link v-if="authStore.hasPermission(['view documents']) 
+                                                             && folder.type === 'file'"  :to="{
+                                                             name: 'MediaDetails',
+                                                             params: {
+                                                                 boardId: boardId,
+                                                                 meetingId: folder.meetingId,
+                                                                 folderId: folder.id,
+                                                                 mediaId: folder?.media[0].uuid,
+                                                             }
+                                                         }"
+                                                         class="text-success 
+                                                         :text-green-700 transition ease-in-out">
+                                                <i class="far fa-eye"></i>
+                                            </router-link>
+                                        </div >
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+        <div class="flex justify-center col-md-6">
+            <dialog id="foldermodal" class="modal" ref="FolderModal">
+                <form method="dialog" class="modal-box rounded-xl">
+                    <h3 class="font-bold text-lg justify-center flex">
+                        {{ action === 'create' ? (type === 'folder' ? 'Create Folder' :
+                            'Upload File') : (type === 'folder' ? 'Update Folder' : 'Update File') }}
+                    </h3>
+                    <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+                    <div class="w-full mt-6 p-2">
+                        <div class="font-thin text-sm flex flex-col items-center gap-6">
+                            <form novalidate @submit.prevent="onSubmit"
+                                  class="w-full rounded-xl mx-auto p-1 custom-modal">
+                                <div  class="row">
+                                    <FormInput
+                                        :labeled="true"
+                                        :label="type === 'folder'? 'Folder name' : 'Upload File name'"
+                                        name="name"
+                                        class="col-md-12 w-full text-sm  text-white tracking-wide"
+                                        :placeholder="type === 'folder'? 'Folder name' : 'Upload File name'"
+                                        type="text"
+                                    />
+                                    <div v-if="type === 'file'" class="row mt-2 ml-2">
+                                        <FormUpload
+                                            :labeled="true"
+                                            label="Upload Cover Image for the Board"
+                                            name="fileupload"
+                                            class="w-full text-sm  text-white tracking-wide col-md-12"
+                                            placeholder="Enter Cover Image of the Board"
+                                            type="file"
+                                            :accept="supportedFileTypes.join(', ')"
+                                            @change="coverChangeIcon($event); updateName($event)"
+                                        />
+                                        <div v-if="values.fileupload" class="row mt-2 ml-2">
+                                            <div class="col-md-6">
+                                                <img v-if="fileDetails.previewUrl"
+                                                     :src="fileDetails.previewUrl"
+                                                     alt="File Preview" class="file_attachment"/>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <p><strong>File Name:</strong>
+                                                    <span class="text-bold text-primary">
+                                                        {{ fileDetails.name }}
+                                                    </span>
+                                                </p>
+                                                <p><strong>File Size:</strong>
+                                                    <span class="text-bold text-primary">
+                                                        {{formatFileSize(fileDetails.size)}}
+                                                    </span>
+                                                </p>
+                                                <p><strong>Type:</strong>
+                                                    <span class="text-bold text-primary">
+                                                        {{ fileDetails.type }}
+                                                    </span>
+                                                </p>
+                                                <p><strong>Last Modified:
+                                                   </strong>
+                                                    <span class="text-bold text-primary">
+                                                        {{formatTime(fileDetails.lastModifiedDate)}}
+                                                    </span>
+                                                </p>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
 
-                            </div>
-                            <button type="submit" class="btn btn-md mb-1 w-full pt-1 text-red-600 mt-6 bg-primary">
-                                {{ action === 'create' ? (type === 'folder' ? 'Create Folder' :
-                                    'Upload File') : (type === 'folder' ? 'Update Folder' : 'Update File') }}
-                            </button>
-                        </form>
+                                </div>
+                                <button type="submit" class="btn btn-md mb-1 w-full pt-1 text-red-600 mt-6 bg-primary">
+                                    {{ action === 'create' ? (type === 'folder' ? 'Create Folder' :
+                                        'Upload File') : (type === 'folder' ? 'Update Folder' : 'Update File') }}
+                                </button>
+                            </form>
+                        </div>
                     </div>
-                </div>
-            </form>
-        </dialog>
+                </form>
+            </dialog>
+        </div>
     </div>
+    <div v-else>
+        <p class="m-0">
+            <span class="h3  text-primary text-bold text-danger">Sorry, You are not Authorised to view this page</span>
+        </p>
+    </div>  
+    
 </template>
 <style scoped>
 .upload-container {

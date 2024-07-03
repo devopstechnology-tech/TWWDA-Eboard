@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {CalendarOptions, DateSelectArg, EventApi, EventClickArg} from '@fullcalendar/core';
+import {CalendarOptions} from '@fullcalendar/core';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import multiMonthPlugin from '@fullcalendar/multimonth';
@@ -8,7 +8,10 @@ import FullCalendar from '@fullcalendar/vue3';
 import {useQuery} from '@tanstack/vue-query';
 import {onMounted, ref, watch} from 'vue';
 import {useGetAlmanacsRequest} from '@/common/api/requests/modules/almanac/useAlmanacRequest';
-import {useGetMeetingsRequest} from '@/common/api/requests/modules/meeting/useMeetingRequest';
+import {useGetSchedulesRequest} from '@/common/api/requests/modules/schedule/useScheduleRequest';
+import useAuthStore from '@/common/stores/auth.store';
+
+const authStore = useAuthStore();
 
 const calendarOptions = ref<CalendarOptions>({
     plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin, multiMonthPlugin],
@@ -35,63 +38,93 @@ const getAlmanacs = () => {
         },
     });
 };
+
 const {isLoading: isLoadingAlmanacs, data: almanacData, refetch: fetchAlmanacs} = getAlmanacs();
 
-const getMeetings = () => {
+const getSchedules = () => {
     return useQuery({
-        queryKey: ['getCalendarMeetingsKey'],
+        queryKey: ['getCalendarMeetingsSchedulesKey'],
         queryFn: async () => {
-            const response = await useGetMeetingsRequest({paginate: 'false'});
+            const response = await useGetSchedulesRequest({paginate: 'false'});
             return response.data.map(formatEvent('meeting'));
         },
     });
 };
-const {isLoading:isLoadingMeetings, data:meetingData, refetch: fetchMeetings} = getMeetings();
-const formatEvent = (type) => (data) => ({
-    id: data.id,
-    title:data.title || data.type,
-    start: type === 'meeting' ? data.schedule?.start_time : data.start,
-    end: type === 'meeting' ? data.schedule?.end_time : data.end,
-    description: data.description || data.purpose,
-    color: determineColor(data, type),
-});
+
+const {isLoading: isLoadingMeetings, data: meetingData, refetch: fetchSchedules} = getSchedules();
+
+function formatEvent(type) {
+    return (data) => {
+        return {
+            id: data.id,
+            title: type === 'meeting' ? data.meeting?.title : data.type,
+            start: type === 'meeting' ? convertToISOFormat(`${data.date} ${data.start_time}`) : convertToISOFormat(`${data.start}`),
+            end: type === 'meeting' ? convertToISOFormat(`${data.date} ${data.end_time}`) : convertToISOFormat(`${data.end}`),
+            description: type === 'meeting' ? data.meeting?.title : data.purpose,
+            color: determineColor(data, type),
+            textColor: '#fff',  // Ensure text is visible on dark backgrounds
+        };
+    };
+}
+
+function convertToISOFormat(dateTimeString: string): string {
+    const parts = dateTimeString.split(/[- :\.]/);
+    if (parts.length === 3) {
+        if (parts[0].length === 4) {
+            return `${parts[0]}-${parts[1]}-${parts[2]}`;
+        } else {
+            return `${parts[2]}-${parts[1]}-${parts[0]}`;
+        }
+    } else if (parts.length >= 5) {
+        const [day, month, year, hour, minute] = parts.slice(0, 5).map(Number);
+        const amPm = parts[5] ? parts[5].toLowerCase() : '';
+        let formattedHour = hour;
+
+        if (amPm === 'pm' && hour < 12) {
+            formattedHour += 12;
+        } else if (amPm === 'am' && hour === 12) {
+            formattedHour = 0;
+        }
+
+        if (parts[0].length === 4) {
+            return `${parts[0]}-${parts[1]}-${parts[2]}T${String(formattedHour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
+        } else {
+            return `${parts[2]}-${parts[1]}-${parts[0]}T${String(formattedHour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
+        }
+    }
+    return dateTimeString;
+}
+
 function determineColor(data, type) {
     const now = new Date();
-    const startDate = new Date(type === 'meeting' ? data.schedule?.start_time : data.start);
-    
-    // Define base and specific colors for each type and status
+    const startDate = new Date(type === 'meeting' ? `${data.date} ${data.start_time}` : data.start);
+
     const colorConfig = {
         almanac: {
-            base: '#DFFF00', // Bright yellow
-            approved: '#FFBF00', // Orange for approved
-            upcoming: '#FF7F50', // Coral for upcoming
-            past: '#DE3163',  // Cerise for past
+            base: 'bg-warning text-dark', // Yellow
+            approved: 'bg-success text-white', // Green
+            upcoming: 'bg-primary text-white', // Blue
+            past: 'bg-secondary text-white', // Grey
         },
         meeting: {
-            base: '#6495ED', // Cornflower Blue
-            published: '#9FE2BF', // Soft Green for published (equivalent to approved)
-            unpublished: '#40E0D0', // Turquoise for unpublished (equivalent to upcoming)
-            past: '#CCCCFF',  // Light periwinkle for past
+            base: 'bg-info text-white', // Light Blue
+            published: 'bg-success text-white', // Green
+            unpublished: 'bg-warning text-dark', // Yellow
+            past: 'bg-secondary text-white', // Grey
         },
     };
 
-    // Mapping meeting statuses to color configurations
     const meetingStatusToColorKey = {
         published: 'published',
         unpublished: 'unpublished',
-        // Other statuses can be added here
     };
 
     if (startDate < now) {
         return colorConfig[type].past;
     }
-    // Use the mapping for meetings or default to status directly for almanacs
-    const statusKey = type === 'meeting' ? meetingStatusToColorKey[data.status] : data.status;
+    const statusKey = type === 'meeting' ? meetingStatusToColorKey[data.meeting?.status] : data.status;
     return colorConfig[type][statusKey] || colorConfig[type].base;
 }
-
-
-
 
 watch([almanacData, meetingData], ([newAlmanacs, newMeetings]) => {
     if (newAlmanacs && newMeetings) {
@@ -101,59 +134,89 @@ watch([almanacData, meetingData], ([newAlmanacs, newMeetings]) => {
 
 onMounted(() => {
     fetchAlmanacs();
-    fetchMeetings();
+    fetchSchedules();
 });
-
-// Event handlers as previously defined
 </script>
 
-
 <template>
-    <div class="card">
-        <div class="card-header">
-            <h3 class="card-title">Calendar</h3>
-            <button class="float-right" @click="toggleWeekends">toggle weekends</button>
-        </div>
+    <div class="container-fluid" v-if="authStore.hasPermission(['view calendar'])">
         <div class="card">
             <div class="card-header">
-                <div class="row">
-                    <!-- Column for Almanac Year Schedule Meetings -->
-                    <div class="col-md-6">
-                        <h1 class="h3 mb-3">Almanac Year Schedule Meetings</h1>
-                        <ul class="list-unstyled">
-                            <li class="legend-item"><span class="legend-color" style="color:#FFBF00;">●</span> Approved Almanac</li>
-                            <li class="legend-item"><span class="legend-color" style="color:#FF7F50;">●</span> Upcoming Almanac</li>
-                            <li class="legend-item"><span class="legend-color" style="color:#DE3163;">●</span> Past Almanac</li>
-                            <li class="legend-item"><span class="legend-color" style="color:#DFFF00;">●</span> Almanac Base</li>
-                        </ul>
-                    </div>
+                <h3 class="card-title">Calendar</h3>
+                <button class="float-right" @click="toggleWeekends">toggle weekends</button>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <div class="row">
+                        <!-- Column for Almanac Year Schedule Meetings -->
+                        <div class="col-md-6">
+                            <h1 class="h3 mb-3">Almanac Year Schedule Meetings</h1>
+                            <ul class="list-unstyled">
+                                <li class="legend-item">
+                                    <span class="badge bg-success">
+                                        ●</span> Approved Almanac
+                                </li>
+                                <li class="legend-item">
+                                    <span class="badge bg-primary">
+                                        ●</span> Upcoming Almanac
+                                </li>
+                                <li class="legend-item">
+                                    <span class="badge bg-secondary">
+                                        ●</span> Past Almanac
+                                </li>
+                                <li class="legend-item">
+                                    <span class="badge bg-warning text-dark">
+                                        ●</span> Almanac Base
+                                </li>
+                            </ul>
+                        </div>
             
-                    <!-- Column for Actual Meetings -->
-                    <div class="col-md-6">
-                        <h1 class="h3 mb-3">Actual Meetings</h1>
-                        <ul class="list-unstyled">
-                            <li class="legend-item"><span class="legend-color" style="color:#9FE2BF;">●</span> Approved Meeting</li>
-                            <li class="legend-item"><span class="legend-color" style="color:#40E0D0;">●</span> Upcoming Meeting</li>
-                            <li class="legend-item"><span class="legend-color" style="color:#CCCCFF;">●</span> Past Meeting</li>
-                            <li class="legend-item"><span class="legend-color" style="color:#6495ED;">●</span> Meeting Base</li>
-                        </ul>
+                        <!-- Column for Actual Meetings -->
+                        <div class="col-md-6">
+                            <h1 class="h3 mb-3">Actual Meetings</h1>
+                            <ul class="list-unstyled">
+                                <li class="legend-item">
+                                    <span class="badge bg-success">
+                                        ●</span> Approved Meeting
+                                </li>
+                                <li class="legend-item">
+                                    <span class="badge bg-warning text-dark">
+                                        ●</span> Upcoming Meeting
+                                </li>
+                                <li class="legend-item">
+                                    <span class="badge bg-secondary">
+                                        ●</span> Past Meeting
+                                </li>
+                                <li class="legend-item">
+                                    <span class="badge bg-info">
+                                        ●</span> Meeting Base
+                                </li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <div class="card-body p-0">            
-            <FullCalendar :options="calendarOptions" >
-                <template v-slot:eventContent='arg'>
-                    <b>{{ arg.timeText }}</b>
-                    <i>{{ arg.event.title }}</i>
-                </template>
-            </FullCalendar>
-            <div v-if="isLoadingAlmanacs || isLoadingMeetings">Loading...</div>
+            <div class="card-body p-0">            
+                <FullCalendar :options="calendarOptions">
+                    <template v-slot:eventContent='arg'>
+                        <div :class="arg.event.extendedProps.color" class="p-1 rounded">
+                            <b>{{ arg.timeText }}</b>
+                            <i>{{ arg.event.title }}</i>
+                        </div>
+                    </template>
+                </FullCalendar>
+                <div v-if="isLoadingAlmanacs || isLoadingMeetings">Loading...</div>
+            </div>
         </div>
     </div>
-    
+    <div class="container-fluid" v-else>
+        <p class="m-0">
+            <span class="h3  text-primary text-bold text-danger">Sorry, You are not Authorised to view this page</span>
+        </p>
+    </div> 
 </template>
+
 <style scoped>
 .legend-item {
     display: flex;
@@ -170,5 +233,4 @@ onMounted(() => {
 .card-header ul {
     padding-left: 20px; /* Adjust if needed */
 }
-
 </style>

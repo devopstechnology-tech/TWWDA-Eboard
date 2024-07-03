@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Resources;
 
 use App\Http\Resources\MeetingResource;
+use App\Http\Resources\AttendanceResource;
 use App\Http\Resources\DetailMinuteResource;
 use Sourcetoad\EnhancedResources\Formatting\Attributes\Format;
 use Sourcetoad\EnhancedResources\Formatting\Attributes\IsDefault;
@@ -22,9 +23,12 @@ class MinuteResource extends BaseResource
             'id' => $this->resource->getRouteKey(),
             'schedule_id' => $this->resource->schedule_id,
             'schedule' => $this->resource->schedule,
+            'attendances' => AttendanceResource::collection($this->resource->schedule->attendances ?? collect()),
             'meeting' => $this->resource->schedule ? (new MeetingResource($this->resource->schedule->meeting))->format('short') : null,
             'membership_id' => $this->resource->membership_id,
+            'approvalstatus' => $this->resource->approvalstatus,
             'status' => $this->resource->status,
+            'signatures' => $this->resource->signatures,
             'author' => $this->resource->author,
             'detailminutes' => DetailMinuteResource::collection($this->resource->detailminutes ?? collect())->format('short'),
             'minuteReviews' => MinuteReviewResource::collection($this->resource->minuteReviews ?? collect())->format('short'),

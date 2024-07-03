@@ -90,13 +90,8 @@ class FolderRepository extends BaseRepository implements FolderInterface
     }
     public function updateBoardFolder($board, $oldfolder, array $payload): Folder
     {
-        $parentfolder = $this->getParentFolder($payload['parent_id']);
         $folder = Folder::find($payload['folder_id']);
-        // $folder->parent_id         = $parentfolder->id;
-        // $folder->folderable_id   = $parentfolder->id;
-        $folder->folderable_type    = Folder::class;
         $folder->name              = $payload['name'];
-        $folder->type              = $payload['type'];
         $folder->save();
         return $folder;
     }
@@ -225,9 +220,6 @@ class FolderRepository extends BaseRepository implements FolderInterface
         }
         return $folder;
     }
-
-
-
 
     public function getFile($folder, $file)
     {
@@ -483,8 +475,8 @@ class FolderRepository extends BaseRepository implements FolderInterface
 
         $folder                    = new Folder();
         $folder->parent_id         = $parentfolder->id;
-        $folder->folderable_id   = $meeting->id;
-        $folder->folderable_type = Meeting::class;
+        $folder->folderable_id      = $meeting->id;
+        $folder->folderable_type    = Meeting::class;
         $folder->name              = $folderName;
         $folder->type              = TypeEnum::Folder->value;
         $folder->save();

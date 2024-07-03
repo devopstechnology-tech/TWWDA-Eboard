@@ -15,6 +15,14 @@ class ScheduleController extends Controller
     public function __construct(private readonly ScheduleInterface $scheduleRepository)
     {
     }
+    public function index(): JsonResponse
+    {
+        // dd('we here');
+        // $this->authorize('delete', [Meeting::class, $meeting->id]);
+        $schedules = $this->scheduleRepository->getAll();
+
+        return $this->response(Response::HTTP_OK, __('messages.records-fetched'), $schedules, Schedule::class);
+    }
     public function close($schedule): JsonResponse
     {
         // $this->authorize('delete', [Meeting::class, $meeting->id]);

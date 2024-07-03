@@ -1,4 +1,4 @@
-<script setup lang="">
+<script setup lang="ts">
 
 // const boardId = route.params.boardId as string;
 // const meetingId = route.params.meetingId as string;

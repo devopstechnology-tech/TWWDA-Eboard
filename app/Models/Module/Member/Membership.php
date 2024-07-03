@@ -11,6 +11,7 @@ use App\Models\Module\Poll\Poll;
 use App\Models\Module\Task\Task;
 use App\Models\Module\Meeting\Agenda;
 use App\Models\Module\Meeting\Meeting;
+use App\Models\Module\Member\Position;
 use App\Models\Module\Conflict\Conflict;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -29,6 +30,7 @@ class Membership extends BaseModel
         'signature',
         'status',
         'user_id',
+        'position_id;',
         'memberable_id',
         'memberable_type',
     ];
@@ -62,7 +64,12 @@ class Membership extends BaseModel
     }
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class)
+            ->with('profile');
+    }
+    public function position()
+    {
+        return $this->belongsTo(Position::class, 'position_id');
     }
     public function memberships()
     {

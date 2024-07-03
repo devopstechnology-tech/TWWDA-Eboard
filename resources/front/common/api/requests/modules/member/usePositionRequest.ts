@@ -7,11 +7,17 @@ import {nonPaginateResponse,PositionRequestPayload} from '@/common/parsers/posit
 
 
 
-export async function useGetPositionsRequest(options?: object):Promise<nonPaginateResponse>{
+export async function useGetBoardPositionsRequest(options?: object):Promise<nonPaginateResponse>{
     const client = useClient();
 
     const cn = Qs.stringify(options, {arrayFormat: 'brackets'});
-    return await client.get(positionsRoute()+ '/' + '?' + cn).json();
+    return await client.get(positionsRoute()+ '/board' + '?' + cn).json();
+}
+export async function useGetMeetingPositionsRequest(options?: object):Promise<nonPaginateResponse>{
+    const client = useClient();
+
+    const cn = Qs.stringify(options, {arrayFormat: 'brackets'});
+    return await client.get(positionsRoute()+ '/meeting' + '?' + cn).json();
 }
 
 export async function useCreatePositionRequest(payload: PositionRequestPayload){

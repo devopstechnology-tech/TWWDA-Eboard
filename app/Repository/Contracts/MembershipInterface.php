@@ -12,8 +12,10 @@ use App\Models\Module\Member\Membership;
 interface MembershipInterface
 {
     // Define your methods here
-    public function getMeetingBoardMemberships($schedule, $board);
+    public function getMeetingMemberships($schedule, $board);
+    public function notifyMeetingLeads($minute); //onminutes approval
     public function getAuthMembership(): Membership;
-    public function updateMeetingBoardMemberships(Meeting|string $meeting, Schedule|string $schedule, array $payload): Membership;
+    public function updateMemberships(Meeting|string $meeting, Schedule|string $schedule, array $payload): Membership;
+    public function updateMembershipPosition(Meeting|string $meeting, Schedule|string $schedule, array $payload): Membership;
     public function create($meeting, $member, $schedule, array $payload): void;
 }
