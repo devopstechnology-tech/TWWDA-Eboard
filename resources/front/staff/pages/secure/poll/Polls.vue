@@ -21,6 +21,11 @@ import useUnexpectedErrorHandler from '@/common/composables/useUnexpectedErrorHa
 import ValidationError from '@/common/errors/ValidationError';
 import {Membership, SelectedResult} from '@/common/parsers/membershipParser';
 import {Poll, PollRequestPayload} from '@/common/parsers/PollParser';
+import useAuthStore from '@/common/stores/auth.store';
+
+
+const authStore = useAuthStore();
+// v-if="authStore.hasPermission(['view meeting'])"
 
 const route = useRoute();
 const showCreate = ref(false);

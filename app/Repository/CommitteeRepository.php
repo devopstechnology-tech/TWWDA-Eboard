@@ -20,7 +20,7 @@ class CommitteeRepository extends BaseRepository implements CommitteeInterface
         // Adjust the implementation based on your actual logic
         // For example, using a hypothetical CommitteeResource for transformation
         $filters = [
-            'owner_id' => Auth::user()->id,
+            // 'owner_id' => Auth::user()->id,
             'orderBy' => ['field' => 'created_at', 'direction' => 'asc']
     ];
         return $this->indexResource(Committee::class, CommitteeResource::class, $filters);

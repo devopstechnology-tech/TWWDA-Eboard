@@ -22,8 +22,8 @@ import {useGetMembershipsRequest} from '@/common/api/requests/modules/membership
 import {useGetMeetingScheduleRequest} from '@/common/api/requests/modules/schedule/useScheduleRequest';
 import FormInput from '@/common/components/FormInput.vue';
 import FormMultiSelect from '@/common/components/FormMultiSelect.vue';
+import FormQuillEditor from '@/common/components/FormQuillEditor.vue';
 import FormSelect from '@/common/components/FormSelect.vue';
-import FormTextBox from '@/common/components/FormTextBox.vue';
 import useUnexpectedErrorHandler from '@/common/composables/useUnexpectedErrorHandler';
 import {
     formatAgendaEntry,        
@@ -39,8 +39,10 @@ import {
 } from '@/common/parsers/boadParser';
 import {Membership} from '@/common/parsers/membershipParser';
 import {Schedule} from '@/common/parsers/scheduleParser';
+import useAuthStore from '@/common/stores/auth.store';
 import Multiselect from '@@/@vueform/multiselect';
-
+const authStore = useAuthStore();
+// v-if="authStore.hasPermission(['view meeting'])"
 
 const emit = defineEmits(['change-tab']);
 // Example function that emits an event
@@ -432,11 +434,33 @@ onMounted(() => {
                                             <!-- {{formatTime(FetchedSchedule?.start_time)}} -->
                                         </div>
                                         <div class="flex gap-2 items-start" 
+                                             v-if="authStore.hasPermission(['edit agenda'])"
                                              @click="enableEditing(pIndex, -1, agenda, 'agenda')">
                                             <div class="font-medium flex-1">
                                                 {{ formatAgendaEntry(pIndex)}}.{{ agenda.title }}
-                                                <div class="text-sm text-gray-800 font-normal">
-                                                    <p>{{ truncateDescription(agenda.description, 40) }}</p>
+                                                <div class="text-sm text-gray-800 font-normal" 
+                                                v-html="agenda.description">
+                                                </div>
+                                            </div>
+                                            <div class="flex items-center gap-2 mt-1 h-6">
+                                                <div class="text-xs text-gray-600">
+                                                    {{ formatDuration(agenda.duration) }}
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <ul class="list-none assignees-list" v-if="agenda.assignees">
+                                                    <li class="text-sm text-primary"
+                                                        v-for="(assignee, idx) in agenda.assignees" :key="idx">
+                                                        {{idx+1 }}. {{assignee.user?.full_name  }}
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                        <div v-else class="flex gap-2 items-start">
+                                            <div class="font-medium flex-1">
+                                                {{ formatAgendaEntry(pIndex)}}.{{ agenda.title }}
+                                                <div class="text-sm text-gray-800 font-normal"
+                                                v-html="agenda.description">
                                                 </div>
                                             </div>
                                             <div class="flex items-center gap-2 mt-1 h-6">
@@ -474,7 +498,8 @@ onMounted(() => {
                                                 </a>
                                             </form>
                                         </div>
-                                        <button v-if="editingParentIndex !== pIndex &&!addingChild"
+                                        <button v-if="editingParentIndex !== pIndex &&!addingChild 
+                                                    && authStore.hasPermission(['create agenda'])"
                                                 @click="enableAddingChild(pIndex, agenda.id)" class="ml-4 mt-2">
                                             + Add sub Agenda
                                         </button>
@@ -490,12 +515,35 @@ onMounted(() => {
                                                  border-gray-200 bg-white px-1">
                                                     10:30pm
                                                 </div>
-                                                <div class="flex gap-2 items-start" @click="
-                                                    enableEditing(pIndex,cIndex,child, 'subagenda')">
+                                                <div class="flex gap-2 items-start" 
+                                                     v-if="authStore.hasPermission(['edit agenda'])"
+                                                     @click="enableEditing(pIndex,cIndex,child, 'subagenda')">
                                                     <div class="font-medium flex-1">
                                                         {{ formatAgendaEntry(pIndex, cIndex) }}. {{ child.title }}
-                                                        <div class="text-sm text-gray-800 font-normal">
-                                                            <p>{{ child.description }}</p>
+                                                        <div class="text-sm text-gray-800 font-normal"
+                                                        v-html="child.description">
+                                                        </div>
+                                                    </div>
+                                                    <div class="flex items-center gap-2 mt-1 h-6">
+                                                        <div class="text-xs text-gray-600">
+                                                            {{ formatDuration(child.duration)  }}
+                                                        </div>
+                                                    </div>
+                                                    <div>
+                                                        <ul class="list-none assignees-list" v-if="child.assignees">
+                                                            <li class="text-sm text-primary" 
+                                                                v-for="(childassignee, idx) in child.assignees" 
+                                                                :key="idx">
+                                                                {{idx+1}}. {{ childassignee.user.full_name }}
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                                <div v-else class="flex gap-2 items-start">
+                                                    <div class="font-medium flex-1">
+                                                        {{ formatAgendaEntry(pIndex, cIndex) }}. {{ child.title }}
+                                                        <div class="text-sm text-gray-800 font-normal"
+                                                             v-html="child.description">
                                                         </div>
                                                     </div>
                                                     <div class="flex items-center gap-2 mt-1 h-6">
@@ -540,7 +588,8 @@ onMounted(() => {
                                         </a>
                                     </div>
                                     <!-- <button class="btn btn-secondary block w-full">Add agenda item</button> -->
-                                    <button @click="enableAddingNewParent" class="btn btn-secondary block w-full mb-4">
+                                    <button v-if="authStore.hasPermission(['create agenda'])"
+                                            @click="enableAddingNewParent" class="btn btn-secondary block w-full mb-4">
                                         Add Agenda
                                     </button>
                                 </div>
@@ -565,7 +614,7 @@ onMounted(() => {
                 <!---->
             </div>
         </div>
-        <div :class="{    hidden: !is_editing,    'md:block': true,    'w-[350px]': true,}">
+        <div :class="{hidden: !is_editing,'md:block': true,'w-[350px]': true,}">
             <div class="w-[350px] relative">
                 <div class="w-[350px]">
                     <div class="card card-outline card-danger mb-0">
@@ -577,12 +626,15 @@ onMounted(() => {
                                     class="w-full text-sm tracking-wide"
                                     placeholder="Enter Meeting Agenda" t
                                     ype="text" />
-                                <FormTextBox
+                                <FormQuillEditor
                                     label="Agenda Description"
                                     name="description"
-                                    class=""
+                                    theme="snow"
                                     placeholder="Enter Agenda  Description"
-                                    :rows="2" />
+                                    toolbar="minimal"
+                                    contentType="html"
+                                    
+                                />
                                 <FormSelect 
                                     name="duration"
                                     label="Duration"

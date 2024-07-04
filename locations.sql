@@ -7,6 +7,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 
+
 CREATE TABLE IF NOT EXISTS `counties` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `county_name` varchar(255) NOT NULL,

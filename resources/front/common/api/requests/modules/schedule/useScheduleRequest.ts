@@ -5,7 +5,14 @@ import {scheduleRoute} from '@/common/api/schedule_routes';
 import {nonPaginateResponse,ScheduleRequestPayload, singleScheduleResponse} from '@/common/parsers/scheduleParser';
 
 
-//all
+//all schedules
+export async function useGetSchedulesRequest(options?: object):Promise<nonPaginateResponse>{
+    const client = useClient();
+
+    const cn = Qs.stringify(options, {arrayFormat: 'brackets'});
+    return await client.get(scheduleRoute() + '?' + cn).json();
+}
+//meeting schedules
 export async function useGetMeetingSchedulesRequest(id:string, options?: object):Promise<nonPaginateResponse>{
     const client = useClient();
 

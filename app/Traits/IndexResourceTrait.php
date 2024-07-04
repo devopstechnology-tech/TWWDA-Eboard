@@ -30,6 +30,14 @@ trait IndexResourceTrait
             }
             unset($filters['whereNot']); // Remove 'whereNot' from filters to avoid misinterpretation
         }
+        // Handling 'whereHas' conditions
+        if (isset($filters['whereHas'])) {
+            foreach ($filters['whereHas'] as $relation => $callback) {
+                $data->whereHas($relation, $callback);
+            }
+            unset($filters['whereHas']); // Remove 'whereHas' from filters to avoid conflicts
+        }
+        // Handling 'realtionships' conditions
         if (isset($filters['with'])) {
             $data->with($filters['with']);
             unset($filters['with']);  // Remove 'with' from filters to avoid conflicts

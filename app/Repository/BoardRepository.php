@@ -38,7 +38,7 @@ class BoardRepository extends BaseRepository implements BoardInterface
         // Adjust the implementation based on your actual logic
         // For example, using a hypothetical BoardResource for transformation
         $filters = [
-            'owner_id' => Auth::user()->id,
+            // 'owner_id' => Auth::user()->id,
             'with' => $this->relationships(),
             'orderBy' => ['field' => 'created_at', 'direction' => 'asc']
         ];
@@ -86,7 +86,7 @@ class BoardRepository extends BaseRepository implements BoardInterface
         if ($board->wasRecentlyCreated) {
             $board->members()->create([
                 'user_id' => $user->id,
-                'position_id' => Position::where('name', 'Secretary')->first()->id,
+                'position_id' => Position::where('name', 'Board Member')->first()->id,
                 'board_id' =>  $board->id,
             ]);
             $DefaultfolderNames = [

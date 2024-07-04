@@ -6,7 +6,6 @@ use App\Enums\StatusEnum;
 use Illuminate\Support\Str;
 use App\Models\Config\Setting;
 use Illuminate\Database\Seeder;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
 class SettingsTableSeeder extends Seeder
 {
@@ -160,16 +159,6 @@ class SettingsTableSeeder extends Seeder
             }
         }
 
-        // Restore the original valueName in the active configuration before storing
-        // if ($activeMailType !== null) {
-        //     foreach ($mailTypes as &$mailType) {
-        //         if ($mailType['id'] === $activeMailType['id']) {
-        //             $mailType = $activeMailType;
-        //             break;
-        //         }
-        //     }
-        // }
-
         Setting::firstOrCreate([
             'logo' => 'defaultlogo.png',
             'textlogo' => 'defaulttextlogo.png',
@@ -184,7 +173,7 @@ class SettingsTableSeeder extends Seeder
             'state' => 'Kenya',
             'phone1' => '+254 724 259 891',
             'phone2' => '+254 61-2032282',
-            'pspdkitlicencekey' => 'TH8Qp7q9KPBLFnAItdIZ3lz9ihiqZxTUUuPhZhug2mGh7YkhmCqgMgi8gICcWSCNeCbti4-ZqzplTuKzRcYCBiPNFB6Ey_tnSVxl9tCDGkE5ZNrTMK8yXZ0nF8ykUnCrb7oVefIUwnxFdY51cDRAo2eXH2bvmGRyGbq66UWlepqciwqoqauW9oznmiUdWtna4dXMn6OLamI4g9d9',
+            'pspdkitlicencekey' => 'gRt6qZCebniKW93WcanGXrnXN3KvmkbNxBaBrizU6w3K2-wIRtXENc8PFtHc5AFYmoiJAZ9Vx0eTQIO_BM0fDnrKZhIsQlXSh3gYqM90VMHTsEsdf2vV6FesH5OWYbsnpLRRdWlZ8khIvDc10gdlDUUfzaxxxMZBxZZcEJlELfym2kZoqDx5ir9DsJratv2KE-Wg-3oczN-eAj9M',
             'mailtype' => json_encode($activeMailType),   // Store the active mail configuration
             'mailtypes' => json_encode($mailTypes),      // Store the full list with the valueNames emptied
         ]);

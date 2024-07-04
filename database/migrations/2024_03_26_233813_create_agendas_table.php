@@ -15,7 +15,7 @@ return new class () extends Migration {
         Schema::create('agendas', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->string('title')->nullable();
-            $table->string('description')->nullable();
+            $table->longText('description')->nullable();
             $table->string('duration')->nullable();
             $table->string('schedule_id')->nullable();
             $table->softDeletes();

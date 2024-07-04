@@ -14,6 +14,7 @@ use App\Models\Module\Member\Membership;
 use App\Models\Module\Committe\Committee;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\Module\Discussion\Sub\DiscussionAssignee;
 
 class Meeting extends BaseModel
 {
@@ -127,5 +128,9 @@ class Meeting extends BaseModel
     public function folders()
     {
         return $this->morphMany(Folder::class, 'folderable');
+    }
+    public function discussionAssignees()
+    {
+        return $this->morphMany(DiscussionAssignee::class, 'assignees');
     }
 }

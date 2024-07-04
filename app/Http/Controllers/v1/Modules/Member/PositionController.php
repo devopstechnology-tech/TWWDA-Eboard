@@ -18,9 +18,21 @@ class PositionController extends Controller
     public function __construct(private readonly PositionInterface $positionRepository)
     {
     }
-    public function index(): JsonResponse
+    public function board(): JsonResponse
     {
-        $positions = $this->positionRepository->getAll();
+        $positions = $this->positionRepository->getBoardPositions();
+
+        return $this->response(Response::HTTP_OK, __('messages.records-fetched'), $positions, Position::class);
+    }
+    public function committee(): JsonResponse
+    {
+        $positions = $this->positionRepository->getCommitteePositions();
+
+        return $this->response(Response::HTTP_OK, __('messages.records-fetched'), $positions, Position::class);
+    }
+    public function meeting(): JsonResponse
+    {
+        $positions = $this->positionRepository->getMeetingPositions();
 
         return $this->response(Response::HTTP_OK, __('messages.records-fetched'), $positions, Position::class);
     }

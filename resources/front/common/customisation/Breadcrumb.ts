@@ -509,11 +509,42 @@ export function formattedDateTime(isoDate: string, timezone: string) {
     }
 }
 
+export function formatDateTime (date: Date){
+    const day = date.toLocaleDateString('en-US', {weekday: 'short'});
+    const month = date.toLocaleDateString('en-US', {month: 'long'});
+    const dayOfMonth = date.toLocaleDateString('en-US', {day: 'numeric'});
+    const year = date.toLocaleDateString('en-US', {year: 'numeric'});
+    const time = date.toLocaleTimeString('en-US', {hour: 'numeric', minute: 'numeric', hour12: true});
+    
+    const daySuffix = (n: number) => {
+        const s = ['th', 'st', 'nd', 'rd'],
+            v = n % 100;
+        return s[(v - 20) % 10] || s[v] || s[0];
+    };
+    
+    return `${day}, ${dayOfMonth}${daySuffix(Number(dayOfMonth))} ${month} ${year}, ${time}`;
+};
+
 export function getAlphabet(index: number): string {
     return String.fromCharCode(97 + index);// ASCII 'a' is 97, 65 is A
 };
+// min numbering
 export function getNumbering(index: number): string {
     return (index + 1).toString(); // Convert the number to string for consistency in return type
+}
+export function formatMinuteEntry(order: any, title: string, day: any, month: any, year: any, childOrder: any) {
+    const today = new Date();
+    // Use current day/month/year if not provided
+    const formattedDay = (day ?? today.getDate()).toString().padStart(2, '0');
+    const formattedMonth = ((month ?? today.getMonth() + 1)).toString().padStart(2, '0'); // Month is 0-indexed
+    const formattedYear = (year ?? today.getFullYear()).toString().substr(-2); // Get the last two digits of the year
+
+    const capitalizedTitle = capitalizeTitle(title);
+
+    // Construct the minute label with or without child order
+    const minuteLabel = `TWWDA/B0${order}${childOrder ? `.${childOrder}` : ''}`;
+
+    return `${minuteLabel}/${formattedDay}/${formattedMonth}/${formattedYear}: ${capitalizedTitle}`;
 }
 
 function capitalizeTitle(title: string): string {
@@ -527,44 +558,18 @@ export const formatAgendaEntry = (parentIndex: number, childIndex = null) => {
     }
     return `${parentIndex + 1}`;
 };
-export function formatMinuteEntry(order: any, title: string, day: any, month: any, year: any, childOrder: any) {
-    const today = new Date();
-    // Use current day/month/year if not provided
-    const formattedDay = (day ?? today.getDate()).toString().padStart(2, '0');
-    const formattedMonth = ((month ?? today.getMonth() + 1)).toString().padStart(2, '0'); // Month is 0-indexed
-    const formattedYear = (year ?? today.getFullYear()).toString().substr(-2); // Get the last two digits of the year
 
-    const capitalizedTitle = capitalizeTitle(title);
-
-    // Construct the minute label with or without child order
-    const minuteLabel = `MIN ${order}${childOrder ? `.${childOrder}` : ''}`;
-
-    return `${minuteLabel}/${formattedDay}/${formattedMonth}/${formattedYear}: ${capitalizedTitle}`;
-}
 
 // Helper function to add the correct suffix to the day
-function getDayWithSuffix(day: number): string {
-    if (day > 3 && day < 21) return `${day}th`; // covers 4-20
-    switch (day % 10) {
-        case 1: return `${day}st`;
-        case 2: return `${day}nd`;
-        case 3: return `${day}rd`;
-        default: return `${day}th`;
-    }
-}
-
 export function formatDate(dateStr: string): string {
     if (!dateStr) {
         dateStr = '1901-01-01'; // Placeholder date
     }
-    // Parse the date string in DD-MM-YYYY format
-    const [day, month, year] = dateStr.split('-').map(Number);
 
-    // Ensure correct handling in Date constructor (month is 0-indexed)
-    const date = new Date(year, month - 1, day);
+    const date = parseDateString(dateStr);
 
     // Extract the day, month, and year components
-    const dayWithSuffix = getDayWithSuffix(day);
+    const dayWithSuffix = getDayWithSuffix(date.getDate());
     const options: Intl.DateTimeFormatOptions = {month: 'long', year: 'numeric'};
     const formattedMonthYear = date.toLocaleDateString('en-US', options);
 
@@ -574,6 +579,56 @@ export function formatDate(dateStr: string): string {
     return formattedDate;
 }
 
+function getDayWithSuffix(day: number): string {
+    if (day > 3 && day < 21) return `${day}th`; // deal with 11th, 12th, 13th
+    switch (day % 10) {
+        case 1: return `${day}st`;
+        case 2: return `${day}nd`;
+        case 3: return `${day}rd`;
+        default: return `${day}th`;
+    }
+}
+
+function parseDateString(dateString: string): Date {
+    let dateParts, date, timeParts;
+    
+    if (dateString.includes(' ')) {
+        [dateParts, timeParts] = dateString.split(' ');
+    } else {
+        dateParts = dateString;
+    }
+
+    if (dateParts.includes('-')) {
+        const parts = dateParts.split('-');
+        if (parts[0].length === 4) {
+            // YYYY-MM-DD or YYYY-MM-DD HH:MM
+            const [year, month, day] = parts.map(Number);
+            date = new Date(year, month - 1, day);
+        } else {
+            // DD-MM-YYYY or DD-MM-YYYY HH:MM
+            const [day, month, year] = parts.map(Number);
+            date = new Date(year, month - 1, day);
+        }
+    } else {
+        // Default to placeholder date if not recognized
+        date = new Date('1901-01-01');
+    }
+
+    return date;
+}
+
+
+export function getDayOfWeek(dateString: string): string {
+    const date = new Date(dateString);
+    const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    return daysOfWeek[date.getDay()];
+}
+  
+export const formatDayDate = (dateStr: string): string => {
+    const [day, month, year] = dateStr.split('-');
+    return `${year}-${month}-${day}`;
+};
+  
 // Example usage:
 const readableDate = formatDate('12-06-2024');
 console.log(readableDate); // "12th June, 2024"
@@ -713,37 +768,39 @@ console.log(readableAgo); // e.g., "in 3 months"
 const readableAgoISO = FormattedAgo('2024-08-15T07:27:00.000Z');
 console.log(readableAgoISO); // e.g., "in 2 months"
 
+
 // export function getYearFromDate(dateString: string): string {
-//     const date = new Date(dateString);
+//     const [day, month, year] = dateString.split('-').map(Number);
+//     const date = new Date(year, month - 1, day);
 //     return new Intl.DateTimeFormat('en-US', {year: 'numeric'}).format(date);
 // }
+
 // export function getMonthAbbreviation(dateString: string): string {
-//     const date = new Date(dateString);
+//     const [day, month, year] = dateString.split('-').map(Number);
+//     const date = new Date(year, month - 1, day);
 //     return new Intl.DateTimeFormat('en-US', {month: 'short'}).format(date).toUpperCase();
 // }
-  
 
 // export function getDayFromDate(dateString: string): string {
-//     const date = new Date(dateString);
-//     return date.getDate().toString();  // Convert day to string for consistency
+//     const [day, month, year] = dateString.split('-').map(Number);
+//     const date = new Date(year, month - 1, day);
+//     return date.getDate().toString(); // Convert day to string for consistency
 // }
 export function getYearFromDate(dateString: string): string {
-    const [day, month, year] = dateString.split('-').map(Number);
-    const date = new Date(year, month - 1, day);
+    const date = parseDateString(dateString);
     return new Intl.DateTimeFormat('en-US', {year: 'numeric'}).format(date);
 }
 
 export function getMonthAbbreviation(dateString: string): string {
-    const [day, month, year] = dateString.split('-').map(Number);
-    const date = new Date(year, month - 1, day);
+    const date = parseDateString(dateString);
     return new Intl.DateTimeFormat('en-US', {month: 'short'}).format(date).toUpperCase();
 }
 
 export function getDayFromDate(dateString: string): string {
-    const [day, month, year] = dateString.split('-').map(Number);
-    const date = new Date(year, month - 1, day);
+    const date = parseDateString(dateString);
     return date.getDate().toString(); // Convert day to string for consistency
 }
+
 
 export function isPast(scheduleDate:string) {
     // Convert scheduleDate from 'dd-mm-yyyy' to 'yyyy-mm-dd'

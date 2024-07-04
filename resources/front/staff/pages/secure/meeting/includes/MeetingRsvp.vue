@@ -1,49 +1,57 @@
 <template>
     <div class="rsvp-container">
-        <div class="dropdown">
-            <button
-                :class="['btn btn-icon dropdown-toggle', rsvpClass]"
-                type="button"
-                @click="toggleDropdown"
-                aria-haspopup="true"
-                :aria-expanded="dropdownOpen"
-            >
+        <div v-if="attendee.membership?.user.id ===  authStore.user.id">
+            <div class="dropdown">
+                <button
+                    :class="['btn btn-icon dropdown-toggle', rsvpClass]"
+                    type="button"
+                    @click="toggleDropdown"
+                    aria-haspopup="true"
+                    :aria-expanded="dropdownOpen"
+                >
+                    <i :class="rsvpIcon" class="mr-2"></i> {{ rsvpText }}
+                </button>
+                <ul v-if="dropdownOpen" class="dropdown-menu show" aria-labelledby="rsvp-status">
+                    <li>
+                        <a href="#" class="dropdown-item" @click.prevent="updateRsvp('Yes')">
+                            <i class="far fa-check-circle bg-success"></i> Yes
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="dropdown-item" @click.prevent="updateRsvp('No')">
+                            <i class="far fa-check-circle bg-warning"></i>No
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="dropdown-item" @click.prevent="updateRsvp('Maybe')">
+                            <i class="far fa-check-circle bg-danger"></i> Maybe
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="dropdown-item" @click.prevent="updateRsvp('Online')">
+                            <i class="far fa-check-circle bg-info"></i> Online
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="dropdown-item" @click.prevent="updateRsvp('Pending')">
+                            <i class="far fa-check-circle bg-info"></i> Pending
+                        </a>
+                    </li>
+                </ul>
+            </div>         
+        </div>
+        <div v-else>
+            <button>
                 <i :class="rsvpIcon" class="mr-2"></i> {{ rsvpText }}
             </button>
-            <ul v-if="dropdownOpen" class="dropdown-menu show" aria-labelledby="rsvp-status">
-                <li>
-                    <a href="#" class="dropdown-item" @click.prevent="updateRsvp('Yes')">
-                        <i class="far fa-check-circle bg-success"></i> Yes
-                    </a>
-                </li>
-                <li>
-                    <a href="#" class="dropdown-item" @click.prevent="updateRsvp('No')">
-                        <i class="far fa-check-circle bg-warning"></i>No
-                    </a>
-                </li>
-                <li>
-                    <a href="#" class="dropdown-item" @click.prevent="updateRsvp('Maybe')">
-                        <i class="far fa-check-circle bg-danger"></i> Maybe
-                    </a>
-                </li>
-                <li>
-                    <a href="#" class="dropdown-item" @click.prevent="updateRsvp('Online')">
-                        <i class="far fa-check-circle bg-info"></i> Online
-                    </a>
-                </li>
-                <li>
-                    <a href="#" class="dropdown-item" @click.prevent="updateRsvp('Pending')">
-                        <i class="far fa-check-circle bg-info"></i> Pending
-                    </a>
-                </li>
-            </ul>
-        </div>
+        </div>        
     </div>
 </template>
   
 <script setup lang="ts">
 import {computed,ref} from 'vue';
-  
+import useAuthStore from '@/common/stores/auth.store';
+const authStore = useAuthStore();
 const props = defineProps<{
     attendee: {
         id: string;

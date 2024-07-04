@@ -6,41 +6,65 @@ namespace App\Permissions;
 
 class PollPermissions
 {
-    public const VIEW = [
-        'name' => 'view Poll',
-        'type' => 'member',
-        'description' => 'Allows a user of type `member` to view Poll',
-    ];
-
     public const CREATE = [
-        'name' => 'create Poll',
-        'type' => 'secretary',
-        'description' => 'Allows a user of type `secretary` to create Poll',
+        'name' => 'create poll',
+        'type' => ['system', 'admin', 'ceo', 'companychairman', 'companysecretary', 'chairperson', 'secretary'],
+        'description' => 'Allows a user to create polls',
     ];
 
     public const EDIT = [
-        'name' => 'edit Poll',
-        'type' => 'secretary',
-        'description' => 'Allows a user of type `secretary` to edit Poll',
+        'name' => 'edit poll',
+        'type' => ['system', 'admin', 'ceo', 'companychairman', 'companysecretary', 'chairperson', 'secretary'],
+        'description' => 'Allows a user to edit polls',
+    ];
+
+    public const VIEW = [
+        'name' => 'view poll',
+        'type' => ['system', 'admin', 'ceo', 'companychairman', 'companysecretary', 'chairperson', 'secretary', 'member'],
+        'description' => 'Allows a user to view polls',
     ];
 
     public const DELETE = [
-        'name' => 'delete Poll',
-        'type' => 'system',
-        'description' => 'Allows a user of type `system` to delete Poll',
+        'name' => 'delete poll',
+        'type' => ['system', 'admin', 'ceo', 'companychairman', 'companysecretary', 'chairperson', 'secretary'],
+        'description' => 'Allows a user to delete polls',
     ];
-    public const APPROVE = [
-        'name' => 'approve Poll',
-        'type' => 'chairperson',
-        'description' => 'Allows a user of type `chairperson` to approve Poll',
+
+    public const ASSIGN = [
+        'name' => 'assign poll',
+        'type' => ['system', 'admin', 'ceo', 'companychairman', 'companysecretary', 'chairperson', 'secretary'],
+        'description' => 'Allows a user to assign polls',
     ];
+
+    public const CLOSE = [
+        'name' => 'close poll',
+        'type' => ['system', 'admin', 'ceo', 'companychairman', 'companysecretary', 'chairperson', 'secretary'],
+        'description' => 'Allows a user to close polls',
+    ];
+
+    public const MONITOR = [
+        'name' => 'monitor poll',
+        'type' => ['system', 'admin', 'ceo', 'companychairman', 'companysecretary', 'chairperson', 'secretary'],
+        'description' => 'Allows a user to monitor polls',
+    ];
+
+    public const PRIVACY = [
+        'name' => 'poll privacy',
+        'type' => ['system', 'admin', 'ceo', 'companychairman', 'companysecretary', 'chairperson', 'secretary'],
+        'description' => 'Allows a user to manage poll privacy',
+    ];
+
     public static function allPermissions(): array
     {
         return [
-            self::VIEW,
             self::CREATE,
             self::EDIT,
-            self::DELETE,self::APPROVE,
+            self::VIEW,
+            self::DELETE,
+            self::ASSIGN,
+            self::CLOSE,
+            self::MONITOR,
+            self::PRIVACY,
         ];
     }
 }

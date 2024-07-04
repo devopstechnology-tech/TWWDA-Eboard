@@ -19,7 +19,8 @@ interface MinuteInterface
     public function createsubminute($schedule, array $payload);
     public function updatesubminute($subminute, array $payload);
 
-    public function ceoApprovalMinute(Minute|string $minute): bool;
+    public function ceoApprovalMinute(Minute|string $minute);
+    public function AcceptceoApprovalMinute(Minute|string $minute);
     public function publishMinute(Minute|string $minute): bool;
     public function signaturesMinute(Minute|string $minute): bool;
     public function deleteMinute(Minute|string $minute): bool;

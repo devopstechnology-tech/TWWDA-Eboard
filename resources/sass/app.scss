@@ -2,6 +2,7 @@
 @import url('https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback');
 
 // // adminlte 3
+
 @import '../assets/themes/adminlte/plugins/fontawesome-free/css/all.min.css';
 @import '../assets/themes/adminlte/plugins/overlayScrollbars/css/OverlayScrollbars.min.css';
 @import '../assets/themes/adminlte/dist/css/adminlte.min.css';
@@ -424,4 +425,29 @@ ol.agenda-list > li > ol > li > ol > li {
         width: 120px;
         height: 120px;
     }
+}
+.calendaheight{
+    height: 100px!important;
+    margin-bottom: 5px!important;
+}
+.customonth{
+    margin-top: 10px !important;
+    font-size: 17px !important;
+    color: white !important;
+    margin-bottom: 10px !important;
+}
+.customday{
+    font-size: 24px!important;
+}
+.customyear{
+    font-size: 19px!important;
+}
+.custom-size{
+    width: 142px!important;
+}
+.meeting-custom-size {
+    width: 114px !important;
+}
+.products-list .product-info {
+    margin-left: 129px!important;
 }

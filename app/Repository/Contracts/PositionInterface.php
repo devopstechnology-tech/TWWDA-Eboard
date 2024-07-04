@@ -6,7 +6,9 @@ interface PositionInterface
 {
     // Define your methods here
 
-    public function getAll();
+    public function getBoardPositions();
+    public function getCommitteePositions();
+    public function getMeetingPositions();
     public function storePosition(array $payload);
     public function updatePosition($position, array $payload);
     public function activatePosition($position);

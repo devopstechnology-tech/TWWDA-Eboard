@@ -2,7 +2,7 @@ import {notify} from '@kyvg/vue3-notification';
 import Qs from 'qs';
 import useClient from '@/common/api/client';
 import {MembershipsRoute} from '@/common/api/membership_routes';
-import {Membership, MembershipRequestPayload, nonPaginateResponse} from '@/common/parsers/membershipParser';
+import {Membership, MemberShipPositionRequestPayload, MembershipRequestPayload, nonPaginateResponse} from '@/common/parsers/membershipParser';
 import {Meta} from '@/common/types/types';
 
 export async function useGetMembershipsRequest(
@@ -39,6 +39,18 @@ export async function useUpdateMembershipRequest(
     }).json();
 }
 
+
+export async function useUpdateMemberShipPositionRequest(
+    payload: MemberShipPositionRequestPayload, 
+    id: string,  
+    schedule: string,
+) {
+    const client = useClient();
+
+    await client.post(MembershipsRoute() + '/update/membership/position/' + id + '/schedule/' + schedule, {
+        json: payload,
+    }).json();
+}
 
 
 

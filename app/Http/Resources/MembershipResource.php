@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Resources;
 
+use App\Http\Resources\PositionResource;
 use Sourcetoad\EnhancedResources\Formatting\Attributes\Format;
 use Sourcetoad\EnhancedResources\Formatting\Attributes\IsDefault;
 
@@ -23,6 +24,8 @@ class MembershipResource extends BaseResource
             'signature' => $this->resource->signature,
             'status' => $this->resource->status,
             'user_id' => $this->resource->user_id,
+            'position_id' => $this->resource->position_id,
+            'position' => new PositionResource($this->resource->position),
             'user' => $this->resource->user,
         ];
     }

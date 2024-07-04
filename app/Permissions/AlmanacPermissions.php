@@ -6,35 +6,67 @@ namespace App\Permissions;
 
 class AlmanacPermissions
 {
-    public const VIEW = [
-        'name' => 'view Almanac',
-        'type' => 'member',
-        'description' => 'Allows a user of type `member` to view Almanac',
-    ];
-
     public const CREATE = [
-        'name' => 'create Almanac',
-        'type' => 'companysecretary',
-        'description' => 'Allows a user of type `companysecretary` to create Almanac',
+        'name' => 'create almanac',
+        'type' => ['system', 'admin', 'companysecretary'],
+        'description' => 'Allows a user to create almanacs',
     ];
 
     public const EDIT = [
-        'name' => 'edit Almanac',
-        'type' => 'companysecretary',
-        'description' => 'Allows a user of type `companysecretary` to edit Almanac',
+        'name' => 'edit almanac',
+        'type' => ['system', 'admin', 'companysecretary'],
+        'description' => 'Allows a user to edit almanacs',
     ];
 
-    public const DELETE = [
-        'name' => 'delete Almanac',
-        'type' => 'system',
-        'description' => 'Allows a user of type `system` to delete Almanac',
+    public const UPLOAD = [
+        'name' => 'upload almanac',
+        'type' => ['system', 'admin', 'companysecretary'],
+        'description' => 'Allows a user to upload almanacs',
     ];
+
+    public const PUBLISH = [
+        'name' => 'publish almanac',
+        'type' => ['system', 'admin', 'companysecretary'],
+        'description' => 'Allows a user to publish almanacs',
+    ];
+    public const POSTPONE = [
+        'name' => 'postpone almanac',
+        'type' => ['system', 'admin', 'companysecretary'],
+        'description' => 'Allows a user to postpone almanacs',
+    ];
+    public const MAKRHELD = [
+        'name' => 'mark held almanac',
+        'type' => ['system', 'admin', 'companysecretary'],
+        'description' => 'Allows a user to mark held almanacs',
+    ];
+    public const CANCEL = [
+        'name' => 'cancel almanac',
+        'type' => ['system', 'admin', 'companysecretary'],
+        'description' => 'Allows a user to cancel almanacs',
+    ];
+    public const VIEW = [
+        'name' => 'view almanac',
+        'type' => ['system', 'admin', 'ceo', 'companychairman', 'companysecretary', 'chairperson', 'secretary', 'member', 'observer'],
+        'description' => 'Allows a user to view almanacs',
+    ];
+    public const DELETE = [
+        'name' => 'delete almanac',
+        'type' => ['system', 'admin', 'companysecretary'],
+        'description' => 'Allows a user to delete almanacs',
+    ];
+
     public static function allPermissions(): array
     {
         return [
-            self::VIEW,
             self::CREATE,
             self::EDIT,
-            self::DELETE,        ];
+            self::UPLOAD,
+            self::PUBLISH,
+            self::POSTPONE,
+            self::MAKRHELD,
+            self::CANCEL,
+            self::VIEW,
+            self::DELETE,
+        ];
     }
 }

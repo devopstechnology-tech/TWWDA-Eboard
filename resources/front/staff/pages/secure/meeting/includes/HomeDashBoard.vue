@@ -5,8 +5,10 @@ import {useRoute,useRouter} from 'vue-router';
 import {useGetSingleBoadMeetingRequest} from '@/common/api/requests/modules/meeting/useMeetingRequest'; // Import your API function
 import {formatDate,formattedDate} from '@/common/customisation/Breadcrumb';
 import {Meeting} from '@/common/parsers/meetingParser';
+import useAuthStore from '@/common/stores/auth.store';
 // Define a reactive reference for storing meeting data
-// const meeting = ref<Meeting>();
+const authStore = useAuthStore();
+// v-if="authStore.hasPermission(['view meeting'])"
 
 // Get the route instance
 const route = useRoute();
@@ -196,32 +198,35 @@ const {isLoading, data: Meeting, refetch: fetchMeeting} = getMeeting();
                 </div> -->
                 <div class="flex items-center">
                     <p class="m-0 text-sm">
-                        Meeting Description: <span class=" text-primary"> {{ Meeting?.description }}</span>
+                        Meeting Description:
+                        <span class=" text-primary"
+                              v-html="Meeting?.description">
+                        </span>
                     </p>  
                 </div>
                 <div>
                     <!-- <a href="https://app.boardable.com/felix-1/groups/dff155-board"
                         class="badge badge-soft">{{  meeting?.board?.title }}  Board</a>
                     <a href="" class="badge badge-soft">{{  meeting?.title }}</a> -->
-                    <router-link 
-                        :to="{
-                            name: 'BoardDetails',
-                            params: {
-                                boardId: boardId,
-                            },
-                        }"
-                        class="badge badge-soft">{{ Meeting.meetingable.name }}
+                    <router-link  v-if="authStore.hasPermission(['view board'])"
+                                  :to="{
+                                      name: 'BoardDetails',
+                                      params: {
+                                          boardId: boardId,
+                                      },
+                                  }"
+                                  class="badge badge-soft">{{ Meeting.meetingable.name }}
                     </router-link>
-                    <router-link 
-                        :to="{
-                            name: 'BoardMeetingDetails',
-                            params: {
-                                boardId: boardId,
-                                meetingId: meetingId,
-                                scheduleId: scheduleId
-                            },
-                        }"
-                        class="badge badge-soft">{{ Meeting.title }}
+                    <router-link v-if="authStore.hasPermission(['view meeting'])"
+                                 :to="{
+                                     name: 'BoardMeetingDetails',
+                                     params: {
+                                         boardId: boardId,
+                                         meetingId: meetingId,
+                                         scheduleId: scheduleId
+                                     },
+                                 }"
+                                 class="badge badge-soft">{{ Meeting.title }}
                     </router-link>
                 </div>
             </div>

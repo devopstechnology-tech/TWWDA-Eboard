@@ -2,25 +2,18 @@ import {notify} from '@kyvg/vue3-notification';
 import Qs from 'qs';
 import {boardMemberRoute,boardRoute} from '@/common/api/board_routes';
 import useClient from '@/common/api/client';
-import {committeeMemberRoute} from '@/common/api/committee_routes';
-import {BoardMembersRequestPayload, BoardRequest, BoardRequestPayload} from '@/common/parsers/boadParser';
-import {Meta} from '@/common/types/types';
+import {
+    BoardMembersRequestPayload, 
+    BoardRequestPayload, 
+    nonPaginateResponse, 
+    singleBoardResponse,
+} from '@/common/parsers/boadParser';
 
-interface response {
-    code: number,
-    data: {
-        data: BoardRequest[],
-        meta: Meta
-    },
-    message: string
+export async function useGetBoardsRequest(options?: object): Promise<nonPaginateResponse> {
+    const client = useClient();
+    const cn = Qs.stringify(options, {arrayFormat: 'brackets'});
+    return await client.get(boardRoute() + '?' + cn).json();
 }
-
-interface singleresponse {
-    code: number,
-    data: BoardRequest,
-    message: string
-}
-
 export async function useCreateBoardRequest(
     payload: BoardRequestPayload) {
     const client = useClient();
@@ -37,10 +30,7 @@ export async function useCreateBoardRequest(
     return response.json();
 }
 
-export async function useGetBoardsRequest(options?: object): Promise<response> {
-    const client = useClient();
-    return await client.get(boardRoute()).json();
-}
+
 
 export async function useUpdateBoardRequest(
     payload: BoardRequestPayload, id: string){
@@ -61,10 +51,10 @@ export async function useUpdateBoardRequest(
 
 //
 
-export async function useGetSingleBoardRequest(id: string): Promise<singleresponse> {
+export async function useGetSingleBoardRequest(id: string): Promise<singleBoardResponse> {
     // console.log('id', id);
     const client = useClient();
-    const data: singleresponse = await client.get(boardRoute() + '/' + id).json();
+    const data: singleBoardResponse = await client.get(boardRoute() + '/' + id).json();
     return data;
 }
 

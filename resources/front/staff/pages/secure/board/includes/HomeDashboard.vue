@@ -20,6 +20,7 @@ import FormDateInput from '@/common/components/FormDateInput.vue';
 import FormDateTimeInput from '@/common/components/FormDateTimeInput.vue';
 import FormInput from '@/common/components/FormInput.vue';
 import FormMultiSelect from '@/common/components/FormMultiSelect.vue';
+import FormQuillEditor from '@/common/components/FormQuillEditor.vue';
 import FormRadioInput from '@/common/components/FormRadioInput.vue';
 import FormSelect from '@/common/components/FormSelect.vue';
 import FormTextBox from '@/common/components/FormTextBox.vue';
@@ -42,10 +43,14 @@ import {
 import ValidationError from '@/common/errors/ValidationError';
 import {Meeting} from '@/common/parsers/meetingParser';
 import {Schedule} from '@/common/parsers/scheduleParser';
+import useAuthStore from '@/common/stores/auth.store';
 import {Meta} from '@/common/types/types';
 import Multiselect from '@@/@vueform/multiselect';
 import {ScheduleRequestPayload} from '../../../../../common/parsers/scheduleParser';
 
+
+const authStore = useAuthStore();
+// v-if="authStore.hasPermission(['edit board'])"
 //constants
 const showCreate = ref(false);
 const action = ref('create');
@@ -447,7 +452,8 @@ const onPublish = async (id: string) => {
                                 @click="filterMeetings('past')">
                             Past
                         </button>
-                        <button type="button" @click.prevent="openCreateMeetingModal" class="btn btn-tool">
+                        <button  v-if="authStore.hasPermission(['create meeting'])"
+                                 type="button" @click.prevent="openCreateMeetingModal" class="btn btn-tool">
                             <i class="far fa fa-plus mr-2 "></i>
                         </button>
                     </div>
@@ -457,10 +463,10 @@ const onPublish = async (id: string) => {
 
              
                 <!-- /.card-header -->
-                <div class="card-body">
+                <div class="card-body" v-if="authStore.hasPermission(['view meeting'])">
                     <ul class="products-list product-list-in-card pl-2 pr-2"  v-if="filteredMeetings.length > 0">
                         <li class="item" v-for="meeting in filteredMeetings" :key="meeting.id">
-                            <div class="product-img custom-size mr-2">
+                            <div class="product-img meeting-custom-size mr-2">
                                 
                                 <div class="calendar-icon w-full flex flex-col items-center 
                                         justify-center mt-1 calendaheight" v-if="meeting?.nearestSchedule">
@@ -482,49 +488,52 @@ const onPublish = async (id: string) => {
                             </div>
                             <div class="product-info">
                                 <!-- {{meeting?.nearestSchedule?.date}} -->
-                                <router-link 
-                                    :to="{ name: 'BoardMeetingDetails',
-                                           params: {
-                                               boardId: boardId,
-                                               meetingId: meeting.id,
-                                               scheduleId: meeting.nearestSchedule.id
-                                           }
-                                    }"
-                                    class="product-title">
+                                <router-link  v-if="authStore.hasPermission(['view meeting'])"
+                                              :to="{ name: 'BoardMeetingDetails',
+                                                     params: {
+                                                         boardId: boardId,
+                                                         meetingId: meeting.id,
+                                                         scheduleId: meeting.nearestSchedule.id
+                                                     }
+                                              }"
+                                              class="product-title">
                                     Meeting: <span class="text-primary text-bold">{{ meeting.title }}</span>
                                     <span class="badge float-right bg-white" v-if="currentStatus === 'unpublished'">
-                                        <a href="" @click.prevent="onPublish(meeting.id)"
+                                        <a href=""  v-if="authStore.hasPermission(['publish meeting'])"
+                                           @click.prevent="onPublish(meeting.id)"
                                            class="text-blue-500 hover:text-blue-700
                                                 transition duration-150 ease-in-out">
                                             Publish
                                         </a>
                                     </span>
                                     <span class="badge float-right bg-white">
-                                        <router-link
-                                            :to="{ name: 'BoardMeetingDetails',
-                                                   params: {
-                                                       boardId: boardId,
-                                                       meetingId: meeting.id,
-                                                       scheduleId: meeting.nearestSchedule.id
-                                                   }
-                                            }"
-                                            class="text-green-500
+                                        <router-link  v-if="authStore.hasPermission(['view meeting'])"
+                                                      :to="{ name: 'BoardMeetingDetails',
+                                                             params: {
+                                                                 boardId: boardId,
+                                                                 meetingId: meeting.id,
+                                                                 scheduleId: meeting.nearestSchedule.id
+                                                             }
+                                                      }"
+                                                      class="text-green-500
                                                 hover:text-green-700 transition duration-150 ease-in-out">
                                             <i class="far fa-eye"></i>
                                         </router-link>
                                     </span>
                                     <span class="badge float-right bg-white" >
-                                        <a href="" @click.prevent="openEditMeetingModal(meeting)"
+                                        <a href=""  v-if="authStore.hasPermission(['edit meeting'])"
+                                           @click.prevent="openEditMeetingModal(meeting)"
                                            class="text-blue-500 hover:text-blue-700
                                                 transition duration-150 ease-in-out">
                                             <i class="far fa-edit"></i>
                                         </a>
                                     </span>
                                 </router-link>
-                                <span class="product-description">
+                                <span v-if="authStore.hasPermission(['edit meeting'])" 
+                                      class="product-description">
                                     Description: 
-                                    <span class="text-primary text-bold">
-                                        {{ truncateDescription(meeting.description, 80) }}
+                                    <span class="text-primary text-bold"
+                                          v-html="meeting.description">
                                     </span>
                                 </span>
                                 <div class="row border-top border-bottom border-warning 
@@ -602,21 +611,22 @@ const onPublish = async (id: string) => {
                                         </span>
                                     </div>
                                     <span>
-                                        <button v-if="schedule.heldstatus === 'scheduled'" 
+                                        <button v-if="schedule.heldstatus === 'scheduled' 
+                                                    && authStore.hasPermission(['edit meeting'])" 
                                                 class="btn btn-sm btn-warning 
                                             font-bold ml-2 mr-2 mt-1 mb-1" 
                                                 @click.prevent="openEditScheduleMeetingModal(meeting, schedule)">
                                             Postpone
                                         </button>
-                                        <router-link
-                                            :to="{ name: 'BoardMeetingDetails',
-                                                   params: {
-                                                       boardId: boardId,
-                                                       meetingId: meeting.id,
-                                                       scheduleId: schedule.id
-                                                   }
-                                            }"
-                                            class="  mr-2
+                                        <router-link v-if="authStore.hasPermission(['view meeting'])"
+                                                     :to="{ name: 'BoardMeetingDetails',
+                                                            params: {
+                                                                boardId: boardId,
+                                                                meetingId: meeting.id,
+                                                                scheduleId: schedule.id
+                                                            }
+                                                     }"
+                                                     class="  mr-2
                                                 hover:text-info transition duration-150 ease-in-out">
                                             <i class="far fa-eye"></i>
                                         </router-link>
@@ -676,7 +686,7 @@ const onPublish = async (id: string) => {
                 </h3>
                 <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
                 <div class="overflow-auto p-4" style="max-height: 80vh;"
-                    :style="action == 'schedule' ? 'height:500px;':''">
+                     :style="action == 'schedule' ? 'height:500px;':''">
                     <div class="grid grid-cols-3 md:grid-cols-3 gap-2 p-2">
                         <div class="col-span-3">
                             <form novalidate @submit.prevent="onSubmit" class="">
@@ -727,14 +737,15 @@ const onPublish = async (id: string) => {
                                 </div>
                                 <div class="flex flex-wrap -mx-2 mt-2"
                                      v-if="action == 'create' || action == 'edit'">
-                                    <FormTextBox  
+                                    <FormQuillEditor 
                                         v-if="action == 'create' || action == 'edit'"
-                                        :labeled="true"
                                         label="Meeting Description"
                                         name="description"
-                                        class="col-span-3"
+                                        theme="snow"
                                         placeholder="Enter Meeting Description"
-                                        :rows="2"
+                                        toolbar="full"
+                                        contentType="html"
+                                        class="col-span-3"
                                     />
                                 </div>
                                 <div class="flex flex-wrap -mx-2 mt-2"
@@ -750,7 +761,7 @@ const onPublish = async (id: string) => {
                                 </div>
                                 <div class="flex flex-wrap -mx-2 mt-2 relative"
                                      v-for="(schedule, index) in values.schedules" :key="index" 
-                                        v-if="values.schedules">
+                                     v-if="values.schedules">
                                     <!-- {{ schedule.start_time }} -->
                                     <div class="w-full md:w-1/3 px-1 md:px-2"> 
                                         <FormDateTimeInput
@@ -817,26 +828,7 @@ const onPublish = async (id: string) => {
   background-color: #17a2b8;
   color: #fff;
 }
-.custom-size{
-    width: 105px!important;
-}
-.calendaheight{
-    height: 100px!important;
-    margin-bottom: 5px!important;
-}
-.customonth{
-    margin-top: 10px !important;
-    font-size: 17px !important;
-    color: rgb(255, 255, 255) !important;
-    margin-bottom: 10px !important;
-}
-.customday{
-    font-size: 24px!important;
-}
-.customyear{
-    font-size: 19px!important;
-}
-.products-list .product-info {
-    margin-left: 129px!important;
-}
+
+
+
 </style>

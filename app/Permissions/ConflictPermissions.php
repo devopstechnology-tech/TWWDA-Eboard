@@ -6,35 +6,36 @@ namespace App\Permissions;
 
 class ConflictPermissions
 {
-    public const VIEW = [
-        'name' => 'view Conflict',
-        'type' => 'member',
-        'description' => 'Allows a user of type `member` to view Conflict',
-    ];
-
     public const CREATE = [
-        'name' => 'create Conflict',
-        'type' => 'member',
-        'description' => 'Allows a user of type `member` to create Conflict',
+        'name' => 'create conflict of interest',
+        'type' => ['system', 'admin', 'ceo', 'companychairman', 'companysecretary', 'chairperson', 'secretary'],
+        'description' => 'Allows a user to create a conflict of interest',
     ];
 
     public const EDIT = [
-        'name' => 'edit Conflict',
-        'type' => 'member',
-        'description' => 'Allows a user of type `member` to edit Conflict',
+        'name' => 'edit conflict of interest',
+        'type' => ['system', 'admin', 'ceo', 'companychairman', 'companysecretary', 'chairperson', 'secretary'],
+        'description' => 'Allows a user to edit a conflict of interest',
     ];
 
-    public const DELETE = [
-        'name' => 'delete Conflict',
-        'type' => 'system',
-        'description' => 'Allows a user of type `system` to delete Conflict',
+    public const VIEW = [
+        'name' => 'view conflicts of interest',
+        'type' => ['system', 'admin', 'ceo', 'companychairman', 'companysecretary', 'chairperson', 'secretary', 'member'],
+        'description' => 'Allows a user to view own conflict of interest',
     ];
+    public const VIEW_ALL_CONFLICTS = [
+        'name' => 'view conflicts of interests',
+        'type' => ['system', 'admin', 'ceo', 'companychairman', 'companysecretary', 'chairperson', 'secretary'],
+        'description' => 'Allows a user to view all conflict of interest',
+    ];
+
     public static function allPermissions(): array
     {
         return [
-            self::VIEW,
             self::CREATE,
             self::EDIT,
-            self::DELETE,        ];
+            self::VIEW,
+            self::VIEW_ALL_CONFLICTS,
+        ];
     }
 }

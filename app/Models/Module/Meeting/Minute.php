@@ -35,7 +35,7 @@ class Minute extends BaseModel
     public function schedule()
     {
         return $this->belongsTo(Schedule::class, 'schedule_id')
-            ->with('meeting');
+            ->with('meeting', 'attendances');
     }
     public function board()
     {

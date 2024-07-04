@@ -4,6 +4,8 @@ import {array, nullable, number, object, output, string} from 'zod';
 export const positionParser = object({
     id:string(),
     name:string(),
+    model: string(),
+    icon: string(),
     description: string(),
     active: string(),
     created_at:string(),
@@ -12,6 +14,8 @@ export const positionParser = object({
 export interface PositionRequestPayload{ //to db
     id:string,
     name:string,
+    model:string,
+    icon:string,
     description:string,
     active:string|null
 }

@@ -4,18 +4,21 @@ import '@@/@vueform/multiselect/themes/default.css';
 import {useQuery} from '@tanstack/vue-query';
 import {useForm} from 'vee-validate';
 import {onMounted,onUnmounted,ref} from 'vue';
-import {useRoute} from 'vue-router';
+import {useRoute, useRouter} from 'vue-router';
 import * as yup from 'yup';
-import {useCreateAttendanceRSVPRequest, useGetMeetingAttendancesRequest,  useUpdateAttendanceRSVPRequest, useUpdateAttendanceSignatureRequest} from '@/common/api/requests/modules/attendance/useAttendanceRequest';
+import {useCreateAttendanceRSVPRequest, useGetMeetingAttendancesRequest,  useSendAttendancesReminder,  useUpdateAttendanceRSVPRequest, useUpdateAttendanceSignatureRequest} from '@/common/api/requests/modules/attendance/useAttendanceRequest';
 import useUnexpectedErrorHandler from '@/common/composables/useUnexpectedErrorHandler';
 import {loadAvatar} from '@/common/customisation/Breadcrumb';
 import ValidationError from '@/common/errors/ValidationError';
 import {AttendanceRequestPayload} from '@/common/parsers/attendanceParser';
-import AttendanceToggle from './AttendanceToggle.vue';
+import useAuthStore from '@/common/stores/auth.store';
 import MeetingRsvp from './MeetingRsvp.vue';
+import Signature from './Signature.vue';
+const authStore = useAuthStore();
 //constants
 const handleUnexpectedError = useUnexpectedErrorHandler();
 const route = useRoute();
+const router = useRouter();
 const action = ref('create');
 const meetingId = route.params.meetingId as string;
 const scheduleId = route.params.scheduleId as string;
@@ -24,6 +27,7 @@ const schema = yup.object({
     id: yup.string().required(),
     rsvp_status: yup.string().nullable(),
     attendance_status: yup.string().nullable(),
+    signatureupload: yup.string().nullable(),
 });
 const {
     handleSubmit, setErrors, setFieldValue, values} = useForm<{
@@ -36,6 +40,7 @@ const {
     invite_status:string|null;
     rsvp_status:string|null;
     attendance_status:string|null;
+    signatureupload:string|null;
 
 }>({
     validationSchema: schema,
@@ -43,6 +48,7 @@ const {
         id:'',
         rsvp_status:'',
         attendance_status:'',
+        signatureupload:'',
     },
 });
 const reset = ()=>{
@@ -50,6 +56,7 @@ const reset = ()=>{
     setFieldValue('id', '');
     setFieldValue('rsvp_status', '');
     setFieldValue('attendance_status', '');
+    setFieldValue('signatureupload', '');
 };
 const handleRsvpUpdated = (event: { attendeeId: string; status: string }) => {
     reset();
@@ -79,6 +86,7 @@ const onSubmit = handleSubmit(async (values, {resetForm}) => {
             membership: values.membership,
             meeting: values.meeting,
             invite_status: null,
+            signatureupload: null,
         };
         if (action.value === 'create') {
             await useCreateAttendanceRSVPRequest(payload, scheduleId);
@@ -127,208 +135,107 @@ function handleMeetingUpdated(event) {
         fetchMeetingAttendances();
     }
 }
-
+const navigateToSignaturePage = (attendee) => {
+    router.push({
+        name: 'SignatureAttendance',
+        params: {
+            boardId: route.params.boardId,
+            meetingId: route.params.meetingId,
+            scheduleId: route.params.scheduleId,
+            attendeeId: attendee.id,
+            mediaId: attendee.media[0]?.uuid,
+        },
+    });
+};
+const sendReminder = async (id: string) => {
+    await useSendAttendancesReminder(id);
+    await fetchMeetingAttendances() ;
+};
 </script>
 <template>
-    <div id="members">
-        <div class="card">
-            <div class="card-header flex items-center">
-                <h2 class="card-header-title h3">Attendance</h2>
-                <!-- <div class="ml-auto flex items-center space-x-2">
-                    <a href="" class="btn btn-secondary btn-sm w-icon">
-                        Update Members
-                    </a>
-                </div> -->
-            </div>
-            <div class="table-responsive overflow-visible">
-                <table class="table card-table table-stacked" v-if="Attendances">
-                    <thead>
-                        <tr>
-                            <th scope="col">
-                                <button data-sort="user-name" class="btn btn-link btn-sm list-sort asc">
-                                    Name
-                                </button>
-                            </th>
-                            <th scope="col">
-                                <button data-sort="role" class="btn btn-link btn-sm list-sort px-0">
-                                    Role
-                                </button> 
-                            </th>
-                            <th scope="col" class="text-center">
-                                <button data-sort="invited" class="btn btn-link btn-sm list-sort asc">
-                                    Invited
-                                </button>
-                            </th>
-                            <th scope="col" class="text-center">
-                                <button data-sort="invited" class="btn btn-link btn-sm list-sort asc">
-                                    Location
-                                </button>
-                            </th>
-                            <th scope="col" class="text-center">
-                                <button data-sort="rsvp" class="btn btn-link btn-sm list-sort">
-                                    RSVP
-                                </button>
-                            </th>
-                            <th scope="col" class="text-center">
-                                <button data-sort="attendance" class="btn btn-link btn-sm list-sort">
-                                    Attendance
-                                </button>
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody id="member-table" class="list">
-                        <tr data-id="323280" class="member" v-for="(attendee, idx) in Attendances" :key="idx">
-                            <td data-name="Felix Nyariki" class="user-name">
-                                <div class="flex items-center">
-                                    <div class="avatar avatar-sm mr-3 flex-shrink-0">
-                                        <img :src="loadAvatar(attendee.membership.user.profile.avatar)" 
-                                             alt="Nyariki Felix profile picture" 
-                                             class="avatar-img rounded-full" 
-                                             data-uw-rm-alt-original="Nyariki Felix profile picture" 
-                                             role="img" data-uw-rm-alt="ALT">
-                                    </div>
+    <div class="container-fluid" v-if="authStore.hasPermission(['view attendances'])">
+        <div class="card-header flex items-center">
+            <h2 class="card-header-title h3">Attendance</h2>
+        </div>
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-lg-3 col-md-4 col-sm-6 mb-3" v-for="(attendee, idx) in Attendances" :key="idx">
+                    <div class="card card-outline card-primary h-100">
+                        <div class="card-body box-profile">
+                            <div class="text-center">
+                                <div class="avatar avatar-md mb-3">
+                                    <img
+                                        :src="loadAvatar(attendee.membership.user.profile.avatar)"
+                                        class="profile-user-img img-fluid img-circle"
+                                        role="img"
+                                        data-uw-rm-alt="ALT"/>
+                                </div>
+                                <h3 class="profile-username text-center text-primary">
+                                    {{ attendee.membership?.user?.full_name }}
+                                </h3>
+                            </div>
+                            <div class="mt-3">
+                                <div class="d-flex justify-content-between mb-2">
+                                    <strong>Invited:</strong>
+                                    <span class="cell-label">{{ attendee.invite_status }}</span>
+                                </div>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <strong>RSVP:</strong>
                                     <div>
-                                        <div class="flex items-center space-x-2">
-                                            <p class="mb-0">
-                                                <!-- lead to veiw profile and activites -->
-                                                <!-- <a href="#" tabindex="0" role="button" 
-                                                data-profile_url=""
-                                                 data-name="Nyariki Felix" data-pronoun="" 
-                                                 data-img="" 
-                                                 data-board_role="Administrative Staff" data-company="" 
-                                                 data-ptitle="" data-contact_email="" data-contact_phone="" 
-                                                 aria-label="Nyariki Felix profile" data-bs-original-title="" 
-                                                 title="" class="person-card">.
-                                                Nyariki Felix
-                                            </a> -->
-                                                {{attendee.membership?.user?.full_name}}
-                                            </p>
-                                        </div>
-                                        <p class="text-muted text-sm mb-0">{{attendee?.membership?.user.role}}</p>
+                                        <MeetingRsvp
+                                            :attendee="attendee"
+                                            :disableRemoteRsvp="0"
+                                            @rsvp-updated="handleRsvpUpdated"/>
                                     </div>
                                 </div>
-                            </td>
-                            <td data-role="meetingOwner" class="role">
-                                <span class="text-sm"> {{attendee.membership?.member?.position}}</span>
-                            </td>
-                            <td class="invited lg:text-center">
-                                <span class="cell-label">Invited</span> 
-                                <span data-bs-toggle="tooltip" 
-                                      title="" data-bs-original-title="User was invited by email"
-                                      class="text-muted">
-                                </span>
-                            </td>
-                            <td class="invited lg:text-center">                               
-                                <span class="text-sm"> 
-                                    {{attendee.location}}
-                                </span>
-                            </td>
-                            <td class="rsvp lg:text-center">
-                                <div class="flex justify-center">
-                                    <MeetingRsvp
-                                        :attendee="attendee"
-                                        :disableRemoteRsvp="0"
-                                        @rsvp-updated="handleRsvpUpdated"
-                                    />
+                                <div class="d-flex justify-content-between mb-2">
+                                    <strong>Attendance:</strong>
+                                    <div>
+                                        <div v-if="attendee.membership?.user.id === authStore.user.id">
+                                            <div v-if="attendee.attendance_status==='Attended'">
+                                                <a
+                                                    href=""
+                                                    @click.prevent="navigateToSignaturePage(attendee)"
+                                                    class="text-blue-500 hover:text-blue-700 
+                                                    transition duration-150 ease-in-out">
+                                                    <i class="far fa-eye"></i> {{ attendee.attendance_status }}
+                                                </a>
+                                            </div>
+                                            <div v-else>
+                                                <button
+                                                    type="submit"
+                                                    class="btn btn-link btn-primary btn-sm text-white"
+                                                    @click.prevent="navigateToSignaturePage(attendee)">
+                                                    Sign
+                                                </button>
+                                            </div>                                            
+                                        </div>
+                                    </div>
+                                    <div v-if="authStore.hasRole(['Super Admin', 'Admin', 'Company Secretary']) 
+                                        && attendee.membership?.user.id !== authStore.user.id">
+                                        <button
+                                            type="submit"
+                                            class="btn btn-link btn-primary btn-sm text-white"
+                                            @click.prevent="sendReminder(attendee.id)">
+                                            Send Reminder
+                                        </button>
+                                    </div>
                                 </div>
-                            </td>
-                            <td class="attendance lg:text-center p-0" :data-attendance="attendee.attendance_status">
-                                <AttendanceToggle :attendee="attendee" @attendance-updated="handleAttendanceUpdated" />
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-    <div class="flex justify-center col-md-6">
-       
-    </div>
+    <div class="container-fluid" v-else>
+        <p class="m-0">
+            <span class="h3  text-primary text-bold text-danger">Sorry, You are not Authorised to view this page</span>
+        </p>
+    </div> 
 </template>
 <style scoped>
-.text-success {
-  color: green;
-}
 
-.text-danger {
-  color: red;
-}
-
-.btn-icon {
-  border: none;
-  background: none;
-}
-
-.fa-spinner {
-  animation: spin 2s linear infinite;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-/* Existing styles */
-.btn-info {
-    background-color: #17a2b8;
-    color: #fff;
-}
-th button.list-sort {
-    background-color: #f9fbfd;
-    color: #4b6c92;
-    font-size: .8125rem;
-    font-weight: 600;
-    letter-spacing: .08em;
-    text-transform: uppercase;
-}
-.avatar-sm {
-    font-size: .8333333333rem;
-    height: 2.5rem;
-    width: 2.5rem;
-}
-.avatar {
-    display: inline-block;
-    font-size: 1rem;
-    height: 3rem;
-    position: relative;
-    width: 3rem;
-}
-.rounded-full {
-    border-radius: 9999px;
-}
-.avatar-img {
-    height: 100%;
-    -o-object-fit: cover;
-    object-fit: cover;
-    width: 100%;
-}
-img {
-    display: block;
-    max-width: 100%;
-}
-img, svg {
-    vertical-align: middle;
-}
-.dropdown-menu {
-  position: absolute;
-  top: 100%; /* Ensures it drops down from the button */
-  left: 0;
-  background-color: white;
-  border: 1px solid #ccc;
-  z-index: 1000;
-}
-
-.btn {
-  padding: 0.5rem 1rem;
-  border: none;
-  color: white;
-  cursor: pointer;
-}
-
-.btn-success { background-color: #28a745; }
-.btn-danger { background-color: #dc3545; }
-.btn-warning { background-color: #ffc107; }
-.btn-info { background-color: #17a2b8; }
-.btn-secondary { background-color: #6c757d; }
 </style>
 
 

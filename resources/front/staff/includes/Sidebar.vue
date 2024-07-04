@@ -17,7 +17,9 @@ import {
     loadAvatar,
 } from '@/common/customisation/Breadcrumb';
 import useAuthStore from '@/common/stores/auth.store';
-
+// import useAuthStore from '@/common/stores/auth.store';
+// const authStore = useAuthStore();
+// v-if="authStore.hasPermission(['view meeting'])"
 
 const authStore = useAuthStore();
 </script>
@@ -33,7 +35,6 @@ const authStore = useAuthStore();
                      style="opacity: .8"> -->
                 <span class="brand-text font-weight-light">Eboard</span>
             </router-link>
-
             <!-- Sidebar -->
             <div class="sidebar">
                 <!-- Sidebar user (optional) -->
@@ -68,7 +69,7 @@ const authStore = useAuthStore();
                                 </p>
                             </router-link>
                         </li>
-                        <li class="nav-item" >
+                        <li class="nav-item" v-if="authStore.hasPermission(['view committee','view board'])">
                             <router-link :to="{name:  BOARDS}" class="nav-link" active-class="active">
                                 <i class="nav-icon fas fa-th"></i>
                                 <p>
@@ -76,7 +77,7 @@ const authStore = useAuthStore();
                                 </p>
                             </router-link>
                         </li>
-                        <li class="nav-item" >
+                        <li class="nav-item" v-if="authStore.hasPermission(['view meeting'])">
                             <router-link :to="{name:  MEETINGS}"   class="nav-link" active-class="active" >
                                 <i class="nav-icon fas fa-copy"></i>
                                 <p>
@@ -84,7 +85,7 @@ const authStore = useAuthStore();
                                 </p>
                             </router-link>
                         </li>
-                        <li class="nav-item" >
+                        <li class="nav-item" v-if="authStore.hasPermission(['view almanac'])">
                             <router-link :to="{name:  ALMANAC}"  class="nav-link" active-class="active">
                                 <i class="nav-icon fas fa-chart-pie"></i>
                                 <p>
@@ -92,7 +93,7 @@ const authStore = useAuthStore();
                                 </p>
                             </router-link>
                         </li>
-                        <li class="nav-item" >
+                        <li class="nav-item" v-if="authStore.hasPermission(['view discussion'])">
                             <router-link :to="{name: DISCUSSIONS}"  class="nav-link" active-class="active">
                                 <i class="nav-icon fas fa-tree"></i>
                                 <p>
@@ -108,7 +109,7 @@ const authStore = useAuthStore();
                                 </p>
                             </router-link>
                         </li> -->
-                        <li class="nav-item" >
+                        <li class="nav-item" v-if="authStore.hasPermission(['view poll'])">
                             <router-link :to="{name: POLLS}"  class="nav-link" active-class="active">
                                 <i class="nav-icon fas fa-edit"></i>
                                 <p>
@@ -116,7 +117,7 @@ const authStore = useAuthStore();
                                 </p>
                             </router-link>
                         </li>
-                        <li class="nav-item" >
+                        <li class="nav-item" v-if="authStore.hasPermission(['view task'])">
                             <router-link :to="{name: TASKS}"  class="nav-link" active-class="active">
                                 <i class="nav-icon fas fa-table"></i>
                                 <p>
@@ -124,7 +125,7 @@ const authStore = useAuthStore();
                                 </p>
                             </router-link>
                         </li>
-                        <li class="nav-item" >
+                        <li class="nav-item" v-if="authStore.hasPermission(['view users'])">
                             <router-link :to="{name: USERS}" class="nav-link" active-class="active">
                                 <i class="nav-icon far fa-calendar-alt"></i>
                                 <p>
@@ -132,7 +133,7 @@ const authStore = useAuthStore();
                                 </p>
                             </router-link>
                         </li>
-                        <li class="nav-item" >
+                        <li class="nav-item" v-if="authStore.hasPermission(['view calendar'])">
                             <router-link :to="{name: CALENDAR}" class="nav-link" active-class="active">
                                 <i class="nav-icon fas fa-tree"></i>
                                 <p>
@@ -140,7 +141,7 @@ const authStore = useAuthStore();
                                 </p>
                             </router-link>
                         </li>
-                        <li class="nav-item" v-if="authStore.hasRole(['Super Admn', 'Admin'])">
+                        <li class="nav-item" v-if="authStore.hasPermission(['view settings'])">
                             <router-link :to="{name: SETTINGS}" class="nav-link" active-class="active">
                                 <i class="nav-icon fas fa-tree"></i>
                                 <p>

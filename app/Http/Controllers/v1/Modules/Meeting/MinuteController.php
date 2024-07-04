@@ -76,28 +76,35 @@ class MinuteController extends Controller
         return $this->response(Response::HTTP_OK, __('messages.record-updated'), $minute);
     }
 
-    public function ceoapproval(Minute $minute): JsonResponse
+    public function ceoapproval($minute): JsonResponse
     {
         // $this->authorize('delete', [Minute::class, $minute->id]);
         $this->minuteRepository->ceoApprovalMinute($minute);
 
         return $this->response(Response::HTTP_NO_CONTENT, __('messages.record-deleted'), null);
     }
-    public function publish(Minute $minute): JsonResponse
+    public function acceptapproval($minute): JsonResponse
+    {
+        // $this->authorize('delete', [Minute::class, $minute->id]);
+        $this->minuteRepository->AcceptceoApprovalMinute($minute);
+
+        return $this->response(Response::HTTP_NO_CONTENT, __('messages.record-deleted'), null);
+    }
+    public function publish($minute): JsonResponse
     {
         // $this->authorize('delete', [Minute::class, $minute->id]);
         $this->minuteRepository->publishMinute($minute);
 
         return $this->response(Response::HTTP_NO_CONTENT, __('messages.record-deleted'), null);
     }
-    public function signatures(Minute $minute): JsonResponse
+    public function signatures($minute): JsonResponse
     {
         // $this->authorize('delete', [Minute::class, $minute->id]);
         $this->minuteRepository->signaturesMinute($minute);
 
         return $this->response(Response::HTTP_NO_CONTENT, __('messages.record-deleted'), null);
     }
-    public function destroy(Minute $minute): JsonResponse
+    public function destroy($minute): JsonResponse
     {
         // $this->authorize('delete', [Minute::class, $minute->id]);
         $this->minuteRepository->deleteMinute($minute);

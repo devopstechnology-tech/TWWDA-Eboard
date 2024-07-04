@@ -6,35 +6,30 @@ namespace App\Permissions;
 
 class SettingPermissions
 {
-    public const VIEW = [
-        'name' => 'view Setting',
-        'type' => 'observer',
-        'description' => 'Allows a user of type `observer` to view Setting',
-    ];
-
     public const CREATE = [
-        'name' => 'create Setting',
-        'type' => 'system',
-        'description' => 'Allows a user of type `system` to create Setting',
+        'name' => 'create settings',
+        'type' => ['system'],
+        'description' => 'Allows a user to create settings',
     ];
 
-    public const EDIT = [
-        'name' => 'edit Setting',
-        'type' => 'admin',
-        'description' => 'Allows a user of type `admin` to edit Setting',
+    public const UPDATE = [
+        'name' => 'update settings',
+        'type' => ['system'],
+        'description' => 'Allows a user to update settings',
     ];
 
-    public const DELETE = [
-        'name' => 'delete Setting',
-        'type' => 'system',
-        'description' => 'Allows a user of type `system` to delete Setting',
+    public const VIEW = [
+        'name' => 'view settings',
+        'type' => ['system'],
+        'description' => 'Allows a user to view settings',
     ];
+
     public static function allPermissions(): array
     {
         return [
-            self::VIEW,
             self::CREATE,
-            self::EDIT,
-            self::DELETE,        ];
+            self::UPDATE,
+            self::VIEW,
+        ];
     }
 }

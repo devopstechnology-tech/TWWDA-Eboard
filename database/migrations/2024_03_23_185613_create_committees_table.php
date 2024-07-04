@@ -7,7 +7,8 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class () extends Migration {
+return new class() extends Migration
+{
     /**
      * Run the migrations.
      */
@@ -16,15 +17,18 @@ return new class () extends Migration {
         Schema::create('committees', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->string('name')->nullable();
-            $table->string('description')->nullable();
+            $table->longText('description')->nullable();
             $table->string('icon')->nullable();
             $table->string('cover')->nullable();
             $table->string('status')->default(StatusEnum::Inactive->value);
             $table->string('owner_id')->nullable();
+            $table->string('committeeable_id'); // This will create `committeeable_id` and `committeeable_type` fields
+            $table->string('committeeable_type')->nullable(); // This will create `committeeable_id` and `committeeable_type` fields
             $table->softDeletes();
             $table->timestamps();
         });
     }
+
 
     /**
      * Reverse the migrations.

@@ -6,35 +6,50 @@ namespace App\Permissions;
 
 class MeetingPermissions
 {
-    public const VIEW = [
-        'name' => 'view Meeting',
-        'type' => 'member',
-        'description' => 'Allows a user of type `member` to view Meeting',
-    ];
-
     public const CREATE = [
-        'name' => 'create Meeting',
-        'type' => 'chairperson',
-        'description' => 'Allows a user of type `chairperson` to create Meeting',
+        'name' => 'create meeting',
+        'type' => ['system', 'admin', 'ceo', 'companychairman', 'companysecretary'],
+        'description' => 'Allows a user to create meetings',
     ];
 
     public const EDIT = [
-        'name' => 'edit Meeting',
-        'type' => 'chairperson',
-        'description' => 'Allows a user of type `chairperson` to edit Meeting',
+        'name' => 'edit meeting',
+        'type' => ['system', 'admin', 'ceo', 'companychairman', 'companysecretary'],
+        'description' => 'Allows a user to edit meetings',
+    ];
+
+    public const VIEW = [
+        'name' => 'view meeting',
+        'type' => ['system', 'admin', 'ceo', 'companychairman', 'companysecretary', 'chairperson', 'secretary', 'member', 'guest'],
+        'description' => 'Allows a user to view meetings',
     ];
 
     public const DELETE = [
-        'name' => 'delete Meeting',
-        'type' => 'system',
-        'description' => 'Allows a user of type `system` to delete Meeting',
+        'name' => 'delete meeting',
+        'type' => ['system', 'admin', 'ceo', 'companychairman', 'companysecretary'],
+        'description' => 'Allows a user to delete meetings',
+    ];
+
+    public const CONFIRM = [
+        'name' => 'confirm meeting',
+        'type' => ['system', 'admin', 'ceo', 'companychairman', 'companysecretary'],
+        'description' => 'Allows a user to confirm meetings',
+    ];
+
+    public const PUBLISH = [
+        'name' => 'publish meeting',
+        'type' => ['system', 'admin', 'ceo', 'companychairman', 'companysecretary'],
+        'description' => 'Allows a user to publish meetings',
     ];
     public static function allPermissions(): array
     {
         return [
-            self::VIEW,
             self::CREATE,
             self::EDIT,
-            self::DELETE,        ];
+            self::VIEW,
+            self::DELETE,
+            self::CONFIRM,
+            self::PUBLISH,
+        ];
     }
 }

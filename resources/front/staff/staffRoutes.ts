@@ -153,6 +153,52 @@ const staffRoutes: RouteRecordRaw[] = [
                 },
                 {
                     beforeEnter: requireStaffAuthentication,
+                    component: () => import('@/staff/pages/secure/meeting/includes/MinuteApproval.vue'),
+                    // Ensure this component is created
+                    name: 'MinuteApproval', // A unique name for the route
+                    path: '/board/:boardId/meeting/:meetingId/schedule/:scheduleId/minutes/:minutesId', // Dynamic segment to capture the board ID & meting id
+                    meta: {title: 'Minute Approval By Board/Chaiman'},
+                    props: route => ({
+                        boardId: route.params.boardId,
+                        meetingId: route.params.meetingId,
+                        scheduleId: route.params.scheduleId,
+                        minutesId: route.params.minutesId,  // Interpret as boolean
+                        // otherParam: route.query.otherParam  // Pass other parameters as needed
+                    }),
+                },
+                {
+                    beforeEnter: requireStaffAuthentication,
+                    component: () => import('@/staff/pages/secure/meeting/includes/minute/Minutepdf.vue'),
+                    // Ensure this component is created
+                    name: 'MinuteView', // A unique name for the route
+                    path: '/board/:boardId/meeting/:meetingId/schedule/:scheduleId/minutes/:minutesId/pdf', // Dynamic segment to capture the board ID & meting id
+                    meta: {title: 'Minute View'},
+                    props: route => ({
+                        boardId: route.params.boardId,
+                        meetingId: route.params.meetingId,
+                        scheduleId: route.params.scheduleId,
+                        minutesId: route.params.minutesId,  // Interpret as boolean
+                        // props: (route: { query: { content: unknown; }; }) => ({content: route.query.content}),
+                        // otherParam: route.query.otherParam  // Pass other parameters as needed
+                    }),
+                },
+                {
+                    beforeEnter: requireStaffAuthentication,
+                    component: () => import('@/staff/pages/secure/meeting/includes/Signature.vue'),
+                    // Ensure this component is created
+                    name: 'SignatureAttendance', // A unique name for the route
+                    path: '/board/:boardId/meeting/:meetingId/schedule/:scheduleId/attendee/:attendeeId/:mediaId', // Dynamic segment to capture the board ID & meting id
+                    meta: {title: 'Attendance Signature'},
+                    props: route => ({
+                        boardId: route.params.boardId,
+                        meetingId: route.params.meetingId,
+                        scheduleId: route.params.scheduleId,
+                        attendeeId: route.params.attendeeId,
+                        mediaId: route.params.mediaId,
+                    }),
+                },
+                {
+                    beforeEnter: requireStaffAuthentication,
                     component: () => import('@/staff/pages/secure/meeting/Meetings.vue'),
                     name: MEETINGS,
                     path: 'meetings',
@@ -263,13 +309,6 @@ const staffRoutes: RouteRecordRaw[] = [
                     name: CALENDAR,
                     path: 'calendar',
                     meta: {title: 'Calendar'},
-                },
-                {
-                    beforeEnter: requireStaffAuthentication,
-                    component: () => import('@/staff/pages/secure/agenda/agenda/AgendaStart.vue'),
-                    name: AGENDAS,
-                    path: 'agendas',
-                    meta: {title: 'Agendas'},
                 },
                 {
                     beforeEnter: requireStaffAuthentication,

@@ -6,13 +6,15 @@ import VueDatePicker from '@vuepic/vue-datepicker';
 import {formatISO,parseISO} from 'date-fns';
 import {useField, useForm} from 'vee-validate';
 import {computed,defineEmits,inject,onMounted,ref} from 'vue';
-import {useRoute} from 'vue-router';
+import {useRoute, useRouter} from 'vue-router';
 import * as yup from 'yup';
 import {
     useGetBoardMembersRequest} from '@/common/api/requests/modules/member/useMemberRequest';
+import {useGetMeetingPositionsRequest} from '@/common/api/requests/modules/member/usePositionRequest';
 import {
     useCreateMembershipRequest,
     useGetMembershipsRequest,
+    useUpdateMemberShipPositionRequest,
     useUpdateMembershipRequest} from '@/common/api/requests/modules/membership/useMembershipRequest';
 import{useGetStaffsRequest}from '@/common/api/requests/staff/useStaffRequest';
 import FormDateInput from '@/common/components/FormDateInput.vue';
@@ -24,16 +26,22 @@ import FormTextBox from '@/common/components/FormTextBox.vue';
 import LoadingComponent from '@/common/components/LoadingComponent.vue';
 import SimpleTable from '@/common/components/Tables/SimpleTable.vue';
 import useUnexpectedErrorHandler from '@/common/composables/useUnexpectedErrorHandler';
-import {formattedDate,loadImage,test,truncateDescription} from '@/common/customisation/Breadcrumb';
+import {formattedDate,formattedDateTime,loadImage,test,truncateDescription} from '@/common/customisation/Breadcrumb';
 import ValidationError from '@/common/errors/ValidationError';
 import {Member, MemberEditParams,MemberRequestPayload,SelectedResult} from '@/common/parsers/memberParser';
-import {MembershipEditParams, MembershipRequestPayload} from '@/common/parsers/membershipParser';
+import {MembershipEditParams, MemberShipPositionRequestPayload, MembershipRequestPayload} from '@/common/parsers/membershipParser';
+import {Position} from '@/common/parsers/positionParser';
+import {User} from '@/common/parsers/userParser';
 import {Meta} from '@/common/types/types';
+import MemberShipPosition from '@/staff/pages/secure/meeting/includes/MemberShipPosition.vue';
 import Multiselect from '@@/@vueform/multiselect';
+import useAuthStore from '@/common/stores/auth.store';
 
+const authStore = useAuthStore();
 //constants
 const handleUnexpectedError = useUnexpectedErrorHandler();
 const route = useRoute();
+const router = useRouter();
 const action = ref('create');
 const boardId = route.params.boardId as string;
 const meetingId = route.params.meetingId as string;
@@ -47,6 +55,8 @@ const emit = defineEmits(['memberships-updated']);
 const {errorMessage} = useField('assignees');
 
 const memberschema = yup.object({
+    id: yup.string().nullable(),
+    position_id: yup.string().nullable(),
     board_id: yup.mixed().required(),
     meeting_id: yup.mixed().required(),
     memberships: yup.array().of(yup.string()).required('Members selection is required.'),
@@ -59,6 +69,8 @@ const {
 } = useForm<{
     board_id: string;
     meeting_id: string;
+    id: string;
+    position_id: string;
     memberships: string[];
 
 }>({
@@ -66,6 +78,8 @@ const {
     initialValues: {
         board_id: boardId,
         meeting_id: meetingId,
+        id: '',
+        position_id: '',
         memberships: [],
     },
 });
@@ -95,8 +109,14 @@ const onSubmit = handleSubmit(async (values, {resetForm}) => {
         };
         if (action.value === 'create') {
             await useCreateMembershipRequest(payload, meetingId, scheduleId);
-        } else {
+        } else if(action.value === 'edit') {
             await useUpdateMembershipRequest(payload, meetingId, scheduleId);
+        } else if(action.value === 'position') {
+            const payload: MemberShipPositionRequestPayload = {
+                id: values.id,
+                position_id: values.position_id,
+            };
+            await useUpdateMemberShipPositionRequest(payload, meetingId, scheduleId);
         }
         await fetchMemberships();
         emit('memberships-updated');
@@ -116,6 +136,8 @@ const reset = () => {
     showCreate.value = false;
     selectedMemberIds.value = [];
     setFieldValue('memberships', []);
+    setFieldValue('id', '');
+    setFieldValue('position_id', '');
 };
 
 const getMemberships = () => {
@@ -123,11 +145,13 @@ const getMemberships = () => {
         queryKey: ['getMembershipsKey', meetingId, scheduleId],
         queryFn: async () => {
             const response = await useGetMembershipsRequest(meetingId, scheduleId, {paginate: 'false'});
+            console.log('response.data', response.data);
             return response.data;
         },
     });
 };
 
+const {isLoading, data: Memberships, refetch: fetchMemberships} = getMemberships();
 const Members = computed(() => {
     const resul:  SelectedResult[] = [];
     if (allMembers.value && allMembers.value?.length > 0) {
@@ -151,8 +175,32 @@ onMounted(async () => {
     getMembers();
 });
 
-const {isLoading, data: Memberships, refetch: fetchMemberships} = getMemberships();
 
+// Fetch positions once and pass to child components
+const allPositions = ref<Position[]>([]);
+const getPositions = async () => {
+    const data = await useGetMeetingPositionsRequest({paginate: 'false'});
+    allPositions.value = data.data;
+};
+onMounted(async () => {
+    await getPositions();
+});
+const handlePositionUpdated = (event: { membershipId: string; positionId: string }) => {
+    reset();
+    action.value = 'position';
+    setFieldValue('id', event.membershipId);
+    setFieldValue('position_id', event.positionId);
+    onSubmit();
+};
+const openUserProfile = (user: User) => {
+    router.push({
+        name: 'ProfileDetails',  // The name of the route to navigate to
+        params: {
+            userId: user.id,
+            profileId: user.profile.id,
+        },
+    });
+};
 </script>
 <template>
     <div class="card">
@@ -168,53 +216,74 @@ const {isLoading, data: Memberships, refetch: fetchMemberships} = getMemberships
                 </button>
             </div>
         </div>
-        <div class="table-responsive">
-            <div id="member-list">
-                <table class="table table-striped card-table">
-                    <thead>
-                        <tr>
-                            <th scope="col">
-                                <button class="btn btn-link btn-sm list-sort asc" data-sort="member-name">Name</button>
-                            </th>
-                            <th scope="col">
-                                <button class="btn btn-link btn-sm list-sort" data-sort="board-role">Board Role</button>
-                            </th>
-                            <th scope="col" class="text-center">
-                                <button class="btn btn-link btn-sm list-sort" data-sort="admin">Group Admin</button>
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody class="list" v-if="Memberships">
-                        <tr v-for="(membership, idx) in Memberships" :key="idx">
-                            <td class="member-name" data-name="Felix Nyariki">
-                                <div class="flex items-center space-x-3" v-if=" membership.user">
-                                    <div class="avatar avatar-sm">
+        <div class="container-fluid">
+            <div class="row" v-if="Memberships">
+                <div class="col-lg-3 col-md-4 col-sm-6 mb-3" v-for="(membership, idx) in Memberships" :key="idx">
+                    <div class="card card-outline card-primary h-100">
+                        <div class="card-body box-profile">
+                            <div class="text-center">
+                                <!-- Image and User Info Column -->
+                                <!-- <div class="avatar avatar-md mb-3">
+                                    <a href="" >
                                         <img
-                                            class="far fa-user avatar-img rounded-full"
+                                            class="profile-user-img img-fluid img-circle"
+                                            :src="loadAvatar(member.user.profile.avatar)"
                                             role="img"
                                             data-uw-rm-alt="ALT"
                                         />
-                                    </div>
-                                    <h3 class="m-2">
-                                        {{ membership?.user?.full_name }}
-                                    </h3>
+                                    </a>
+                                </div> -->
+                                <h3 class="profile-username text-center text-primary">
+                                    <a href="" @click.prevent="openUserProfile(membership.user)">
+                                        {{ membership.user.full_name }}
+                                    </a>
+                                    <button type="button" @click.prevent="openUserProfile(membership.user)"
+                                            title="" class="mx-2 btn btn-sm btn-primary">
+                                        <i class="far fa-eye"></i>
+                                    </button>
+                                    <!-- <button v-show="member.user.role !== 'Super Admin'" 
+                                            type="button" @click.prevent="onDeleteMember(member.id)"
+                                            title="" class="mx-2 btn btn-sm btn-primary">
+                                        <i class="fa fa-trash mr-1"></i>
+                                    </button> -->
+                                </h3>
+                                <p class="text-muted text-center text-bold">{{membership.position.name}}</p>
+                            </div>
+                            <!-- Action Column -->
+                            <div class="mt-3" v-if="authStore.hasPermission(['assign meeting position'])">
+                                <div class="text-bold text-danger text-center mb-1" >
+                                    Position
                                 </div>
-                            </td>
-
-                            <td class="board-role">
-                                {{ membership?.member?.position }}
-                            </td>
-                            <td class="admin text-center" data-admin="0">
-                                <p class="my-0 leading-none p-2 mx-auto" v-if="membership?.position === 'Owner'">
-                                    Group Owner
+                                <div class="text-center">
+                                    <MemberShipPosition
+                                        :membership="membership"
+                                        :positions="allPositions"
+                                        :disableRemotePosition="0"
+                                        @position-updated="handlePositionUpdated"
+                                    />
+                                </div>
+                            </div>
+                            <div class="mt-3" v-else>
+                                <div class="text-bold text-danger text-center mb-1" >
+                                    Position
+                                </div>
+                                <div class="text-center" >
+                                    <i :class="'mr-2 fa ' + membership.position.icon" class="mr-2"></i> 
+                                    {{ membership.position.name }}
+                                </div>
+                            </div>
+                            <!-- Last Updated Column -->
+                            <div class="mt-3">
+                                <div class="text-bold text-danger text-center mb-1">
+                                    Last Updated
+                                </div>
+                                <p class="text-center text-primary text-small">
+                                    {{ formattedDateTime(membership.updated_at, null) }}
                                 </p>
-                                <p class="my-0 leading-none p-2 mx-auto" v-else>
-                                    <i class="fa fa-check"></i>
-                                </p>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

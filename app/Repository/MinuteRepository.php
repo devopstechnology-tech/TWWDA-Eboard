@@ -27,6 +27,7 @@ class MinuteRepository extends BaseRepository implements MinuteInterface
         return [
             'detailminutes.subdetailminutes',
             'schedule.meeting',
+            'schedule.attendances',
             'board',
             'committee',
             'author'
@@ -100,13 +101,13 @@ class MinuteRepository extends BaseRepository implements MinuteInterface
 
         return $minute;
     }
-    public function ceoApprovalMinute(Minute|string $minute): bool
+    public function ceoApprovalMinute(Minute|string $minute)
     {
         if (!($minute instanceof Minute)) {
             $minute = Minute::findOrFail($minute);
         }
-        $minute->approvalstatus = ApprovalEnum::Approved->value;
-
+        $this->membershipRepository->notifyMeetingLeads($minute->id);
+        // $minute->approvalstatus = ApprovalEnum::Approved->value;
         return $minute->save();
     }
     public function AcceptceoApprovalMinute(Minute|string $minute): bool

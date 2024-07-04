@@ -30,14 +30,14 @@ const fileName = ref<string>('');
 
 const goBack = () => {
     pspdfStore.unloadPdf(containerRef.value);
-    // router.back();  // This takes the user back to the previous page
-    router.push({
-        name: 'BoardMeetingDetails',  // The name of the route to navigate to
-        params: {
-            boardId:boardId,
-            meetingId:meetingId,
-        },
-    });
+    router.back();  // This takes the user back to the previous page
+    // router.push({
+    //     name: 'BoardMeetingDetails',  // The name of the route to navigate to
+    //     params: {
+    //         boardId:boardId,
+    //         meetingId:meetingId,
+    //     },
+    // });
 };
 
 
@@ -197,17 +197,6 @@ const {isLoading, data: File, refetch: fetchMeetingFile} = getMeetingFile();
                     <i class="fas fa-chevron-left fa-xs"></i> Go back to The Meeting
                 </a>
             </div>
-            <!-- <div class="flex items-center flex-1 w-full">
-                <label for="file-upload" class="custom-file-upload">
-			Open PDF
-		</label>
-		<input
-			id="file-upload"
-			type="file"
-			@change="openDocument"
-			class="btn"
-		/>
-            </div> -->
             <div class="flex items-center space-x-2">
                 <button type="button" @click.prevent="savePdf" :disabled="!pspdfStore.instance" class="btn btn-tool">
                     <i class="far fa fa-save mr-2 bg-primary"></i>

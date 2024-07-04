@@ -47,9 +47,9 @@ const useAuthStore = defineStore('auth', () => {
     }
 
     function hasPermission(permissions: string | string[]): boolean {
-        if (user.value?.role === 'Super Admin') {
-            return true;
-        }
+        // if (user.value?.role === 'Super Admin') {
+        //     return true;
+        // }
         if (Array.isArray(permissions)) {
             return permissions.some(permission =>
                 user.value?.permissions?.some(p => p.name === permission),

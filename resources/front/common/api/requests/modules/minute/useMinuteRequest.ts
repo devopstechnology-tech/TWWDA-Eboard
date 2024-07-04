@@ -50,6 +50,11 @@ export async function useGetCEOApprovalRequest(id: string | null) {
 
     await client.patch(minutesRoute() + '/ceo/approval/' + id).json();
 }
+export async function useGetAcceptCEOApprovalRequest(id: string | null) {
+    const client = useClient();
+
+    await client.patch(minutesRoute() + '/ceo/accept/approval/' + id).json();
+}
 export async function useGetPublishMinutesRequest(id: string | null) {
     const client = useClient();
 
