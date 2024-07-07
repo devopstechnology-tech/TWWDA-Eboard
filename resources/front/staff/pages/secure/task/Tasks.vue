@@ -244,7 +244,7 @@ onMounted(async () => {
                         <td class="task-title" data-name="task.name"
                             style="max-width: 200px; word-wrap: break-word;">
                             <div class="font-weight-bold">{{ task.title }}</div>
-                            <p style="white-space: normal;">{{ task.description }}</p>
+                            <div v-html="task.description"></div>
                         </td>
                         <td
                             :class="{

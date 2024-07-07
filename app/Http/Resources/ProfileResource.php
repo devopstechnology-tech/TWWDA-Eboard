@@ -32,7 +32,7 @@ class ProfileResource extends BaseResource
             'establishment' => $this->resource->establishment,
             'title' => $this->resource->title,
             'appointing_authority' => $this->resource->appointing_authority,
-            'appointnment_date' => $this->resource->appointnment_date,
+            'appointment_date' => $this->resource->appointment_date,
             'appointment_letter' => $this->resource->appointment_letter,
             'appointment_end_date' => $this->resource->appointment_end_date,
             'serving_term' => $this->resource->serving_term,

@@ -414,7 +414,7 @@ const statusClass = (status) => {
                         <td class="poll-title" data-name="poll.name"
                             style="max-width: 200px; word-wrap: break-word;">
                             <div class="font-weight-bold">{{ poll.question }}</div>
-                            <p style="white-space: normal;">{{ poll.description }}</p>
+                            <div v-html="poll.description"></div>
                         </td>
                         <td :class="dateBadgeClass(poll.duedate)">
                             {{ formattedDateTime(poll.duedate) }}

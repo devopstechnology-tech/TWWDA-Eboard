@@ -626,7 +626,7 @@ const onCloseMeeting = async (id: string) => {
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <ol class="min-h-6 border-l border-blue">
+                                                <ol class="min-h-6 border-l border-blue" v-if="agenda.children">
                                                     <li class="mb-2 hover:border-gray-400" draggable="false" 
                                                         v-for="(child, cIndex) in agenda.children" :key="cIndex">
                                                         <div class="rounded-lg border border-transparent 

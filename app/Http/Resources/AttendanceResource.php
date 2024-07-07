@@ -22,7 +22,7 @@ class AttendanceResource extends BaseResource
             'schedule_id' => $this->resource->schedule_id,
             'membership_id' => $this->resource->membership_id,
             'membership' => $this->resource->membership,
-            'meeting' => $this->resource->meeting,
+            'meeting' => $this->resource->schedule->meeting,
             // 'media' =>  MediaResource::collection($this->whenLoaded('media')),
             'media' => MediaResource::collection($this->resource->media ?? collect()),
         ];

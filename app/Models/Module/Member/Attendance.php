@@ -84,12 +84,13 @@ class Attendance extends BaseModel implements HasMedia
 
     public function membership()
     {
-        return $this->belongsTo(Membership::class)
+        return $this->belongsTo(Membership::class, 'membership_id')
             ->with('position', 'user');
     }
 
     public function schedule()
     {
-        return $this->belongsTo(Schedule::class, 'schedule_id');
+        return $this->belongsTo(Schedule::class, 'schedule_id')
+                    ->with('meeting');
     }
 }

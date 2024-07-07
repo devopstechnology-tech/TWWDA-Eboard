@@ -1,13 +1,12 @@
-
 <script lang="ts" setup>
-import {useQuery} from '@tanstack/vue-query';
-import {useField, useForm} from 'vee-validate';
-import {computed,defineProps,onMounted, Ref, ref, watch} from 'vue';
-import {useRoute,useRouter} from 'vue-router';
+import { useQuery } from '@tanstack/vue-query';
+import { useField, useForm } from 'vee-validate';
+import { computed, defineProps, onMounted, Ref, ref, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import * as yup from 'yup';
-import {useGetMeetingScheduleAgendasRequest} from '@/common/api/requests/modules/agenda/useAgendaRequest';
-import {useCreateMinuteRequest, useCreateSubMinuteRequest, useDeleteMinutesRequest, useGetAcceptCEOApprovalRequest, useGetCEOApprovalRequest, useGetMinutesRequest, useGetMinutesSignaturesRequest, useGetPublishMinutesRequest, useUpdateMinuteRequest, useUpdateSubMinuteRequest} from '@/common/api/requests/modules/minute/useMinuteRequest';
-import {useGetCloseMeetingRequest} from '@/common/api/requests/modules/schedule/useScheduleRequest';
+import { useGetMeetingScheduleAgendasRequest } from '@/common/api/requests/modules/agenda/useAgendaRequest';
+import { useCreateMinuteRequest, useCreateSubMinuteRequest, useDeleteMinutesRequest, useGetAcceptCEOApprovalRequest, useGetCEOApprovalRequest, useGetMinutesRequest, useGetMinutesSignaturesRequest, useGetPublishMinutesRequest, useUpdateMinuteRequest, useUpdateSubMinuteRequest } from '@/common/api/requests/modules/minute/useMinuteRequest';
+import { useGetCloseMeetingRequest } from '@/common/api/requests/modules/schedule/useScheduleRequest';
 import FormInput from '@/common/components/FormInput.vue';
 import FormTextBox from '@/common/components/FormTextBox.vue';
 import useUnexpectedErrorHandler from '@/common/composables/useUnexpectedErrorHandler';
@@ -16,16 +15,16 @@ import {
     formatDayDate,
     formatMinuteEntry,
     formattedDate,
-    getDayOfWeek, 
+    getDayOfWeek,
     getNumbering,
     loadLogo,
     truncateDescription,
 } from '@/common/customisation/Breadcrumb';
 import ValidationError from '@/common/errors/ValidationError';
-import {Agenda} from '@/common/parsers/agendaParser';
-import {DetailMinute} from '@/common/parsers/detailminuteParser';
-import {Minute, MinuteRequestPayload} from '@/common/parsers/minuteParser';
-import {SubdetailMinute} from '@/common/parsers/subdetailminuteParser';
+import { Agenda } from '@/common/parsers/agendaParser';
+import { DetailMinute } from '@/common/parsers/detailminuteParser';
+import { Minute, MinuteRequestPayload } from '@/common/parsers/minuteParser';
+import { SubdetailMinute } from '@/common/parsers/subdetailminuteParser';
 import useAuthStore from '@/common/stores/auth.store';
 import useSettingsStore from '@/common/stores/settings.store';
 
@@ -56,7 +55,7 @@ const editingChildIndex = ref(-1);
 const editingParentIndex = ref(-1);
 const is_editing = ref(false);
 const isAddingNewParent = ref(false);
-const minutes = ref<Minute[]>([{text: ''}]);
+const minutes = ref<Minute[]>([{ text: '' }]);
 const handleUnexpectedError = useUnexpectedErrorHandler();
 // numbering the parent adn chiild
 const parentOrder = 1 as number; // This would typically come from the parent minute's data
@@ -113,38 +112,36 @@ const {
     },
 });
 
-const onSubmit = handleSubmit(async (values, {resetForm}) =>{
+const onSubmit = handleSubmit(async (values, { resetForm }) => {
     try {
         const payload: MinuteRequestPayload = {
             schedule_id: values.schedule_id,
             committee_id: null,
             membership_id: null,
             // // minutedetails
-            minute_id: minuteId.value? minuteId.value.toString() : null,
+            minute_id: minuteId.value ? minuteId.value.toString() : null,
             agenda_id: values.agenda_id.toString(),
-            detail_minute_id: values.detail_minute_id? values.detail_minute_id.toString() : null,
-            subdetailminute_id: values.subdetailminute_id? values.subdetailminute_id.toString() : null,
-            subagenda_id: values.subagenda_id? values.subagenda_id.toString() : null,
+            detail_minute_id: values.detail_minute_id ? values.detail_minute_id.toString() : null,
+            subdetailminute_id: values.subdetailminute_id ? values.subdetailminute_id.toString() : null,
+            subagenda_id: values.subagenda_id ? values.subagenda_id.toString() : null,
             description: values.description,
             status: values.status,
         };
         if (action.value === 'create') {
-            if(addingChild.value)
-            {
+            if (addingChild.value) {
                 await useCreateSubMinuteRequest(payload, scheduleId);
             }
-            else if(isAddingNewParent.value)
-            {
+            else if (isAddingNewParent.value) {
                 await useCreateMinuteRequest(payload, scheduleId);
             }
         }
         else {
-            if(editingChildIndex.value !== -1){
+            if (editingChildIndex.value !== -1) {
                 // update child
                 await useUpdateSubMinuteRequest(payload, scheduleId);
-                console.log('payload',payload);
+                console.log('payload', payload);
             }
-            else if(editingParentIndex.value !== -1){
+            else if (editingParentIndex.value !== -1) {
                 // update parent
                 await useUpdateMinuteRequest(payload, scheduleId);
             }
@@ -163,9 +160,9 @@ const onSubmit = handleSubmit(async (values, {resetForm}) =>{
 
 
 
-const reset = ()=>{
+const reset = () => {
     action.value = 'create';
-    addingChild.value =false;
+    addingChild.value = false;
     currentParentId.value = null;
     childId.value = null;
     editingChildIndex.value = -1;
@@ -182,10 +179,10 @@ const reset = ()=>{
     setFieldValue('detail_minute_id', null);
     setFieldValue('subdetailminute_id', null);
     setFieldValue('subagenda_id', null);
-    setFieldValue('description','');
+    setFieldValue('description', '');
     setFieldValue('status', 'unpublished');
 };
-const enableAddingNewParent = (agenda:Agenda) => {
+const enableAddingNewParent = (agenda: Agenda) => {
     reset();
     isAddingNewParent.value = true;
     currentParentId.value = agenda.id;
@@ -197,7 +194,7 @@ const enableAddingNewParent = (agenda:Agenda) => {
     setFieldValue('agenda_id', agenda.id);
 };
 
-const enableAddingChild = (pIndex, cIndex,  agenda:Agenda, child: Agenda) => {
+const enableAddingChild = (pIndex, cIndex, agenda: Agenda, child: Agenda) => {
     reset();
     addingChild.value = true;
     currentParentId.value = agenda.id; // Identify the parent
@@ -224,7 +221,7 @@ const isEditing = computed(() => {
     return result;
 });
 // edit functionality of minutes
-const enableEditing = (pIndex: number, cIndex: number, agenda:Agenda, detailminute:DetailMinute, subminute:SubdetailMinute) => {
+const enableEditing = (pIndex: number, cIndex: number, agenda: Agenda, detailminute: DetailMinute, subminute: SubdetailMinute) => {
     reset();
     is_editing.value = true;
     isAddingNewParent.value = false;
@@ -232,7 +229,7 @@ const enableEditing = (pIndex: number, cIndex: number, agenda:Agenda, detailminu
     editingParentIndex.value = pIndex;
     editingChildIndex.value = cIndex;
     action.value = 'edit';
-    console.log('pIndex: number, cIndex:',pIndex, cIndex);
+    console.log('pIndex: number, cIndex:', pIndex, cIndex);
     console.log('States after enabling adding child:', {
         is_editing: is_editing.value,
         isAddingNewParent: isAddingNewParent.value,
@@ -244,14 +241,14 @@ const enableEditing = (pIndex: number, cIndex: number, agenda:Agenda, detailminu
     // console.log('child', editingChildIndex.value !== -1, 'AGENDA', agenda.id, 'detailmnute', minute.id, 'subdetailminute', minute.subdetailminute);
     // console.log('PARENT',editingParentIndex.value !== -1, 'AGENDA', agenda.id, 'detailmnute', minute.id, minute.description);
     setFieldValue('agenda_id', agenda.id);
-    
-    if(editingChildIndex.value !== -1){
+
+    if (editingChildIndex.value !== -1) {
         setFieldValue('subdetailminute_id', subminute.id);
         setFieldValue('detail_minute_id', subminute.detail_minute_id);
         setFieldValue('subagenda_id', subminute.subagenda_id);
         setFieldValue('description', subminute.description);
     }
-    else if(editingParentIndex.value !== -1){
+    else if (editingParentIndex.value !== -1) {
         setFieldValue('detail_minute_id', detailminute.id);
         setFieldValue('description', detailminute.description);
     }
@@ -262,8 +259,8 @@ const getMinutes = () => {
     return useQuery({
         queryKey: ['getMinutesKey', scheduleId],
         queryFn: async () => {
-            const response = await useGetMinutesRequest(scheduleId, {paginate: 'false'});
-            minuteId.value = response.data.id; 
+            const response = await useGetMinutesRequest(scheduleId, { paginate: 'false' });
+            minuteId.value = response.data.id;
             return response.data;
         },
         onSuccess: (data) => {
@@ -276,11 +273,11 @@ const getMinutes = () => {
 };
 
 // const {data: minutes, refetch: fetchMinutes} = getMinutes();
-const {isLoading, data: Minutes, refetch: fetchMinutes} = getMinutes();
+const { isLoading, data: Minutes, refetch: fetchMinutes } = getMinutes();
 
 const attendedAttendances = computed(() => {
     return Minutes.value?.attendances.filter(
-        attendance => attendance.rsvp_status === 'Yes' &&  attendance.attendance_status === 'Attended') || [];
+        attendance => attendance.rsvp_status === 'Yes' && attendance.attendance_status === 'Attended') || [];
 });
 
 const presentOnEPlatformAttendances = computed(() => {
@@ -290,7 +287,7 @@ const presentOnEPlatformAttendances = computed(() => {
 
 const absentWithApologyAttendances = computed(() => {
     return Minutes.value?.attendances.filter(
-        attendance => ['Yes', 'No', 'Maybe'].includes(attendance.rsvp_status) 
+        attendance => ['Yes', 'No', 'Maybe'].includes(attendance.rsvp_status)
             && attendance.attendance_status === 'Absent') || [];
 });
 
@@ -300,7 +297,7 @@ const absentAttendances = computed(() => {
 });
 
 const getmeetingagendas = async () => {
-    const response = await useGetMeetingScheduleAgendasRequest(scheduleId, {paginate: 'false'});
+    const response = await useGetMeetingScheduleAgendasRequest(scheduleId, { paginate: 'false' });
     allAgendas.value = response.data;
 };
 
@@ -320,7 +317,7 @@ watch(() => minutes.value, (newMinutes) => {
     if (newMinutes) {
         minuteId.value = newMinutes;
     }
-}, {deep: true});
+}, { deep: true });
 
 
 const minuteDetails = computed(() => {
@@ -335,7 +332,7 @@ const minuteDetails = computed(() => {
             map[detailminute.agenda_id].push(detailminute);
 
             // Map subdetailminutes by subagenda_id
-            detailminute.subdetailminutes.forEach((subdetailminute:SubdetailMinute) => {
+            detailminute.subdetailminutes.forEach((subdetailminute: SubdetailMinute) => {
                 if (!map[subdetailminute.subagenda_id]) {
                     map[subdetailminute.subagenda_id] = [];
                 }
@@ -366,21 +363,21 @@ const onAcceptCEOApproval = async (id: string) => {
                     </a>
                 </div>
                 <div class="ml-auto flex self-end" v-if="Minutes">
-                    <button v-if="Minutes.schedule?.closestatus === 'closed'" type="button" 
-                            class="btn btn-sm mr-1 btn-success btn-lg">
+                    <button v-if="Minutes.schedule?.closestatus === 'closed'" type="button"
+                        class="btn btn-sm mr-1 btn-success btn-lg">
                         <i class="fas fa-door-closed mr-1"></i> Meeting Closed
                     </button>
                     <!-- <button v-else type="button" class="btn btn-sm mr-1 btn-success btn-lg"
                             @click.prevent="onCloseMeeting(Minutes.schedule.id)">
                         <i class="fas fa-door-closed mr-1"></i> Close Meeting
                     </button> -->
-                    
-                    <button v-if="Minutes.approvalstatus ==='approved'" 
-                            type="button" class="btn btn-sm mr-1 btn-warning btn-lg">
+
+                    <button v-if="Minutes.approvalstatus === 'approved'" type="button"
+                        class="btn btn-sm mr-1 btn-warning btn-lg">
                         <i class="fa fa-check mr-1"></i> This Minutes are Approved
                     </button>
                     <button v-else type="button" class="btn btn-sm mr-1 btn-warning btn-lg"
-                            @click.prevent="onAcceptCEOApproval(Minutes.id)">
+                        @click.prevent="onAcceptCEOApproval(Minutes.id)">
                         <i class="fa fa-check mr-1"></i> Click here to Approve This Minutes
                     </button>
                     <!-- <button v-if="Minutes.detailminutes" 
@@ -400,23 +397,22 @@ const onAcceptCEOApproval = async (id: string) => {
             </div>
         </div>
     </div>
-    <div class="card"  v-if="Minutes">
+    <div class="card" v-if="Minutes">
         <div class="card-body">
-            <span class="info-box-icon"
-                  style="left: 4%; margin-left: -45px; position: absolute; top: 88px;">
+            <span class="info-box-icon" style="left: 4%; margin-left: -45px; position: absolute; top: 88px;">
                 <div class="h3  text-bold font-bold uppercase text-primary"> Confidential</div>
             </span>
             <div class="text-center logo-container">
                 <img :src="loadLogo(companySettings?.logo)" alt="Organization Logo" class="img-fluid logo">
             </div>
-            <div class="h3 text-center text-primary text-bold font-bold uppercase">{{companySettings?.name}}</div>
+            <div class="h3 text-center text-primary text-bold font-bold uppercase">{{ companySettings?.name }}</div>
             <hr class="thick-line">
-            <h4 class="text-center text-primary text-bold uppercase h4 ">MINUTES OF THE {{Minutes?.meeting?.title}}</h4>
+            <h4 class="text-center text-primary text-bold uppercase h4 ">MINUTES OF THE {{ Minutes?.meeting?.title }}</h4>
             <p class="text-center text-primary text-bold uppercase h4">
-                HELD AT {{Minutes?.meeting?.location}} ON 
+                HELD AT {{ Minutes?.meeting?.location }} ON
                 <!-- {{ getDayOfWeek(formatDayDate(Minutes?.schedule?.date)) }}  -->
-                {{ formatDate(Minutes?.schedule?.date) }} 
-                STARTING AT {{Minutes?.schedule?.start_time}}   
+                {{ formatDate(Minutes?.schedule?.date) }}
+                STARTING AT {{ Minutes?.schedule?.start_time }}
             </p>
             <h5 class="mt-1 text-primary text-bold uppercase" v-if="attendedAttendances.length">Present</h5>
             <table class="table table-borderless" v-if="attendedAttendances.length">
@@ -430,8 +426,8 @@ const onAcceptCEOApproval = async (id: string) => {
                 </tbody>
             </table>
 
-            <h5 class="mt-2 text-primary text-bold uppercase" 
-                v-if="presentOnEPlatformAttendances.length">Present on E-platform
+            <h5 class="mt-2 text-primary text-bold uppercase" v-if="presentOnEPlatformAttendances.length">Present on
+                E-platform
             </h5>
             <table class="table table-borderless" v-if="presentOnEPlatformAttendances.length">
                 <tbody>
@@ -444,8 +440,8 @@ const onAcceptCEOApproval = async (id: string) => {
                 </tbody>
             </table>
 
-            <h5 class="mt-2 text-primary text-bold uppercase" 
-                v-if="absentWithApologyAttendances.length">Absent With Apology
+            <h5 class="mt-2 text-primary text-bold uppercase" v-if="absentWithApologyAttendances.length">Absent With
+                Apology
             </h5>
             <table class="table table-borderless" v-if="absentWithApologyAttendances.length">
                 <tbody>
@@ -506,16 +502,15 @@ const onAcceptCEOApproval = async (id: string) => {
                     <div class="ce-block">
                         <div class="flex w-full">
                             <div class="flex-1">
-                                <ol data-list_format="num_la_lr" class="agenda-list mb-0" 
-                                    v-if="Agendas">
-                                    <li class="mb-2 hover:border-gray-400" 
-                                        v-for="(agenda, pIndex) in Agendas" :key="pIndex">
+                                <ol data-list_format="num_la_lr" class="agenda-list mb-0" v-if="Agendas">
+                                    <li class="mb-2 hover:border-gray-400" v-for="(agenda, pIndex) in Agendas"
+                                        :key="pIndex">
                                         <div class="rounded-lg border border-transparent hover:cursor-pointer 
                                         border-blue -ml-7 p-2 pl-7 relative border-blue">
-                                            <div class="flex gap-2 items-start">                                               
-                                                <div  class="font-medium flex-1">
+                                            <div class="flex gap-2 items-start">
+                                                <div class="font-medium flex-1">
                                                     <div v-for="(minutedetail, dIndex) in minuteDetails[agenda.id]"
-                                                         :key="dIndex">
+                                                        :key="dIndex">
                                                         <div class="font-bold text-primary">
                                                             {{ formatMinuteEntry(getNumbering(pIndex), agenda.title) }}
                                                         </div>
@@ -524,8 +519,8 @@ const onAcceptCEOApproval = async (id: string) => {
                                                 </div>
                                             </div>
                                         </div>
-                                        <ol class="min-h-6">
-                                            <li class="mb-2 hover:border-gray-400" draggable="false" 
+                                        <ol class="min-h-6" v-if="agenda.children">
+                                            <li class="mb-2 hover:border-gray-400" draggable="false"
                                                 v-for="(child, cIndex) in agenda.children" :key="cIndex">
                                                 <div class="rounded-lg border border-transparent hover:cursor-pointer 
                                                 border-blue -ml-7 p-2 pl-7 relative border-blue">
@@ -533,17 +528,18 @@ const onAcceptCEOApproval = async (id: string) => {
                                                         <div class="font-medium flex-1">
                                                             <div class="font-bold text-primary">
                                                                 {{ formatMinuteEntry(
-                                                                    getNumbering(pIndex), child.title, undefined, undefined, undefined, 
-                                                                    getNumbering(cIndex)) }}
+                                                                    getNumbering(pIndex), child.title, undefined, undefined,
+                                                                    undefined,
+                                                                getNumbering(cIndex)) }}
                                                             </div>
                                                             <div v-for="(minutedetail, dIndex) in minuteDetails[agenda.id]"
-                                                                 :key="dIndex">
-                                                                <div v-for="subminutedetail in minuteDetails[child.id]" 
-                                                                     :key="subminutedetail.id">
-                                                                    <div  v-html="subminutedetail.description"></div>
+                                                                :key="dIndex">
+                                                                <div v-for="subminutedetail in minuteDetails[child.id]"
+                                                                    :key="subminutedetail.id">
+                                                                    <div v-html="subminutedetail.description"></div>
                                                                 </div>
                                                             </div>
-                                                        </div>  
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </li>
@@ -558,17 +554,21 @@ const onAcceptCEOApproval = async (id: string) => {
         </div>
     </div>
 </template>
-  
 
 
 
-  <style scoped>
-  .input-group {
+
+<style scoped>
+.input-group {
     display: flex;
-    align-items: center; /* Align items vertically in the center */
-    gap: 10px; /* Optional: adds space between children */
-    width: 100%; /* Ensure the group takes full width */
-    margin: 10px 0; /* Vertical spacing between each group */
+    align-items: center;
+    /* Align items vertically in the center */
+    gap: 10px;
+    /* Optional: adds space between children */
+    width: 100%;
+    /* Ensure the group takes full width */
+    margin: 10px 0;
+    /* Vertical spacing between each group */
 }
 
 .add-btn {
@@ -580,42 +580,47 @@ const onAcceptCEOApproval = async (id: string) => {
     justify-content: center;
     font-size: 20px;
     color: #333;
-    padding: 5px 10px; /* Make button easier to click */
-    margin-right: 10px; /* Space between button and input */
+    padding: 5px 10px;
+    /* Make button easier to click */
+    margin-right: 10px;
+    /* Space between button and input */
 }
 
-.minute-input, .form-input {
-    flex-grow: 1; /* Makes the input take up the remaining space */
+.minute-input,
+.form-input {
+    flex-grow: 1;
+    /* Makes the input take up the remaining space */
     padding: 8px;
     font-size: 16px;
 }
-  .meeting-minutes {
+
+.meeting-minutes {
     display: flex;
     flex-direction: column;
     align-items: center;
     margin-top: 20px;
-  }
+}
 
-  .minutes-header {
+.minutes-header {
     background-color: #f3f3f3;
     width: 100%;
     padding: 10px 20px;
     text-align: center;
-  }
+}
 
-  .minutes-list ul {
+.minutes-list ul {
     list-style: none;
     width: 100%;
     padding: 0;
-  }
+}
 
-  .input-group {
+.input-group {
     display: flex;
     align-items: center;
     margin: 10px;
-  }
+}
 
-  .add-btn {
+.add-btn {
     background: none;
     border: none;
     cursor: pointer;
@@ -624,31 +629,39 @@ const onAcceptCEOApproval = async (id: string) => {
     justify-content: center;
     font-size: 20px;
     color: #333;
-  }
-  .minute-input {
+}
+
+.minute-input {
     flex: 1;
     padding: 8px;
     margin-left: 5px;
     font-size: 16px;
-  }
-  .thick-line {
-  border-top: 5px solid #000;
 }
-.table-borderless td, .table-borderless th {
-  border: 0;
+
+.thick-line {
+    border-top: 5px solid #000;
 }
+
+.table-borderless td,
+.table-borderless th {
+    border: 0;
+}
+
 .table-borderless td {
-  padding: 0.5rem;
+    padding: 0.5rem;
 }
+
 .logo-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
+
 .logo {
-  max-width: 150px;
+    max-width: 150px;
 }
+
 .content-wrapper {
-  padding: 20px;
+    padding: 20px;
 }
-  </style>
+</style>

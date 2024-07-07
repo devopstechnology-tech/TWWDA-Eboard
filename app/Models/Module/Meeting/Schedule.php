@@ -28,7 +28,8 @@ class Schedule extends BaseModel
     protected $dates = ['deleted_at'];
     public function attendances()
     {
-        return $this->hasMany(Attendance::class, 'schedule_id');
+        return $this->hasMany(Attendance::class, 'schedule_id')
+                    ->with('membership', 'schedule', 'media');
     }
     public function agendas()
     {
