@@ -77,14 +77,14 @@ const authStore = useAuthStore();
                                 </p>
                             </router-link>
                         </li>
-                        <li class="nav-item" v-if="authStore.hasPermission(['view meeting'])">
+                        <!-- <li class="nav-item" v-if="authStore.hasPermission(['view meeting'])">
                             <router-link :to="{name:  MEETINGS}"   class="nav-link" active-class="active" >
                                 <i class="nav-icon fas fa-copy"></i>
                                 <p>
                                     Meetings
                                 </p>
                             </router-link>
-                        </li>
+                        </li> -->
                         <li class="nav-item" v-if="authStore.hasPermission(['view almanac'])">
                             <router-link :to="{name:  ALMANAC}"  class="nav-link" active-class="active">
                                 <i class="nav-icon fas fa-chart-pie"></i>

@@ -83,7 +83,6 @@ const childIndex = 2 as number; // Example child index, increment as needed
 const minuteschema = yup.object({
     schedule_id: yup.mixed().required(),
     committee_id: yup.string().nullable(),
-    committee_id: yup.number().nullable(),
     membership_id: yup.string().nullable(),
     // // minutedetails
     minute_id: yup.string().nullable(),
@@ -102,7 +101,6 @@ const {
 } = useForm<{
     schedule_id: string;
     committee_id: string | null;
-    committee_id: string | null;
     membership_id: string | null;
     // // minutedetails
     minute_id: string | null;
@@ -118,7 +116,6 @@ const {
     initialValues: {
         schedule_id: scheduleId,
         committee_id: committeeId,
-        committee_id: null,
         membership_id: null,
         // // minutedetails
         minute_id: minuteId.value,

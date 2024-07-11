@@ -60,7 +60,6 @@ const discussionassigneeSchema = yup.object({
 const discussionschema = yup.object({
     meeting_id: yup.string().nullable(),
     committee_id: yup.string().nullable(),
-    committee_id: yup.string().nullable(),
     topic: yup.string().required(),
     description: yup.string().required(),
     assigneetype: yup.string().required(),
@@ -75,7 +74,6 @@ const {
     values,
 } = useForm<{
     meeting_id: string | null;
-    committee_id: string | null;
     committee_id: string | null;
     topic: string;
     description: string;
@@ -95,7 +93,6 @@ const {
     initialValues: {
         meeting_id: meetingId,
         committee_id: committeeId,
-        committee_id: null,
         topic: '',
         description: '',
         assigneetype: '',
@@ -150,7 +147,6 @@ const onSubmit = handleSubmit(async (values, {resetForm}) => {
         const payload: DiscussionRequestPayload = {
             meeting_id: values.meeting_id,
             committee_id: values.committee_id,
-            committee_id: values.committee_id,
             topic: values.topic,
             description: values.description,
             assigneetype: values.assigneetype,
@@ -183,7 +179,6 @@ const reset = () => {
     selectedAssigneeIds.value = [];
     setFieldValue('meeting_id', meetingId);
     setFieldValue('committee_id', committeeId);
-    setFieldValue('committee_id', null);
     setFieldValue('topic', '');
     setFieldValue('description', 'description ................');
     setFieldValue('assigneetype', 'all_members');

@@ -278,21 +278,21 @@ const staffRoutes: RouteRecordRaw[] = [
 
 
                 
-                {
-                    beforeEnter: requireStaffAuthentication,
-                    component: () => import('@/staff/pages/secure/meeting/Meetings.vue'),
-                    name: MEETINGS,
-                    path: 'meetings',
-                    meta: {title: 'Meetings'},
-                },
-                {
-                    beforeEnter: requireStaffAuthentication,
-                    component: () => import('@/staff/pages/secure/meeting/MeetingsDetails.vue'),
-                    // Ensure this component is created
-                    name: 'MeetingDetails', // A unique name for the route
-                    path: '/meeting/:id', // Dynamic segment to capture the board ID
-                    meta: {title: 'Meetings Details'},
-                },
+                // {
+                //     beforeEnter: requireStaffAuthentication,
+                //     component: () => import('@/staff/pages/secure/meeting/Meetings.vue'),
+                //     name: MEETINGS,
+                //     path: 'meetings',
+                //     meta: {title: 'Meetings'},
+                // },
+                // {
+                //     beforeEnter: requireStaffAuthentication,
+                //     component: () => import('@/staff/pages/secure/meeting/MeetingsDetails.vue'),
+                //     // Ensure this component is created
+                //     name: 'MeetingDetails', // A unique name for the route
+                //     path: '/meeting/:id', // Dynamic segment to capture the board ID
+                //     meta: {title: 'Meetings Details'},
+                // },
                
                 {
                     beforeEnter: requireStaffAuthentication,
