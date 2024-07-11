@@ -12,11 +12,10 @@ class UpdateCommitteeRequest extends FormRequest
     public function rules(): array
     {
         return [
-
+            'name' => RuleSet::create()->required()->string(),
             'description' => RuleSet::create()->required()->string(),
-            'icon' => RuleSet::create()->nullable()->string(),
-            // 'cover' => RuleSet::create()->nullable()->str'name' => RuleSet::create()->required()->string(),ing(),
-            // 'cover' => ['nullable', 'image', 'mimes:jpg,jpeg,png,svg', 'max:2048'], // Example rules
+            'icon' => RuleSet::create()->sometimes(),
+            'cover' => RuleSet::create()->sometimes(),
         ];
     }
 }

@@ -9,6 +9,7 @@ use Illuminate\Http\JsonResponse;
 use App\Models\Module\Board\Board;
 use App\Http\Controllers\Controller;
 use App\Models\Module\Member\Member;
+use App\Models\Module\Committe\Committee;
 use App\Http\Requests\UpdateMemberRequest;
 use App\Repository\Contracts\MemberInterface;
 use App\Http\Requests\UpdateMemberRoleRequest;
@@ -27,14 +28,35 @@ class MemberController extends Controller
     }
     public function updateboardmembers(UpdateMemberRequest $request, Board $board): JsonResponse
     {
-        $member = $this->memberRepository->updateMembers($board, $request->validated());
+        $member = $this->memberRepository->updateBoardMembers($board, $request->validated());
 
         return $this->response(Response::HTTP_OK, __('messages.record-updated'), $member);
     }
     public function updateboardmemberposition(UpdateMemberPositionRequest $request, Board $board): JsonResponse
     {
-        $member = $this->memberRepository->updateMemberPosition($board, $request->validated());
+        $member = $this->memberRepository->updateBoardMemberPosition($board, $request->validated());
 
         return $this->response(Response::HTTP_OK, __('messages.record-updated'), $member);
     }
+    //committtee
+    public function getcommitteemembers($member): JsonResponse
+    {
+        $members = $this->memberRepository->getCommitteeMembers($member);
+
+        return $this->response(Response::HTTP_OK, __('messages.records-fetched'), $members, Member::class);
+    }
+    public function updatecommitteemembers(UpdateMemberRequest $request, Committee $committee): JsonResponse
+    {
+        $member = $this->memberRepository->updateCommitteeMembers($committee, $request->validated());
+
+        return $this->response(Response::HTTP_OK, __('messages.record-updated'), $member);
+    }
+    public function updatecommitteememberposition(UpdateMemberPositionRequest $request, Committee $committee): JsonResponse
+    {
+        $member = $this->memberRepository->updateCommitteeMemberPosition($committee, $request->validated());
+
+        return $this->response(Response::HTTP_OK, __('messages.record-updated'), $member);
+    }
+
+
 }

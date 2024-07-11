@@ -9,7 +9,9 @@ use App\Traits\Uuids;
 use App\Models\BaseModel;
 use App\Models\Module\Board\Board;
 use App\Models\Module\Member\Position;
+use App\Models\Module\Poll\AssigneePoll;
 use App\Models\Module\Committe\Committee;
+use App\Models\Module\Task\Sub\AssigneeTask;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -57,5 +59,13 @@ class Member extends BaseModel
     {
         return $this->belongsTo(User::class, 'user_id')
             ->with('profile');
+    }
+    public function assigneeTasks()
+    {
+        return $this->morphMany(AssigneeTask::class, 'assignable');
+    }
+    public function assigneePolls()
+    {
+        return $this->morphMany(AssigneePoll::class, 'assignable');
     }
 }

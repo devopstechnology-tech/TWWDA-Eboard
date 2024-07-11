@@ -9,7 +9,6 @@ use App\Models\Module\Board\Board;
 interface BoardInterface
 {
     public function getAll();
-    public function fetchAuthMember(string $board);
 
     public function get(Board|string $board): Board;
     public function getMembers(Board|string $board): Board;

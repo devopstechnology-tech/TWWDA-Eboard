@@ -4,17 +4,23 @@ declare(strict_types=1);
 
 namespace App\Repository;
 
-use App\Http\Resources\MemberResource;
 use App\Models\Module\Board\Board;
+use App\Repository\BaseRepository;
+use Illuminate\Support\Facades\Log;
 use App\Models\Module\Member\Member;
+use Illuminate\Support\Facades\Auth;
+use App\Http\Resources\MemberResource;
+use App\Models\Module\Committe\Committee;
 use App\Repository\Contracts\BoardInterface;
 use App\Repository\Contracts\MemberInterface;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
+use App\Repository\Contracts\CommitteeInterface;
 
 class MemberRepository extends BaseRepository implements MemberInterface
 {
-    public function __construct(private readonly BoardInterface $boardRepository)
+    public function __construct(
+        private readonly BoardInterface $boardRepository,
+        private readonly CommitteeInterface $committeeRepository,
+        )
     {
     }
     public function relationships()
@@ -38,6 +44,13 @@ class MemberRepository extends BaseRepository implements MemberInterface
         ];
         return $this->indexResource(Member::class, MemberResource::class, $filters);
     }
+    public function fetchBoardMember($board)
+    {
+        $member =  Member::where('board_id', $board)
+                     ->where('user_id', Auth::user()->id)->first();
+                     return $member;
+    }
+    
     public function getBoardMembers($board)
     {
         $filters = [
@@ -47,100 +60,36 @@ class MemberRepository extends BaseRepository implements MemberInterface
         ];
         return $this->indexResource(Member::class, MemberResource::class, $filters);
     }
-    public function updateMembers(Board|string $board, array $payload): Board
+    public function updateBoardMembers(Board|string $board, array $payload): Board
     {
         return $this->boardRepository->updateMembers($board, $payload);
     }
-    public function updateMemberPosition(Board|string $board, array $payload): Board
+    public function updateBoardMemberPosition(Board|string $board, array $payload): Board
     {
         return $this->boardRepository->updateMemberPosition($board, $payload);
     }
 
-    // public function get(Member|string $member): Member
-    // {
-    //     if (!($member instanceof Member)) {
-    //         $member = Member::findOrFail($member);
-    //     }
-
-    //     return $member;
-    // }
-
-    // public function create(Member|string $member, array $payload): void
-    // {
-    //     if (!($member instanceof Member)) {
-    //         $member = Member::findOrFail($member);
-    //     }
-    //     if (Auth::check()) {
-    //         $userId = Auth::id();// Ensure $member is a valid Member model instance
-    //         // Sync the user to the member without detaching existing ones
-    //         $member->members()->syncWithoutDetaching([$userId]);
-    //     }
-    // }
-
-    // public function update(Member|string $member, array $payload): Member
-    // {
-    //     if (!($member instanceof Member)) {
-    //         $member = Member::findOrFail($member);
-    //     }
-    //     Log::info('Array content 2:', ['member' => $member]);
-
-
-    //     // // Ensure we have an authenticated user before proceeding
-    //     // if (!Auth::check()) {
-    //     // //     return response()->json(['message' => 'User not authenticated'], 401);
-    //     // // }
-    //     //     $userId = Auth::id(); // Get the current authenticated user's ID
-    //     //     $userIds = $payload['members'];
-
-    //     // //     // Filter out null values and ensure unique IDs
-    //     //     $userIds = array_unique(array_filter($userIds, function ($id) {
-    //     //         return !is_null($id) && $id !== '';
-    //     //     }));
-
-    //     //     Log::info('Array content 2:', $userIds);
-    //     // //     // Ensure the current user's ID is included
-    //     //     if (!in_array($userId, $userIds)) {
-    //     //         $userIds[] = $userId;
-    //     //     }
-    //     // //     // Sync the member associations, including the current user
-    //     //     $member->members()->sync($userIds);
-
-    //     return $member;
-    // }
-    // public function updateMembers(Member|string $member, array $payload): void
-    // {
-    //     if (!($member instanceof Member)) {
-    //         $member = Member::findOrFail($member);
-    //     }
-
-    //     // Ensure we have an authenticated user before proceeding
-    //     if (!Auth::check()) {
-    //         //     return response()->json(['message' => 'User not authenticated'], 401);
-    //     }
-    //     $userId = Auth::id(); // Get the current authenticated user's ID
-    //     $userIds = $payload['members'];
-
-    //     //     // Filter out null values and ensure unique IDs
-    //     $userIds = array_unique(array_filter($userIds, function ($id) {
-    //         return !is_null($id) && $id !== '';
-    //     }));
-
-    //     Log::info('Array content 2:', $userIds);
-    //     //     // Ensure the current user's ID is included
-    //     if (!in_array($userId, $userIds)) {
-    //         $userIds[] = $userId;
-    //     }
-    //     //     // Sync the member associations, including the current user
-    //     $member->members()->sync($userIds);
-    // }
-
-    // public function delete(Member|string $member): bool
-    // {
-    //     if (!($member instanceof Member)) {
-    //         $member = Member::findOrFail($member);
-    //     }
-
-    //     return $member->delete();
-    // }
+    public function getCommitteeMembers($committee)
+    {
+        $filters = [
+            'committee_id' => $committee,
+            'with' => $this->relationships(),
+            'orderBy' => ['field' => 'created_at', 'direction' => 'asc']
+        ];
+        return $this->indexResource(Member::class, MemberResource::class, $filters);
+    }
+    public function fetchCommitteeMember($committee)
+    {
+        return Member::where('committee_id', $committee)
+                     ->where('user_id', Auth::user()->id)->first();
+    }
+    public function updateCommitteeMembers(Committee|string $committee, array $payload): Committee
+    {
+        return $this->committeeRepository->updateMembers($committee, $payload);
+    }
+    public function updateCommitteeMemberPosition(Committee|string $committee, array $payload): Committee
+    {
+        return $this->committeeRepository->updateMemberPosition($committee, $payload);
+    }
 
 }

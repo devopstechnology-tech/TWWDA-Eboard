@@ -23,6 +23,7 @@ export interface FolderRequestPayload{ //to db
     parent_id: string,
     meeting_id: string,
     board_id: string|null,
+    committee_id: string|null,
     folder_id: string| null,
     media: [],
     type: string,

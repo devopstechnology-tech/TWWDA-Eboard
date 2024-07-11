@@ -91,28 +91,30 @@ class Meeting extends BaseModel
     {
         return $this->belongsTo(User::class, 'owner_id');
     }
-    public function committee()
-    {
-        return $this->belongsTo(Committee::class, 'committee_id');
-    }
-    public function board()
-    {
-        // Check if the meetingable type is a Board
-        if ($this->meetingable_type === Board::class) {
-            return $this->meetingable;
-        }
+    public function meetingable()
+{
+    return $this->morphTo();
+}
 
-        return null; // Return null if the meetingable type is not a Board
+public function board()
+{
+    if ($this->meetingable_type === Board::class) {
+        return $this->meetingable;
     }
+    return null;
+}
+
+public function committee()
+{
+    if ($this->meetingable_type === Committee::class) {
+        return $this->meetingable;
+    }
+    return null;
+}
     public function schedules()
     {
         return $this->hasMany(Schedule::class, 'meeting_id')
             ->with('attendances', 'agendas');
-    }
-
-    public function meetingable()
-    {
-        return $this->morphTo();
     }
 
 

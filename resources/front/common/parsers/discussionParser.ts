@@ -1,33 +1,37 @@
-import {array, boolean, number, object, output, string} from 'zod';
+
+import {array, object, output, string} from 'zod';
+import {DiscussionAssignee, discussionassigneeParser} from '@/common/parsers/DiscussionAssigneeParser';
 
 export const discussionParser = object({
-    // created_at: string(),
-    id: string(),
-    name: string(),
-    description: string(),
-    owner_id: string(),
-    icon: string(),
-    owner: string(),
-    cover: string(),
-    status: string(),
-    members: array(object({
-        id: string(),
-        full_name: string(),
-    })),
+    id:string(),    
+    topic:string(),
+    description:string(),
+    closestatus:string(),
+    archivestatus:string(),
+    assigneetype:string(),
+    assigneestatus:string(),
+    discussionassignees:array(discussionassigneeParser),
 });
+
+export interface DiscussionRequestPayload{ //to db
+    id:string| null,
+    topic:string,
+    description:string,
+    closestatus:string,
+    archivestatus:string,
+    assigneetype:string,
+    assigneestatus:string,
+    discussionassignees:DiscussionAssignee[],
+}
+
+export interface nonPaginateResponse {
+    code: number,
+    data: Discussion[],
+    message: string
+}
 
 export type Discussion = output<typeof discussionParser>;
-export const createDiscussionParser = object({
-    // created_at: string(),
-    name: string(),
-    description: string(),
-    icon: string(),
-    // cover: string(),
-    status: string(),
-    // updated_at: string(),
-});
 
-export type CreateDiscussion = output<typeof createDiscussionParser>;
 
 
 

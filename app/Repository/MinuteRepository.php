@@ -54,9 +54,9 @@ class MinuteRepository extends BaseRepository implements MinuteInterface
         return $minute;
     }
 
-    public function getScheduleMinutes($schedule)
+    public function getScheduleMinute($schedule)
     {
-        $minute = Minute::with($this->relationships())->where('schedule_id', $schedule)->firstOrFail();
+        $minute = Minute::with($this->relationships())->where('schedule_id', $schedule)->first();
         // dd( $minute);
         return MinuteResource::make($minute);
     }

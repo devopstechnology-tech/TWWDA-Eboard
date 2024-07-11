@@ -34,7 +34,7 @@ class BoardMemberPositionNotification extends Notification implements ShouldQueu
     public function toArray($notifiable)
     {
         return [
-            'message' => "Hi {$this->user->full_name}, your p in this {$this->board->name} (board) has Been Updaqte.",
+            'message' => "Hi {$this->user->full_name}, your position in this {$this->board->name} (board) has Been Updaqte.",
             'board_id' => $this->board->id,
             'both'       => false,
         ];

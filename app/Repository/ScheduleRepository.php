@@ -49,7 +49,7 @@ class ScheduleRepository extends BaseRepository implements ScheduleInterface
 
         return $schedule;
     }
-    public function createSchedule(Meeting|string $meeting, Member|string $member, array $payload): void
+    public function createSchedule(Meeting $meeting, Member $member, array $payload): void
     {
 
         $schedules = $payload['schedules'];

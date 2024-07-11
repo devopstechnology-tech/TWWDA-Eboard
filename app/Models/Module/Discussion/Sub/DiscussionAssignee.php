@@ -2,11 +2,10 @@
 
 namespace App\Models\Module\Discussion\Sub;
 
+use App\Models\User;
 use App\Traits\Uuids;
 use App\Models\BaseModel;
-use Illuminate\Database\Eloquent\Model;
 use App\Models\Module\Discussion\Discussion;
-use App\Models\User;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;

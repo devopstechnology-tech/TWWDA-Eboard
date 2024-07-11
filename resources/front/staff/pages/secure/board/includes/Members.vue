@@ -9,10 +9,9 @@ import {computed,onMounted,ref} from 'vue';
 import {useRoute, useRouter} from 'vue-router';
 import * as yup from 'yup';
 import {
-    useCreateMemberRequest,
+  useCreateBoardMemberRequest,
     useGetBoardMembersRequest,
-    useUpdateMemberPositionRequest,
-    useUpdateMemberRequest,
+    useUpdateBoardMemberRequest,
 } from '@/common/api/requests/modules/member/useMemberRequest';
 import {useGetBoardPositionsRequest} from '@/common/api/requests/modules/member/usePositionRequest';
 import{useGetStaffsRequest}from '@/common/api/requests/staff/useStaffRequest';
@@ -108,9 +107,9 @@ const onSubmit = handleSubmit(async (values, {resetForm}) => {
             members: values.members,
         };
         if (action.value === 'create') {
-            await useCreateMemberRequest(payload, boardId);
+            await useCreateBoardMemberRequest(payload, boardId);
         } else if(action.value === 'edit') {
-            await useUpdateMemberRequest(payload, boardId);
+            await useUpdateBoardMemberRequest(payload, boardId);
         } else if(action.value === 'position') {
             const payload: MemberPositionRequestPayload = {
                 id: values.id,

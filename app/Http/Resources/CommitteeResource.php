@@ -12,15 +12,6 @@ class CommitteeResource extends BaseResource
     #[Format, IsDefault]
     public function base(): array
     {
-        // dd('me');
-
-        if (!$this->resource->relationLoaded('owner')) {
-            $this->resource->load('owner');
-        }
-        if (!$this->resource->relationLoaded('members')) {
-            $this->resource->load('members');
-        }
-
         return [
             // Base resource fields here
             'id' => $this->resource->getRouteKey(),
@@ -30,7 +21,13 @@ class CommitteeResource extends BaseResource
             'owner' => $this->owner->full_name,
             'icon' => $this->resource->icon,
             'cover' => $this->resource->cover,
+            'status' => $this->resource->status,
             'members' => $this->resource->members,
+            // 'folders' => $this->resource->folders,
+            'committeeable' => [
+                'type' => class_basename($this->committeeable_type),  // Extracts simple class name
+                'details' => $this->committeeable,
+            ],
         ];
     }
 
@@ -42,12 +39,9 @@ class CommitteeResource extends BaseResource
             'id' => $this->resource->getRouteKey(),
             'name' => $this->resource->name,
             'description' => $this->resource->description,
-            // 'owner' => $this->whenLoaded('owner', $this->resource->owner->full_name,''),
             'owner_id' => $this->resource->owner_id,
             'icon' => $this->resource->icon,
             'cover' => $this->resource->cover,
-            // 'members' => $this->whenLoaded('members',
-            //           UserResource::collection($this->resource->members), []),
         ];
     }
 }

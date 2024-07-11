@@ -12,7 +12,7 @@ interface ScheduleInterface
 {
     public function getAll();
     public function get(Schedule|string $schedule): Schedule;
-    public function createSchedule(Meeting|string $meeting, Member|string $member, array $payload): void;
+    public function createSchedule(Meeting $meeting, Member $member, array $payload): void;
     public function updateSchedule(Meeting|string $meeting, array $payload): void;
     public function updateMembers(Schedule|string $schedule, array $payload): void;
     public function update(Schedule|string $schedule, array $payload): Schedule;

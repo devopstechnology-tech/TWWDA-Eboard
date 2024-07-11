@@ -7,21 +7,19 @@ import {Meta} from '@/common/types/types';
 
 export async function useGetMembershipsRequest(
     meeting:string,
-    board: string,
     options?: object,
 ):Promise<nonPaginateResponse>{
     const client = useClient();
 
     const cn = Qs.stringify(options, {arrayFormat: 'brackets'});
-    return await client.get(MembershipsRoute()+ '/meeting/' + meeting + '/board/' + board + '?' + cn).json();
+    return await client.get(MembershipsRoute()+ '/meeting/' + meeting + '?' + cn).json();
 }
 
 export async function useCreateMembershipRequest(payload: MembershipRequestPayload,
     meeting:string,
-    board: string,
 ){
     const client = useClient();
-    const response = await client.post(MembershipsRoute() + '/create/meeting/' + meeting + '/board/' + board,{
+    const response = await client.post(MembershipsRoute() + '/create/meeting/' + meeting,{
         json: payload,
     });
     return response.json();

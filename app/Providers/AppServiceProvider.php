@@ -28,6 +28,7 @@ use App\Services\SMS\MobiTechSMS;
 use App\Models\Module\Board\Board;
 use App\Models\System\ActivityLog;
 use App\Observers\MeetingObserver;
+use App\Repository\ChatRepository;
 use App\Repository\PollRepository;
 use App\Repository\RoleRepository;
 use App\Repository\TaskRepository;
@@ -40,6 +41,7 @@ use App\Repository\StaffRepository;
 use App\Repository\UsersRepository;
 use Illuminate\Support\Facades\URL;
 use App\Models\Module\Member\Member;
+use App\Observers\CommitteeObserver;
 use App\Repository\AgendaRepository;
 use App\Repository\FolderRepository;
 use App\Repository\MemberRepository;
@@ -75,8 +77,8 @@ use App\Repository\DiscussionRepository;
 use App\Repository\MembershipRepository;
 use App\Services\Contracts\SmsInterface;
 use App\Models\Module\Committe\Committee;
-use App\Models\Module\Meeting\Discussion;
 use App\Repository\ActivityLogRepository;
+use App\Models\Module\Discussion\Sub\Chat;
 use App\Repository\AssigneePollRepository;
 use App\Repository\AssigneeTaskRepository;
 use App\Repository\DetailMinuteRepository;
@@ -86,11 +88,13 @@ use App\Repository\ModificationRepository;
 use App\Repository\NotificationRepository;
 use App\Models\Module\Meeting\MeetingGuest;
 use App\Models\System\PasswordResetRequest;
+use App\Repository\Contracts\ChatInterface;
 use App\Repository\Contracts\PollInterface;
 use App\Repository\Contracts\RoleInterface;
 use App\Repository\Contracts\TaskInterface;
 use App\Repository\Contracts\UserInterface;
 use App\Repository\MeetingMemberRepository;
+use App\Models\Module\Discussion\Discussion;
 use App\Models\Module\Meeting\MeetingMember;
 use App\Models\Module\Task\Sub\AssigneeTask;
 use App\Repository\AgendaAssigneeRepository;
@@ -114,6 +118,7 @@ use App\Repository\Contracts\PositionInterface;
 use App\Repository\Contracts\ScheduleInterface;
 use App\Repository\SubAgendaAssigneeRepository;
 use App\Repository\Contracts\CommitteeInterface;
+use App\Repository\DiscussionAssigneeRepository;
 use App\Repository\Contracts\AttendanceInterface;
 use App\Repository\Contracts\DiscussionInterface;
 use App\Repository\Contracts\MembershipInterface;
@@ -133,7 +138,9 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use App\Models\Module\Meeting\Minute\SubDetailMinute;
 use App\Repository\Contracts\AgendaAssigneeInterface;
 use App\Repository\Contracts\CommitteeMemberInterface;
+use App\Models\Module\Discussion\Sub\DiscussionAssignee;
 use App\Repository\Contracts\SubAgendaAssigneeInterface;
+use App\Repository\Contracts\DiscussionAssigneeInterface;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -169,6 +176,8 @@ class AppServiceProvider extends ServiceProvider
             'subagenda' => SubAgenda::class,
             'agendaassignee' => AgendaAssignee::class,
             'discussion' => Discussion::class,
+            'discussionassignee' => DiscussionAssignee::class,
+            'chat' => Chat::class,
             'meetingguest' => MeetingGuest::class,
             'meetingmember' => MeetingMember::class,
             'meeting' => Meeting::class,
@@ -194,6 +203,7 @@ class AppServiceProvider extends ServiceProvider
         }
         User::observe(UserObserver::class);
         Board::observe(BoardObserver::class);
+        Committee::observe(CommitteeObserver::class);
         Meeting::observe(MeetingObserver::class);
         Membership::observe(MembershipObserver::class);
         // Staff::observe(StaffObserver::class);
@@ -225,6 +235,8 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(AgendaAssigneeInterface::class, AgendaAssigneeRepository::class);
         $this->app->singleton(SubAgendaAssigneeInterface::class, SubAgendaAssigneeRepository::class);
         $this->app->singleton(DiscussionInterface::class, DiscussionRepository::class);
+        $this->app->singleton(DiscussionAssigneeInterface::class, DiscussionAssigneeRepository::class);
+        $this->app->singleton(ChatInterface::class, ChatRepository::class);
         $this->app->singleton(MeetingGuestInterface::class, MeetingGuestRepository::class);
         $this->app->singleton(MeetingMemberInterface::class, MeetingMemberRepository::class);
         $this->app->singleton(MeetingInterface::class, MeetingRepository::class);

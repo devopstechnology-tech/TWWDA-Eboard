@@ -84,9 +84,73 @@ export async function useUpdateBoardUploadFolderRequest(
 
 
 
+//committee folders
+export async function useGetCommitteeFoldersRequest(committee_id:string, options?: object):Promise<nonPaginateResponse>{
+    const client = useClient();
 
+    const cn = Qs.stringify(options, {arrayFormat: 'brackets'});
+    return await client.get(folderRoute()+ '/committee/' + committee_id + '?' + cn).json();
+}
 
+export async function useCreateCommitteeFolderRequest(
+    payload: FolderRequestPayload,
+    committeeid: string,
+){
+    const client = useClient();
+    const response = await client.post(folderRoute() + '/committee/create/' + committeeid,{
+        json: payload,
+    });
+    return response.json();
+}
 
+export async function useUpdateCommitteeFolderRequest(
+    payload: FolderRequestPayload,
+    committeeid: string,
+    folderid: string,
+){
+    const client = useClient();
+    const response = await client.patch(folderRoute() + '/committee/update/' + committeeid + '/'+ folderid,{
+        json: payload,
+    });
+    return response.json();
+}
+//committee file create and update anotaionadn so forth
+export async function useCreateCommitteeUploadFolderRequest(
+    payload: FolderRequestPayload,
+    committeeid: string,
+){
+    const client = useClient();
+    const data = new FormData();
+    data.append('committee_id', payload.committee_id);
+    data.append('name', payload.name);
+    data.append('parent_id', payload.parent_id);
+    data.append('type', payload.type);
+    data.append('fileupload', payload.fileupload);
+
+    const response = await client.post(folderRoute() + '/committee/file/create/' + committeeid,{
+        body: data,
+    });
+    return response.json();
+}
+export async function useUpdateCommitteeUploadFolderRequest(
+    payload: FolderRequestPayload,
+    committeeid: string,
+    folderid: string,
+){
+    const client = useClient();
+    const data = new FormData();
+    data.append('folder_id', payload.folder_id);
+    data.append('committee_id', payload.committee_id);
+    data.append('name', payload.name);
+    data.append('parent_id', payload.parent_id);
+    data.append('type', payload.type);
+    data.append('fileupload', payload.fileupload);
+
+    const response = await client.post(folderRoute() + '/committee/file/update/' + committeeid + '/'+ folderid,{
+        body: data,
+    });
+    return response.json();
+}
 
 
 
@@ -112,10 +176,9 @@ export async function useGetMeetingFoldersRequest(meeting_id:string, options?: o
 export async function useCreateMeetingFolderRequest(
     payload: FolderRequestPayload,
     meetingid: string,
-    boardid: string,
 ){
     const client = useClient();
-    const response = await client.post(folderRoute() + '/meeting/create/' + meetingid + '/board/' + boardid,{
+    const response = await client.post(folderRoute() + '/meeting/create/' + meetingid,{
         json: payload,
     });
     return response.json();
@@ -123,7 +186,6 @@ export async function useCreateMeetingFolderRequest(
 export async function useCreateMeetingUploadFolderRequest(
     payload: FolderRequestPayload,
     meetingid: string,
-    boardid: string,
 ){
     const client = useClient();
     const data = new FormData();
@@ -133,7 +195,7 @@ export async function useCreateMeetingUploadFolderRequest(
     data.append('type', payload.type);
     data.append('fileupload', payload.fileupload);
 
-    const response = await client.post(folderRoute() + '/meeting/file/create/' + meetingid + '/board/' + boardid,{
+    const response = await client.post(folderRoute() + '/meeting/file/create/' + meetingid ,{
         body: data,
     });
     return response.json();
@@ -144,7 +206,6 @@ export async function useCreateMeetingUploadFolderRequest(
 export async function useUpdateMeetingUploadFolderRequest(
     payload: FolderRequestPayload,
     meetingid: string,
-    boardid: string,
 ){
     const client = useClient();
     const data = new FormData();
@@ -155,7 +216,7 @@ export async function useUpdateMeetingUploadFolderRequest(
     data.append('type', payload.type);
     data.append('fileupload', payload.fileupload);
 
-    const response = await client.post(folderRoute() + '/meeting/file/update/' + meetingid + '/board/' + boardid,{
+    const response = await client.post(folderRoute() + '/meeting/file/update/' + meetingid,{
         body: data,
     });
     return response.json();
@@ -164,10 +225,9 @@ export async function useUpdateMeetingUploadFolderRequest(
 export async function useUpdateMeetingFolderRequest(
     payload: FolderRequestPayload,
     meetingid: string,
-    boardid: string,
 ){
     const client = useClient();
-    const response = await client.patch(folderRoute() + '/meeting/update/' + meetingid + '/board/' + boardid,{
+    const response = await client.patch(folderRoute() + '/meeting/update/' + meetingid,{
         json: payload,
     });
     return response.json();

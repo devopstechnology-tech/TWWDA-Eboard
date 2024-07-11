@@ -6,24 +6,22 @@ namespace App\Repository\Contracts;
 
 use App\Models\Module\Board\Board;
 use App\Models\Module\Member\Member;
+use App\Models\Module\Committe\Committee;
 
 interface MemberInterface
 {
     // Define your methods here
-    // Define your methods here
     public function getAll();
     public function getBoardMembers($member);
-    public function updateMembers(Board|string $board, array $payload): Board;
-    public function updateMemberPosition(Board|string $board, array $payload): Board;
-    // public function get(Member|string $member): Member;
-    // public function boardMeeting(Member|string $member): Member;
-    // public function committeeMeeting(Member|string $member): Member;
-    // public function getBoardmeetings(Member|string $member): Member;
-    // public function getCommitteeMeetings(Member|string $member): Member;
+    public function fetchBoardMember($board);
+    
+    public function updateBoardMembers(Board|string $board, array $payload): Board;
+    public function updateBoardMemberPosition(Board|string $board, array $payload): Board;
+    //committee
+    public function fetchCommitteeMember($committee);
+    public function getCommitteeMembers($member);
+    public function updateCommitteeMembers(Committee|string $committee, array $payload): Committee;
+    public function updateCommitteeMemberPosition(Committee|string $committee, array $payload): Committee;
 
-    // public function create(Member|string $member, array $payload): void;
 
-    // public function update(Member|string $member, array $payload): Member;
-
-    // public function delete(Member|string $member): bool;
 }

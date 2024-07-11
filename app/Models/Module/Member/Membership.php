@@ -13,6 +13,8 @@ use App\Models\Module\Meeting\Agenda;
 use App\Models\Module\Meeting\Meeting;
 use App\Models\Module\Member\Position;
 use App\Models\Module\Conflict\Conflict;
+use App\Models\Module\Poll\AssigneePoll;
+use App\Models\Module\Task\Sub\AssigneeTask;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -88,6 +90,14 @@ class Membership extends BaseModel
     public function assignees()
     {
         return $this->belongsToMany(Agenda::class, 'agenda_assignees');
+    }
+    public function assigneeTasks()
+    {
+        return $this->morphMany(AssigneeTask::class, 'assignable');
+    }
+    public function assigneePolls()
+    {
+        return $this->morphMany(AssigneePoll::class, 'assignable');
     }
     public function taskassignees()
     {

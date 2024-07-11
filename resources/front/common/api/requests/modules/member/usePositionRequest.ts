@@ -13,6 +13,12 @@ export async function useGetBoardPositionsRequest(options?: object):Promise<nonP
     const cn = Qs.stringify(options, {arrayFormat: 'brackets'});
     return await client.get(positionsRoute()+ '/board' + '?' + cn).json();
 }
+export async function useGetCommitteePositionsRequest(options?: object):Promise<nonPaginateResponse>{
+    const client = useClient();
+
+    const cn = Qs.stringify(options, {arrayFormat: 'brackets'});
+    return await client.get(positionsRoute()+ '/committee' + '?' + cn).json();
+}
 export async function useGetMeetingPositionsRequest(options?: object):Promise<nonPaginateResponse>{
     const client = useClient();
 

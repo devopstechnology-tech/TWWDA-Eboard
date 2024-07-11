@@ -2,8 +2,11 @@
 import {onMounted, ref} from 'vue';
 import {useRoute, useRouter} from 'vue-router';
 import {useGetSingleBoardRequest} from '@/common/api/requests/modules/board/useBoardRequest'; // Import your API function
+import {
+    BOARDS,
+} from '@/common/constants/staffRouteNames';
 import {loadCover, loadIcon, truncateDescription} from '@/common/customisation/Breadcrumb';
-import {Board} from '@/common/parsers/boadParser';
+import {Board} from '@/common/parsers/boardParser';
 import useAuthStore from '@/common/stores/auth.store';
 import Discussion from './includes/Discussion.vue';
 import Documents from './includes/Documents.vue';
@@ -21,8 +24,11 @@ const board = ref<Board>();
 const route = useRoute();
 const router = useRouter();
 
+
 function goBack() {
-    router.back();
+    router.push({
+        name: BOARDS,
+    });
 }
 // Extract the id parameter from the route
 const boardId = route.params.boardId as string;
@@ -48,10 +54,13 @@ onMounted(async () => {
         <div class="card card-widget widget-user shadow-lg" v-if="board">
             <!-- Add the bg color to the header using any of the bg-* classes -->
             <div class="widget-user-header text-white"
-                 :style="{ backgroundImage: `url(${loadCover(board.cover)})`, backgroundPosition: 'center center', backgroundSize: 'cover', backgroundRepeat: 'no-repeat' }"
+                 :style="{ backgroundImage: `url(${loadCover(board.cover)})`, 
+                           backgroundPosition: 'center center', backgroundSize: 'cover', 
+                           backgroundRepeat: 'no-repeat' }"
                  style="height: 250px; width: 100%; position: relative;">
                 <!-- Optional overlay for better readability -->
-                <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5);"></div>
+                <div style="position: absolute; top: 0; left: 0; 
+                width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5);"></div>
                 <!-- Content goes here -->
             </div>
 
@@ -104,13 +113,13 @@ onMounted(async () => {
                                             Task & Polls
                                         </a>
                                     </li>
-                                    <li class="nav-item">
+                                    <!-- <li class="nav-item">
                                         <a class="nav-link" id="custom-tabs-four-goals-tab" data-toggle="pill"
                                            href="#custom-tabs-four-goals" role="tab"
                                            aria-controls="custom-tabs-four-goals" aria-selected="false">
                                             Goals
                                         </a>
-                                    </li>
+                                    </li> -->
                                     <li class="nav-item">
                                         <a class="nav-link" id="custom-tabs-four-members-tab" data-toggle="pill"
                                            href="#custom-tabs-four-members" role="tab"
@@ -136,7 +145,7 @@ onMounted(async () => {
                                     </div>
                                     <div class="tab-pane fade" id="custom-tabs-four-tasks"
                                          role="tabpanel" aria-labelledby="custom-tabs-four-tasks-tab">
-                                         <!-- <TaskPolls/> -->
+                                        <TaskPolls/>
                                     </div>
                                     <div class="tab-pane fade" id="custom-tabs-four-goals"
                                          role="tabpanel" aria-labelledby="custom-tabs-four-goals-tab">

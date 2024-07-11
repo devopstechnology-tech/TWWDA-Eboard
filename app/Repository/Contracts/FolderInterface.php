@@ -26,15 +26,21 @@ interface FolderInterface
     public function createBoardFileFolder($board, array $payload): Folder;
     public function updateBoardFileFolder($board, $folder, array $payload): Folder;
 
-
-
-
+     //committee
+     public function getCommitteeFolders($committee);
+     public function createCommitteeFolder($committee, array $payload): Folder;
+     public function updateCommitteeFolder($committee, $folder, array $payload): Folder;
+     public function deleteCommitteeFolders($committee);
+     public function forceDeleteCommitteeFolder($committee);
+     public function createCommitteeFileFolder($committee, array $payload): Folder;
+     public function updateCommitteeFileFolder($committee, $folder, array $payload): Folder;
+ 
     //meeting
     public function getMeetingFolders($meeting);
-    public function createMeetingFolder(Meeting|string $meeting, Board|string $board, array $payload): Folder;
-    public function updateMeetingFolder(Meeting|string $meeting, Board|string $board, array $payload): Folder;
-    public function createMeetingFileFolder(Meeting|string $meeting, Board|string $board, array $payload): Folder;
-    public function updateMeetingFileFolder(Meeting|string $meeting, Board|string $board, array $payload): Folder;
+    public function createMeetingFolder(Meeting|string $meeting, array $payload): Folder;
+    public function updateMeetingFolder(Meeting|string $meeting, array $payload): Folder;
+    public function createMeetingFileFolder(Meeting|string $meeting, array $payload): Folder;
+    public function updateMeetingFileFolder(Meeting|string $meeting, array $payload): Folder;
     public function deleteMeetingFolder($board);
     public function forcedeleteMeetingFolder($board);
 

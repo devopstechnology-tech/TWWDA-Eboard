@@ -28,10 +28,10 @@ class MinuteController extends Controller
 
         return $this->response(Response::HTTP_OK, __('messages.records-fetched'), $minute, Minute::class);
     }
-    public function meetingminutes($meeting): JsonResponse
+    public function meetingminute($meeting): JsonResponse
     {
         // $this->authorize('viewAny', Minute::class);
-        $minute = $this->minuteRepository->getScheduleMinutes($meeting);
+        $minute = $this->minuteRepository->getScheduleMinute($meeting);
 
         return $this->response(Response::HTTP_OK, __('messages.records-fetched'), $minute, Minute::class);
     }

@@ -60,13 +60,7 @@ class BoardRepository extends BaseRepository implements BoardInterface
         }
 
         return $board;
-    }
-    public function fetchAuthMember(string $id)
-    {
-        $board = Board::findOrFail($id);
-        $member = $board->members()->where('user_id', Auth::user()->id)->first();
-        return $member;
-    }
+    }    
 
     public function create(array $payload): Board
     {

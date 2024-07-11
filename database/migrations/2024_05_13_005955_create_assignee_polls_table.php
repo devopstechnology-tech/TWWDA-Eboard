@@ -14,7 +14,8 @@ return new class extends Migration
         Schema::create('assignee_polls', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->string('poll_id')->nullable();
-            $table->string('membership_id')->nullable();
+            $table->uuid('assignable_id');
+            $table->string('assignable_type');
             $table->softDeletes();
             $table->timestamps();
         });

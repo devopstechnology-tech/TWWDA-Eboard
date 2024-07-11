@@ -17,8 +17,7 @@ return new class () extends Migration {
             $table->uuid('id')->primary();
             $table->string('option_id')->nullable();
             $table->string('poll_id')->nullable();
-            $table->string('membership_id')->nullable();
-            $table->string('member_id')->nullable();//for board or committee
+            $table->string('assginee_poll_id')->nullable();
             $table->string('date')->nullable();
             $table->string('status')->default(VoteEnum::Default->value);//signed or unsigned
             $table->softDeletes();

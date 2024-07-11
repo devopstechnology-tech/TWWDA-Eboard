@@ -20,14 +20,16 @@ class AssigneeTask extends BaseModel
     protected $dates = ['deleted_at'];
     protected $fillable = [
         'task_id',
-        'membership_id',
+        'assignable_id',
+        'assignable_type',
+        'status',
     ];
     public function task()
     {
         return $this->belongsTo(Task::class, 'task_id');
     }
-    public function membership()
+    public function assignable()
     {
-        return $this->belongsTo(Membership::class, 'membership_id');
+        return $this->morphTo();
     }
 }

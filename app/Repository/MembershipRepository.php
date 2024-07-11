@@ -36,7 +36,7 @@ class MembershipRepository extends BaseRepository implements MembershipInterface
             'user',
         ];
     }
-    public function getMeetingMemberships($meeting, $board)
+    public function getMeetingMemberships($meeting)
     {
         $filters = [
             'meeting_id' => $meeting,
@@ -131,22 +131,22 @@ class MembershipRepository extends BaseRepository implements MembershipInterface
         }
         // Fetch the schedule associated with the minute
         $schedule = $minute->schedule;
-        // // Access the meeting associated with the schedule
-        $meeting = $schedule->meeting;
-        $board = $meeting->meetingable_id;
+        // Access the meeting associated with the schedule
+        $meeting = $schedule->meeting;    
+        // Determine if the meetingable is a Board or Committee
+        $meetingable = $meeting->meetingable;
         // dd($board);
         // Get the meeting title and schedule date
         $meetingTitle = $meeting->title;
         $scheduleDate = $schedule->date;
         $Chairperson = Position::where('name', 'Meeting Chairperson')->first()->id;
-        // $ViceChairperson = Position::where('name', 'Vice-Chairperson')->first()->id;
-
-        $membershipUserIds = Membership::whereIn('position_id', [$Chairperson])->pluck('user_id')->toArray();
+        $membershipUserIds = Membership::where('meeting_id', $meeting->id)
+                                        ->whereIn('position_id', [$Chairperson])->pluck('user_id')->toArray();
 
         $users = User::whereIn('id', $membershipUserIds)->get();
         $updateMessage = "The minutes for the meeting titled '{$meetingTitle}', held on '{$scheduleDate}', have been established.";
         foreach ($users as $user) {
-            $user->notify(new MinuteApprovalRequestNotification($user, $minute, $updateMessage));
+            $user->notify(new MinuteApprovalRequestNotification($user, $minute, $meetingable, $updateMessage));
         }
     }
 }

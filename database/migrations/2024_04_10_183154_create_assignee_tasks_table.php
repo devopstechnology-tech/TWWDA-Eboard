@@ -17,7 +17,8 @@ return new class() extends Migration
         Schema::create('assignee_tasks', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->string('task_id')->nullable();
-            $table->string('membership_id')->nullable();
+            $table->uuid('assignable_id');
+            $table->string('assignable_type');
             $table->string('status')->default(TaskEnum::Backlog->value); //signed or unsigned
             $table->softDeletes();
             $table->timestamps();

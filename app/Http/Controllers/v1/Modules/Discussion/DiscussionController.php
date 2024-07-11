@@ -8,6 +8,8 @@ use Illuminate\Http\Response;
 use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\Controller;
 use App\Models\Module\Discussion\Discussion;
+use App\Http\Requests\CreateDiscussionRequest;
+use App\Http\Requests\UpdateDiscussionRequest;
 use App\Repository\Contracts\DiscussionInterface;
 
 class DiscussionController extends Controller
@@ -28,4 +30,17 @@ class DiscussionController extends Controller
 
         return $this->response(Response::HTTP_OK, __('messages.records-fetched'), $discussion, Discussion::class);
     }
+    public function creatediscussion(CreateDiscussionRequest $request, User $user): JsonResponse
+    {
+        $discussion = $this->discussionRepository->createDiscussion($user, $request->validated());
+
+        return $this->response(Response::HTTP_OK, __('messages.records-fetched'), $discussion, Discussion::class);
+    }
+    public function updatediscussion(UpdateDiscussionRequest $request, User $user, Discussion $discussion): JsonResponse
+    {
+        $discussion = $this->discussionRepository->updateDiscussion($user, $discussion, $request->validated());
+
+        return $this->response(Response::HTTP_OK, __('messages.records-fetched'), $discussion, Discussion::class);
+    }
+
 }

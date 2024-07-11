@@ -24,12 +24,12 @@ class MeetingObserver
      */
     public function updated(Meeting $meeting): void
     {
-        //
-        // dd($meeting->isUpdate, $meeting->wasChanged());
-        $isUpdate = $meeting->isUpdate;
-        $board = $meeting->board();
         if ($meeting->wasChanged()) {
-            $this->notifyMeetingMembers($meeting, $board, $isUpdate, $meeting->tempUserIds);
+            $isUpdate = $meeting->isUpdate;
+            $meetingable = $meeting->meetingable;
+
+            // Notify the members
+            $this->notifyMeetingMembers($meeting, $meetingable, $isUpdate, $meeting->tempUserIds);
         }
     }
 
@@ -56,11 +56,12 @@ class MeetingObserver
     {
         //
     }
-    private function notifyMeetingMembers(Meeting $meeting, Board $board, $isUpdate, array $userIds)
+    private function notifyMeetingMembers(Meeting $meeting, $meetingable, $isUpdate, array $userIds)
     {
         $users = User::whereIn('id', $userIds)->get();
         foreach ($users as $user) {
-            $user->notify(new NewMeetingNotification($board, $meeting, $isUpdate));
+            // Dynamically pass either Board or Committee instance
+            $user->notify(new NewMeetingNotification($meetingable, $meeting, $isUpdate));
         }
     }
 }

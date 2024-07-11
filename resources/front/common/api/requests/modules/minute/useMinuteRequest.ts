@@ -6,11 +6,20 @@ import {MinuteRequestPayload, nonPaginateResponse, singleResponse} from '@/commo
 import {Meta} from '@/common/types/types';
 
 
-export async function useGetMinutesRequest(id:string, options?: object):Promise<singleResponse>{
+export async function useGetMinutesRequest(
+    id:string, 
+    options?: object,
+):Promise<singleResponse>{
     const client = useClient();
 
     const cn = Qs.stringify(options, {arrayFormat: 'brackets'});
     return await client.get(minutesRoute()+ '/' + id + '?' + cn).json();
+}
+export async function useGetMinuteRequest(
+    id:string,
+):Promise<singleResponse>{
+    const client = useClient();
+    return await client.get(minutesRoute()+ '/' + id ).json();
 }
 
 export async function useCreateMinuteRequest(payload: MinuteRequestPayload, id: string){

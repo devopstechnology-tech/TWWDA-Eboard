@@ -11,7 +11,8 @@ export const meetingParser = object({
     link: string().nullable(),
     status: string(),
     type: string(),
-    committee_id: string(),
+    committee_id: string().nullable(),
+    board_id: string().nullable(),
     meetingable: string(),
     //schdeule
     schedules:array(scheduleParser),
@@ -28,6 +29,24 @@ export interface MeetingRequestPayload{ //to db
 }
 
 
+export interface MeetingMembersRequestPayload {
+    members: string[],
+}
+
+// export interface response {
+//     code: number,
+//     data: {
+//         data: Meeting[],
+//         meta: Meta
+//     },
+//     message: string
+// }
+
+export interface singleresponse {
+    code: number,
+    data: Meeting,
+    message: string
+}
 
 
 export interface nonPaginateResponse {

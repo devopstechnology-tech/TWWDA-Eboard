@@ -25,10 +25,12 @@ class Committee extends BaseModel
     protected $fillable = [
         'name',
         'description',
-        'owner_id',
-        'board_id',
         'icon',
         'cover',
+        'status',
+        'owner_id',
+        'committeeable_id',
+        'committeeable_type',
     ];
 
     // updating board only but wnato notify already members, 
@@ -112,10 +114,19 @@ class Committee extends BaseModel
     {
         return $this->morphMany(Meeting::class, 'meetingable');
     }
-
     public function board()
     {
-        return $this->belongsTo(Board::class, 'board_id');
+        // Check if the meetingable type is a Board
+        if ($this->committeeable_type === Board::class) {
+            return $this->committeeable;
+        }
+
+        return null; // Return null if the meetingable type is not a Board
+    }
+    
+    public function committeeable()
+    {
+        return $this->morphTo();
     }
 
     public function members()

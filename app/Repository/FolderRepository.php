@@ -44,19 +44,6 @@ class FolderRepository extends BaseRepository implements FolderInterface
     }
     public function getAll()
     {
-        // $board = Board::find(1); // Assuming a board exists with ID 1
-        // $folder = new Folder();
-        // $folder->name = 'Example Folder';
-        // $folder->type = 'pdf';
-        // $folder->folderable()->associate($board);
-        // $folder->save();
-
-        // $file = UploadedFile::fake()->create('folder.pdf', 1000, 'application/pdf');
-        // $folder->addMedia($file)->toMediaCollection('folders');
-
-        // $media = $folder->media->first();
-        // echo $media->getPath(); // Output the path to see where it's being stored
-
         $filters = [
             'with' => $this->relationships(),
             'orderBy' => ['field' => 'id', 'direction' => 'asc']
@@ -104,52 +91,7 @@ class FolderRepository extends BaseRepository implements FolderInterface
         foreach ($folders as $folder) {
             $this->deleteFolderRecursively($folder);
         }
-    }
-
-    private function deleteFolderRecursively($folder)
-    {
-        // Recursively delete child folders
-        // Recursively delete child folders
-        foreach ($folder->children as $child) {
-            $this->deleteFolderRecursively($child);
-        }
-
-        // Handle deletion based on folder type
-        if ($folder->type === 'file') {
-            // Retrieve or create the 'Board Archives' folder
-            $archiveFolder = $this->archiveFolder($folder);
-
-            // Move all media items to the archive folder
-            $mediaItems = $folder->getMedia();
-            foreach ($mediaItems as $mediaItem) {
-                $mediaItem->move($archiveFolder, 'file');
-            }
-
-            // Optionally, mark the original folder as archived or update status
-            // $folder->name = $folder->name . " (Archived)";
-            // $folder->save();
-        } else {
-            // Delete the folder itself after all children have been deleted
-            $folder->delete();
-        }
-    }
-    private function archiveFolder($folder)
-    {
-        // Assuming folderable_id refers to the parent entity (like Board)
-        // and that 'Board Archives' is directly under this entity
-        $archiveFolder = Folder::firstOrCreate(
-            [
-                'folderable_id'   => $folder->folderable_id,
-                'folderable_type' => $folder->folderable_type,
-                'name'            => 'Board Archives'
-            ],
-            [
-                'type'            => 'file' // Make sure the type and other necessary attributes are set
-            ]
-        );
-
-        return $archiveFolder;
-    }
+    }  
 
     public function forcedeleteBoardFolder($board)
     {
@@ -160,26 +102,7 @@ class FolderRepository extends BaseRepository implements FolderInterface
         foreach ($folders as $folder) {
             $this->forceDeleteFolderRecursively($folder);
         }
-    }
-    private function forceDeleteFolderRecursively($folder)
-    {
-        // Recursively delete all child folders first
-        foreach ($folder->children as $child) {
-            $this->forceDeleteFolderRecursively($child);
-        }
-
-        // Conditionally force delete all associated media files
-        // Only if the folder type is NOT 'file'
-        if ($folder->type === 'file') {
-            $folder->media()->each(function ($media) {
-                $media->forceDelete(); // Force delete media
-            });
-        }
-
-        // Finally, force delete the folder itself
-        // This happens regardless of the type
-        $folder->forceDelete();
-    }
+    }  
 
     public function createBoardFileFolder($board, array $payload): Folder
     {
@@ -221,27 +144,102 @@ class FolderRepository extends BaseRepository implements FolderInterface
         return $folder;
     }
 
-    public function getFile($folder, $file)
-    {
-        //    am here
-        // dd($meeting, $folder, $file);
-        $folder = Folder::find($folder);
-        $media  = $folder->media->where('uuid', $file)->first();
-        $fileRawContent = $media->getPath();
-        $fileContent = file_get_contents($fileRawContent);
-        // Encode the content to base64
-        $base64File = base64_encode($fileContent);
-        // Prepare the file metadata
-        $fileData = [
-            'fileName' => basename($fileRawContent),
-            'fileSize' => filesize($fileRawContent),
-            'fileType' => 'application/pdf',
-            'file' => $base64File,
-            'folderId' => $folder->id,
-            'mediaId' => $media->uuid,
-        ];
-        return $fileData;
-    }
+        // committee folders
+        public function getCommitteeFolders($committee)
+        {
+            $filters = [
+                'folderable_id'   => $committee,
+                'folderable_type' => Committee::class,
+                'with'            => $this->relationships(),
+                'orderBy'         => ['field' => 'id', 'direction' => 'asc']
+            ];
+            return $this->indexResource(Folder::class, FolderResource::class, $filters);
+        }
+    
+        public function createCommitteeFolder($committee, array $payload): Folder
+        {
+            $parentfolder = $this->getParentFolder($payload['parent_id']);
+            $folder                    = new Folder();
+            $folder->parent_id         = $parentfolder->id;
+            $folder->folderable_id     = $parentfolder->id;
+            $folder->folderable_type   = Folder::class;
+            $folder->name              = $payload['name'];
+            $folder->type              = $payload['type'];
+            $folder->save();
+            return $folder;
+        }
+        public function updateCommitteeFolder($committee, $oldfolder, array $payload): Folder
+        {
+            $folder = Folder::find($payload['folder_id']);
+            $folder->name              = $payload['name'];
+            $folder->save();
+            return $folder;
+        }
+        public function deleteCommitteeFolders($committee)
+        {
+            $folders = Folder::where('folderable_id', $committee->id)
+                ->where('folderable_type', Committee::class)
+                ->get();
+    
+            foreach ($folders as $folder) {
+                $this->deleteFolderRecursively($folder);
+            }
+        }  
+    
+        public function forcedeleteCommitteeFolder($committee)
+        {
+            $folders = Folder::where('folderable_id', $committee->id)
+                ->where('folderable_type', Committee::class)
+                ->get();
+    
+            foreach ($folders as $folder) {
+                $this->forceDeleteFolderRecursively($folder);
+            }
+        }  
+    
+        public function createCommitteeFileFolder($committee, array $payload): Folder
+        {
+            // dd($payload);
+            $parentfolder = $this->getParentFolder($payload['parent_id']);
+    
+            // for files,   parent must crete file folder (virtual)
+            // so that in any case we create a file, it must pck the
+            //parent that has file naem if not crerate file name then
+            //add files, so in vue its iterated underchild file
+            $folder                    = new Folder();
+            $folder->parent_id         = $parentfolder->id;
+            $folder->folderable_id   = $parentfolder->id;
+            $folder->folderable_type = Folder::class;
+            $folder->name              = $payload['name'];
+            $folder->type              = $payload['type'];
+            $folder->save();
+    
+            if (isset($payload['fileupload']) && $payload['fileupload'] instanceof UploadedFile) {
+                $media = $folder->addMediaFromRequest('fileupload')
+                    ->toMediaCollection('file');
+            }
+            return $folder;
+        }
+        public function updateCommitteeFileFolder($committee, $oldfolder, array $payload): Folder
+        {
+            $folder = Folder::find($payload['folder_id']);
+            $folder->name              = $payload['name'];
+            $folder->type              = $payload['type'];
+            $folder->save();
+            if (isset($payload['fileupload']) && $payload['fileupload'] instanceof UploadedFile) {
+                $media = $folder->addMediaFromRequest('fileupload')
+                    ->toMediaCollection('file');
+            } elseif ($folder->getFirstMedia('file')) {
+                $media = $folder->getFirstMedia('file');
+                $media->file_name = $payload['name'];
+                $media->save();
+            }
+            return $folder;
+        }
+    
+    
+    
+   
     //updating from board or meetin file view
     public function updateFile($folder, $media, array $payload)
     {
@@ -270,7 +268,7 @@ class FolderRepository extends BaseRepository implements FolderInterface
         // dd($filters);
         return $this->indexResource(Folder::class, FolderResource::class, $filters);
     }
-    public function createMeetingFolder(Meeting|string $meeting, Board|string $board, array $payload): Folder
+    public function createMeetingFolder(Meeting|string $meeting, array $payload): Folder
     {
         $parentfolder = $this->getParentFolder($payload['parent_id']);
         $folder                    = new Folder();
@@ -282,7 +280,7 @@ class FolderRepository extends BaseRepository implements FolderInterface
         $folder->save();
         return $folder;
     }
-    public function updateMeetingFolder(Meeting|string $meeting, Board|string $board, array $payload): Folder
+    public function updateMeetingFolder(Meeting|string $meeting, array $payload): Folder
     {
         $parentfolder = $this->getParentFolder($payload['parent_id']);
         $folder = Folder::find($payload['folder_id']);
@@ -294,7 +292,7 @@ class FolderRepository extends BaseRepository implements FolderInterface
         $folder->save();
         return $folder;
     }
-    public function createMeetingFileFolder(Meeting|string $meeting, Board|string $board, array $payload): Folder
+    public function createMeetingFileFolder(Meeting|string $meeting, array $payload): Folder
     {
         // dd($payload);
         $parentfolder = $this->getParentFolder($payload['parent_id']);
@@ -317,7 +315,7 @@ class FolderRepository extends BaseRepository implements FolderInterface
         }
         return $folder;
     }
-    public function updateMeetingFileFolder(Meeting|string $meeting, Board|string $board, array $payload): Folder
+    public function updateMeetingFileFolder(Meeting|string $meeting, array $payload): Folder
     {
         $folder = Folder::find($payload['folder_id']);
         $folder->name              = $payload['name'];
@@ -524,65 +522,89 @@ class FolderRepository extends BaseRepository implements FolderInterface
 
         return "{$number}{$suffix} Meeting";
     }
-    // private function includeChildren($level = 1) {
-    //     // Adjust level to control the depth of the recursion
-    //     $with = ['children'];
-    //     for ($i = 1; $i < $level; $i++) {
-    //         $with = array_merge($with, ["children.$with[0]"]);
-    //     }
-    //     return $with;
-    // }
 
-    //     public function updateMeetingFileFolder(Meeting|string $meeting, Board|string $board, array $payload): Folder
-    // {
-    //     $parentfolder = $this->getParentFolder($payload['parent_id']);
-    //     $folder = Folder::find($payload['folder_id']);
-    //     if (!$folder) {
-    //         throw new \Exception("Folder not found.");
-    //     }
+    private function forceDeleteFolderRecursively($folder)
+    {
+        // Recursively delete all child folders first
+        foreach ($folder->children as $child) {
+            $this->forceDeleteFolderRecursively($child);
+        }
 
-    //     $folder->name = $payload['name'];
-    //     $folder->type = $payload['type'];
-    //     $folder->save();
+        // Conditionally force delete all associated media files
+        // Only if the folder type is NOT 'file'
+        if ($folder->type === 'file') {
+            $folder->media()->each(function ($media) {
+                $media->forceDelete(); // Force delete media
+            });
+        }
 
-    //     // Check if a new file is uploaded.
-    //     if (isset($payload['fileupload']) && $payload['fileupload'] instanceof UploadedFile) {
-    //         $this->replaceMedia($folder, $payload['fileupload']);
-    //     } else if ($folder->getFirstMedia('folders')) {
-    //         // Rename the existing file if no new file is uploaded.
-    //         $media = $folder->getFirstMedia('folders');
-    //         $newFileName = $payload['name'] . '.' . $media->extension;
-    //         $this->renameMediaFile($media, $newFileName);
-    //     }
+        // Finally, force delete the folder itself
+        // This happens regardless of the type
+        $folder->forceDelete();
+    }
+ public function getFile($folder, $file)
+    {
+        //    am here
+        // dd($meeting, $folder, $file);
+        $folder = Folder::find($folder);
+        $media  = $folder->media->where('uuid', $file)->first();
+        $fileRawContent = $media->getPath();
+        $fileContent = file_get_contents($fileRawContent);
+        // Encode the content to base64
+        $base64File = base64_encode($fileContent);
+        // Prepare the file metadata
+        $fileData = [
+            'fileName' => basename($fileRawContent),
+            'fileSize' => filesize($fileRawContent),
+            'fileType' => 'application/pdf',
+            'file' => $base64File,
+            'folderId' => $folder->id,
+            'mediaId' => $media->uuid,
+        ];
+        return $fileData;
+    }
+    private function deleteFolderRecursively($folder)
+    {
+        // Recursively delete child folders
+        // Recursively delete child folders
+        foreach ($folder->children as $child) {
+            $this->deleteFolderRecursively($child);
+        }
 
-    //     // Check if the folder needs to be deleted based on some condition in payload
-    //     if (isset($payload['delete']) && $payload['delete'] === true) {
-    //         $folder->delete(); // Soft delete triggers moving files to "Deleted" directory
-    //     }
+        // Handle deletion based on folder type
+        if ($folder->type === 'file') {
+            // Retrieve or create the 'Board Archives' folder
+            $archiveFolder = $this->archiveFolder($folder);
 
-    //     return $folder;
-    // }
+            // Move all media items to the archive folder
+            $mediaItems = $folder->getMedia();
+            foreach ($mediaItems as $mediaItem) {
+                $mediaItem->move($archiveFolder, 'file');
+            }
 
-    // protected function replaceMedia(Folder $folder, UploadedFile $newFile)
-    // {
-    //     $media = $folder->getFirstMedia('folders');
-    //     if ($media) {
-    //         $media->delete(); // Delete the media instance, triggers media file deletion
-    //     }
-    //     $folder->addMedia($newFile)
-    //              ->toMediaCollection('folders');
-    // }
+            // Optionally, mark the original folder as archived or update status
+            // $folder->name = $folder->name . " (Archived)";
+            // $folder->save();
+        } else {
+            // Delete the folder itself after all children have been deleted
+            $folder->delete();
+        }
+    }
+    private function archiveFolder($folder)
+    {
+        // Assuming folderable_id refers to the parent entity (like Board)
+        // and that 'Board Archives' is directly under this entity
+        $archiveFolder = Folder::firstOrCreate(
+            [
+                'folderable_id'   => $folder->folderable_id,
+                'folderable_type' => $folder->folderable_type,
+                'name'            => 'Board Archives'
+            ],
+            [
+                'type'            => 'file' // Make sure the type and other necessary attributes are set
+            ]
+        );
 
-    // protected function renameMediaFile(Media $media, string $newFileName)
-    // {
-    //     $oldPath = $media->getPath();
-    //     $newPath = dirname($oldPath) . '/' . $newFileName;
-
-    //     if (file_exists($oldPath) && !file_exists($newPath)) {
-    //         rename($oldPath, $newPath);
-    //         $media->file_name = $newFileName;
-    //         $media->save();
-    //     }
-    // }
-
+        return $archiveFolder;
+    }
 }

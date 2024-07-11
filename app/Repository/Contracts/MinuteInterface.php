@@ -11,7 +11,7 @@ interface MinuteInterface
     // Define your methods here
     public function getAll();
 
-    public function getScheduleMinutes($schedule);
+    public function getScheduleMinute($schedule);
     public function get(Minute|string $minute): Minute;
     public function create($schedule, array $payload);
 

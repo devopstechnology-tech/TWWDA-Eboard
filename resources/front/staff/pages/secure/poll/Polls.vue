@@ -246,7 +246,7 @@ const getmemberships = async () => {
 
 const getPolls = () => {
     return useQuery({
-        queryKey: ['getPollsKey'],
+        queryKey: ['getOwnPollsKey'],
         queryFn: async () => {
             const response = await useGetPollsRequest({paginate: 'false'});
             return response.data;

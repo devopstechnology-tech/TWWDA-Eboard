@@ -28,10 +28,10 @@ use App\Http\Controllers\v1\Modules\Board\BoardMemberController;
 use App\Http\Controllers\v1\Modules\Conflict\ConflictController;
 use App\Http\Controllers\v1\Modules\Member\AttendanceController;
 use App\Http\Controllers\v1\Modules\User\NotificationController;
-use App\Http\Controllers\v1\Modules\Meeting\DiscussionController;
 use App\Http\Controllers\v1\Modules\Meeting\MembershipController;
 use App\Http\Controllers\v1\Modules\Committee\CommitteeController;
 use App\Http\Controllers\v1\Modules\Meeting\MeetingGuestController;
+use App\Http\Controllers\v1\Modules\Discussion\DiscussionController;
 use App\Http\Controllers\v1\Modules\Meeting\MeetingMemberController;
 use App\Http\Controllers\v1\Modules\Committee\CommitteeMemberController;
 
@@ -86,21 +86,32 @@ Route::group(['prefix' => 'v1'], function () {
             Route::apiResource('boards', BoardController::class);
             Route::post('boards/update/{board}', [BoardController::class, 'update']);
             Route::post('boards/members/{board}', [BoardController::class, 'updatemembers']);
-            Route::apiResource('boardmembers', BoardMemberController::class);
+           
+             //////////////////////////// Committee/////////////////
+            //  Route::apiResource('committees', CommitteeController::class);
+             Route::get('committees', [CommitteeController::class, 'index']);
+             Route::get('committees/{committee}', [CommitteeController::class, 'show']);
+             Route::post('committees/create/{board}', [CommitteeController::class, 'store']);
+             Route::post('committees/update/{committee}', [CommitteeController::class, 'update']);
+             Route::post('committees/members/{board}/{committee}', [CommitteeController::class, 'updatemembers']);
+ 
             // members
             Route::get('members/board/{board}', [MemberController::class, 'getboardmembers']);
             Route::post('members/board/update/members/{board}', [MemberController::class, 'updateboardmembers']);
             Route::post('members/board/update/member/position/{board}', [MemberController::class, 'updateboardmemberposition']);
+            Route::get('members/committee/{committee}', [MemberController::class, 'getcommitteemembers']);
+            Route::post('members/committee/update/members/{committee}', [MemberController::class, 'updatecommitteemembers']);
+            Route::post('members/committee/update/member/position/{committee}', [MemberController::class, 'updatecommitteememberposition']);
+
+
 
 
             // positions
             Route::get('positions/board', [PositionController::class, 'board']);
             Route::get('positions/committee', [PositionController::class, 'committee']);
             Route::get('positions/meeting', [PositionController::class, 'meeting']);
-            //////////////////////////// Committee/////////////////
-            Route::apiResource('committees', CommitteeController::class);
-            Route::post('committees/members/{committee}', [CommitteeController::class, 'updatememmbers']);
-            Route::apiResource('committeemembers', CommitteeMemberController::class);
+           
+
 
 
             ///////////////////////////////board meeting//////////////////
@@ -118,7 +129,7 @@ Route::group(['prefix' => 'v1'], function () {
 
             ///////////////////////////////meeting Minutes//////////////////
             Route::apiResource('minutes', MinuteController::class);
-            Route::get('minutes/schedule/{schedule}', [MinuteController::class, 'meetingminutes']);
+            Route::get('minutes/schedule/{schedule}', [MinuteController::class, 'meetingminute']);
             Route::post('minutes/schedule/create/{schedule}', [MinuteController::class, 'store']);
             Route::post('minutes/schedule/create/subminute/{schedule}', [MinuteController::class, 'createsubminute']);
             Route::post('minutes/schedule/update/minute/{meeting}', [MinuteController::class, 'update']);
@@ -132,18 +143,18 @@ Route::group(['prefix' => 'v1'], function () {
 
 
 
-            Route::apiResource('discussions', DiscussionController::class);
             Route::apiResource('meetingGuests', MeetingGuestController::class);
             Route::apiResource('meetingMembers', MeetingMemberController::class);
 
             Route::apiResource('meetings', MeetingController::class);
             Route::get('meeting', [MeetingController::class, 'index']);
             Route::get('meeting/board/{board}', [MeetingController::class, 'boardmeeting']);
-            Route::get('meetings/board/{board}', [MeetingController::class, 'boardmeetings']);
-            Route::get('meeting/committee/{committee}', [MeetingController::class, 'committeemeeting']);
-            Route::get('meetings/committee/{committee}', [MeetingController::class, 'committeemeetings']);
+            Route::get('meetings/board/{board}', [MeetingController::class, 'boardmeetings']);            
             Route::post('meetings/board', [MeetingController::class, 'store']);
             Route::patch('meetings/board/meeting/{board}', [MeetingController::class, 'update']);
+            //committee
+            Route::get('meeting/committee/{committee}', [MeetingController::class, 'committeemeeting']);
+            Route::get('meetings/committee/{committee}', [MeetingController::class, 'committeemeetings']);
             Route::post('meetings/committee', [MeetingController::class, 'store']);
             Route::patch('meetings/committee/meeting/{committee}', [MeetingController::class, 'update']);
             Route::patch('meetings/publish/{meeting}', [MeetingController::class, 'publish']);
@@ -160,7 +171,7 @@ Route::group(['prefix' => 'v1'], function () {
 
 
             //////////////////////////// memberships/////////////////
-            Route::get('memberships/meeting/{meeting}/board/{board}', [MembershipController::class, 'getmeetingmemberships']);
+            Route::get('memberships/meeting/{meeting}', [MembershipController::class, 'getmeetingmemberships']);
             Route::post('memberships/update/meeting/{meeting}/schedule/{schedule}', [MembershipController::class, 'updatememberships']);
             Route::post('memberships/update/membership/position/{membership}/schedule/{schedule}', [MembershipController::class, 'updateposition']);
 
@@ -178,10 +189,39 @@ Route::group(['prefix' => 'v1'], function () {
 
             Route::apiResource('tasks', TaskController::class);
             Route::get('tasks/meeting/{meeting}', [TaskController::class, 'getmeetingtasks']);
-            Route::post('tasks/meeting/create/{meeting}/board/{board}', [TaskController::class, 'createmeetingtask']);
-            Route::patch('tasks/meeting/update/{meeting}/board/{board}/{task}', [TaskController::class, 'updatemeetingtask']);
+            Route::post('tasks/meeting/create/{meeting}', [TaskController::class, 'createmeetingtask']);
+            Route::patch('tasks/meeting/update/{meeting}/{task}', [TaskController::class, 'updatemeetingtask']);
             Route::patch('tasks/meeting/update/{meeting}', [TaskController::class, 'updatetask']);
             
+            Route::get('tasks/board/{board}', [TaskController::class, 'getboardtasks']);
+            Route::post('tasks/board/create/{board}', [TaskController::class, 'createboardtask']);
+            Route::patch('tasks/board/update/{task}', [TaskController::class, 'updateboardtask']);
+
+            Route::get('tasks/committee/{committee}', [TaskController::class, 'getcommitteetasks']);
+            Route::post('tasks/committee/create/{committee}', [TaskController::class, 'createcommitteetask']);
+            Route::patch('tasks/committee/update/{task}', [TaskController::class, 'updatecommitteetask']);
+
+
+
+            
+
+            //////////////////////////// polls/////////////////
+            Route::apiResource('polls', PollController::class);
+            Route::get('polls/meeting/{meeting}', [PollController::class, 'getmeetingpolls']);
+            Route::post('polls/meeting/create/{meeting}', [PollController::class, 'createmeetingpoll']);
+            Route::patch('polls/meeting/update/{meeting}/{poll}', [PollController::class, 'updatemeetingpoll']);
+            Route::patch('polls/meeting/update/{meeting}', [PollController::class, 'updatepoll']);
+            
+            Route::get('polls/board/{board}', [PollController::class, 'getboardpolls']);
+            Route::post('polls/board/create/{board}', [PollController::class, 'createboardpoll']);
+            Route::patch('polls/board/update/{poll}', [PollController::class, 'updateboardpoll']);
+
+            Route::get('polls/committee/{committee}', [PollController::class, 'getcommitteepolls']);
+            Route::post('polls/committee/create/{committee}', [PollController::class, 'createcommitteepoll']);
+            Route::patch('polls/committee/update/{poll}', [PollController::class, 'updatecommitteepoll']);
+
+
+
             
             
             // discussions
@@ -198,13 +238,22 @@ Route::group(['prefix' => 'v1'], function () {
             Route::post('folders/board/file/create/{board}', [FolderController::class, 'createboardfilefolder']);
             Route::post('folders/board/file/update/{board}/{file}', [FolderController::class, 'updateboardfilefolder']);
 
+              //////////////////////////// committee folders/////////////////
+            Route::get('folders/committee/{committee}', [FolderController::class, 'getcommitteefolders']);
+            Route::post('folders/committee/create/{committee}', [FolderController::class, 'createcommitteefolder']);
+            Route::patch('folders/committee/update/{committee}/{folder}', [FolderController::class, 'updatecommitteefolder']);
+            Route::post('folders/committee/file/create/{committee}', [FolderController::class, 'createcommitteefilefolder']);
+            Route::post('folders/committee/file/update/{committee}/{file}', [FolderController::class, 'updatecommitteefilefolder']);
+
+
+
 
             //////////////////////////// folders/////////////////
             Route::get('folders/meeting/{meeting}', [FolderController::class, 'getmeetingfolders']);
-            Route::post('folders/meeting/create/{meeting}/board/{board}', [FolderController::class, 'createmeetingfolder']);
-            Route::patch('folders/meeting/update/{meeting}/board/{board}', [FolderController::class, 'updatemeetingfolder']);
-            Route::post('folders/meeting/file/create/{meeting}/board/{board}', [FolderController::class, 'createmeetingfilefolder']);
-            Route::post('folders/meeting/file/update/{meeting}/board/{board}', [FolderController::class, 'updatemeetingfilefolder']);
+            Route::post('folders/meeting/create/{meeting}', [FolderController::class, 'createmeetingfolder']);
+            Route::patch('folders/meeting/update/{meeting}', [FolderController::class, 'updatemeetingfolder']);
+            Route::post('folders/meeting/file/create/{meeting}', [FolderController::class, 'createmeetingfilefolder']);
+            Route::post('folders/meeting/file/update/{meeting}', [FolderController::class, 'updatemeetingfilefolder']);
             Route::patch('folders/meeting/update/{meeting}', [FolderController::class, 'updatefolder']);
 
             /////////////////////////// files/////////////////
@@ -235,14 +284,6 @@ Route::group(['prefix' => 'v1'], function () {
             Route::patch('almanacs/delete/{almanac}', [AlmanacController::class, 'delete']);
 
 
-
-
-            //////////////////////////// polls/////////////////
-            Route::apiResource('polls', PollController::class);
-            Route::get('polls/meeting/{meeting}', [PollController::class, 'getmeetingpolls']);
-            Route::post('polls/meeting/create/{meeting}/board/{board}', [PollController::class, 'createmeetingpoll']);
-            Route::patch('polls/meeting/update/{meeting}/board/{board}/{poll}', [PollController::class, 'updatemeetingpoll']);
-            Route::post('polls/meeting/update/{meeting}/board/{board}', [PollController::class, 'updatemeetingpoll']);
 
 
             Route::apiResource('roles', RoleController::class);

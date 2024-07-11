@@ -8,12 +8,13 @@ use App\Models\User;
 use App\Http\Resources\DiscussionResource;
 use App\Models\Module\Discussion\Discussion;
 use App\Repository\Contracts\DiscussionInterface;
+use App\Repository\Contracts\DiscussionAssigneeInterface;
 
 class DiscussionRepository extends BaseRepository implements DiscussionInterface
 {
     // Implement the methods
     public function __construct(
-        private readonly AttendanceInterface $attendanceRepository,
+        private readonly DiscussionAssigneeInterface $discussionassigneeRepository,
     ) {
     }
 
@@ -49,5 +50,30 @@ class DiscussionRepository extends BaseRepository implements DiscussionInterface
             'orderBy' => ['field' => 'created_at', 'direction' => 'asc']
         ];
         return $this->indexResource(Discussion::class, DiscussionResource::class, $filters);
+    }
+    public function createDiscussion(User $user, array $payload)
+    {
+        if (!($user instanceof User)) {
+            $user = User::findOrFail($user);
+        }
+        $discussion = new Discussion();
+        $discussion->topic = $payload['topic'];
+        $discussion->description = $payload['description'];
+        $discussion->closestatus = $payload['closestatus'];
+        $discussion->archivestatus = $payload['archivestatus'];
+        $discussion->user_id = $user->id;
+        $discussion->save();
+        if ($discussion->save()) {
+            $this->discussionassigneeRepository->create($user, $discussion, $payload);
+        }
+    }
+    public function updateDiscussion(User $user, Discussion $discussion, array $payload)
+    {
+        if (!($user instanceof User)) {
+            $user = User::findOrFail($user);
+        }
+        if (!($discussion instanceof Discussion)) {
+            $discussion = User::findOrFail($discussion);
+        }
     }
 }

@@ -12,9 +12,13 @@ import {useRoute} from 'vue-router';
 import * as yup from 'yup';
 import {
     useCreateBoardMeetingRequest,
+    useCreateMeetingRequest,
     useDeleteMeetingRequest,
     useGetBoardMeetingsRequest,
-    usePublishMeetingRequest,    useUpdateBoardMeetingRequest} from '@/common/api/requests/modules/meeting/useMeetingRequest';
+    usePublishMeetingRequest,    
+    useUpdateBoardMeetingRequest,
+    useUpdateMeetingRequest,
+} from '@/common/api/requests/modules/meeting/useMeetingRequest';
 import{useGetStaffsRequest}from '@/common/api/requests/staff/useStaffRequest';
 import FormDateInput from '@/common/components/FormDateInput.vue';
 import FormDateTimeInput from '@/common/components/FormDateTimeInput.vue';
@@ -183,10 +187,7 @@ const openEditScheduleMeetingModal = (e: Meeting, schedule:Schedule) => {
     setFieldValue('description', e.description);
     setFieldValue('type', e.type);
     setFieldValue('status', e.status);       
-    if (e.conference === 'Custom 3rd party Links') {
-        handleConferenceTypeChange(e.conference);
-        setFieldValue('link', e.link);
-    }  
+   
     const sched = {
         id:schedule.id,
         date:schedule.date,
@@ -197,6 +198,10 @@ const openEditScheduleMeetingModal = (e: Meeting, schedule:Schedule) => {
         meeting_id:schedule.meeting_id,
     };  
     setFieldValue('schedules', [sched]);
+    if (e.conference === 'Custom 3rd party Links') {
+        handleConferenceTypeChange(e.conference);
+        setFieldValue('link', e.link);
+    }  
     console.log('values', values);
     action.value = 'schedule';
     showCreate.value = true;
@@ -236,20 +241,10 @@ const Meetingschedules = computed(() => {
 // methods/functions
 const getMeetings = (boardId: string) => {
     return useQuery({
-        queryKey:
-            ['getBoardMeetingsKey',
-                page.value, perPage.value,
-                boardId,
-            ], // Include boardId in the queryKey
+        queryKey: ['getBoardMeetingsKey'],
         queryFn: async () => {
-            const response = await useGetBoardMeetingsRequest({
-                page: page.value,
-                perPage: perPage.value,
-                Id:boardId, // Pass boardId to useGetMeetingsRequest
-            });
-            // Assuming meta and page are reactive variables
-            meta.value = response.data.meta;
-            return response.data.data;
+            const response = await useGetBoardMeetingsRequest(boardId, {paginate: 'false'});
+            return response.data;
         },
     });
 };
@@ -258,10 +253,10 @@ const onSubmit = handleSubmit(async (values) => {
     console.log('setErrors',setErrors);
     try {
         if (action.value === 'create') {
-            await useCreateBoardMeetingRequest(values);
+            await useCreateMeetingRequest(values);
         } else {
             if (selectedMeeting.value?.id) {
-                await useUpdateBoardMeetingRequest(values, selectedMeeting.value?.id);
+                await useUpdateMeetingRequest(values, selectedMeeting.value?.id);
             }
         }
         await fetchMeetings();

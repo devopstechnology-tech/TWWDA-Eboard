@@ -18,6 +18,8 @@ use App\Http\Requests\CreateBoardFileFolderRequest;
 use App\Http\Requests\UpdateBoardFileFolderRequest;
 use App\Http\Requests\CreateMeetingFileFolderRequest;
 use App\Http\Requests\UpdateMeetingFileFolderRequest;
+use App\Http\Requests\CreateCommitteeFileFolderRequest;
+use App\Http\Requests\UpdateCommitteeFileFolderRequest;
 
 class FolderController extends Controller
 {
@@ -81,6 +83,39 @@ class FolderController extends Controller
         return $this->response(Response::HTTP_OK, __('messages.records-fetched'), $folder, Folder::class);
     }
 
+    //committee
+    public function getcommitteefolders($committee): JsonResponse
+    {
+        $folders = $this->folderRepository->getCommitteeFolders($committee);
+
+        return $this->response(Response::HTTP_OK, __('messages.records-fetched'), $folders, Folder::class);
+    }
+    public function createcommitteefolder(CreateFolderRequest $request, $committee): JsonResponse
+    {
+        $folder = $this->folderRepository->createCommitteeFolder($committee, $request->validated());
+
+        return $this->response(Response::HTTP_OK, __('messages.records-fetched'), $folder, Folder::class);
+    }
+    public function updatecommitteefolder(UpdateFolderRequest $request, $committee, $folder): JsonResponse
+    {
+        $folder = $this->folderRepository->updateCommitteeFolder($committee, $folder, $request->validated());
+
+        return $this->response(Response::HTTP_OK, __('messages.records-fetched'), $folder, Folder::class);
+    }
+    public function createcommitteefilefolder(CreateCommitteeFileFolderRequest $request, $committee): JsonResponse
+    {
+        $folder = $this->folderRepository->createCommitteeFileFolder($committee, $request->validated());
+
+        return $this->response(Response::HTTP_OK, __('messages.records-fetched'), $folder, Folder::class);
+    }
+    public function updatecommitteefilefolder(UpdateCommitteeFileFolderRequest $request, $committee, $folder): JsonResponse
+    {
+        $folder = $this->folderRepository->updateCommitteeFileFolder($committee, $folder, $request->validated());
+
+        return $this->response(Response::HTTP_OK, __('messages.records-fetched'), $folder, Folder::class);
+    }
+
+
 
 
     //meeting
@@ -93,27 +128,27 @@ class FolderController extends Controller
     }
 
 
-    public function createmeetingfolder(CreateFolderRequest $request, Meeting $meeting, Board $board): JsonResponse
+    public function createmeetingfolder(CreateFolderRequest $request, Meeting $meeting): JsonResponse
     {
-        $folder = $this->folderRepository->createMeetingFolder($meeting, $board, $request->validated());
+        $folder = $this->folderRepository->createMeetingFolder($meeting, $request->validated());
 
         return $this->response(Response::HTTP_OK, __('messages.records-fetched'), $folder, Folder::class);
     }
-    public function updatemeetingfolder(UpdateFolderRequest $request, Meeting $meeting, Board $board): JsonResponse
+    public function updatemeetingfolder(UpdateFolderRequest $request, Meeting $meeting): JsonResponse
     {
-        $folder = $this->folderRepository->updateMeetingFolder($meeting, $board, $request->validated());
+        $folder = $this->folderRepository->updateMeetingFolder($meeting, $request->validated());
 
         return $this->response(Response::HTTP_OK, __('messages.records-fetched'), $folder, Folder::class);
     }
-    public function createmeetingfilefolder(CreateMeetingFileFolderRequest $request, Meeting $meeting, Board $board): JsonResponse
+    public function createmeetingfilefolder(CreateMeetingFileFolderRequest $request, Meeting $meeting): JsonResponse
     {
-        $folder = $this->folderRepository->createMeetingFileFolder($meeting, $board, $request->validated());
+        $folder = $this->folderRepository->createMeetingFileFolder($meeting, $request->validated());
 
         return $this->response(Response::HTTP_OK, __('messages.records-fetched'), $folder, Folder::class);
     }
-    public function updatemeetingfilefolder(UpdateMeetingFileFolderRequest $request, Meeting $meeting, Board $board): JsonResponse
+    public function updatemeetingfilefolder(UpdateMeetingFileFolderRequest $request, Meeting $meeting): JsonResponse
     {
-        $folder = $this->folderRepository->updateMeetingFileFolder($meeting, $board, $request->validated());
+        $folder = $this->folderRepository->updateMeetingFileFolder($meeting, $request->validated());
 
         return $this->response(Response::HTTP_OK, __('messages.records-fetched'), $folder, Folder::class);
     }

@@ -30,16 +30,19 @@ class PollResource extends BaseResource
             'status' => $this->resource->status,
             'options' => $this->resource->options,
             'votes' => $this->resource->votes,
-            'memberships' => $this->resource->memberships,
+            // 'memberships' => $this->resource->memberships,
             'pollassignees' => $this->resource->pollassignees->map(function ($pollassignee) {
                 // dd($pollassignee);
                 return [
-                    'id' => $pollassignee->pivot->id, // Accessing pivot data
-                    'membership_id' => $pollassignee->pivot->membership_id ?? null, // Accessing pivot data
-                    'poll_id' => $pollassignee->pivot->poll_id ?? null,
+                    'id' => $pollassignee->id, // Accessing pivot data
+                    'assignable' => [
+                        'type' => class_basename($pollassignee->assignable_type),  // Extracts simple class name
+                        'details' => $pollassignee->assignable,
+                    ], // Accessing pivot data
+                    'poll_id' => $pollassignee->poll_id,
                     'user' => [
-                        'id' => $pollassignee->user->id ?? null,  // Ensure user is loaded
-                        'full_name' => $pollassignee->user->full_name ?? 'N/A',  // Check if user is loaded and full_name is available
+                        'id' =>  $pollassignee->assignable->user->id,
+                        'full_name' =>  $pollassignee->assignable->user->full_name,
                     ],
                 ];
             }),

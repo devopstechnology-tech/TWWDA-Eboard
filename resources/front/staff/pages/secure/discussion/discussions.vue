@@ -146,12 +146,212 @@
 </template>
   
 <script setup lang="ts">
-import {computed, onMounted, ref} from 'vue';
+import {useQuery} from '@tanstack/vue-query';
+import {useField, useForm} from 'vee-validate';
+import {computed, onMounted,ref, watch} from 'vue';
+import {ValidationError} from 'yup';
+import * as yup from 'yup';
+import {useCreateDiscussionRequest, useGetUserDiscussionsRequest,useUpdateDiscussionRequest} from '@/common/api/requests/modules/discussion/useDiscussionRequest';
+import useUnexpectedErrorHandler from '@/common/composables/useUnexpectedErrorHandler';
+import {DiscussionAssignee} from '@/common/parsers/DiscussionAssigneeParser';
+import {Discussion, DiscussionRequestPayload} from '@/common/parsers/discussionParser';
+import useAuthStore from '@/common/stores/auth.store';
+import { useGetBoardsRequest } from '@/common/api/requests/modules/board/useBoardRequest';
+import { Board } from '@/common/parsers/boardParser';
+import { User } from '@/common/parsers/userParser';
+import { useGetCommitteesRequest } from '@/common/api/requests/modules/committee/useCommitteeRequest';
+import { useGetUsersRequest } from '@/common/api/requests/modules/user/useUserRequest';
+import { Committee } from '@/common/parsers/committeeParser';
 
 
+const authStore = useAuthStore();
+authStore.initialize(); 
 const currentSort = ref('latest');
 const currentGroupName = ref('board');
 
+const showCreate = ref(false);
+const action = ref('create');
+const userId = authStore.user?.id as string;
+const discussionId = ref<string | null>(null);
+const selectedUserAssigneeIds = ref<DiscussionAssignee[]>([]);
+const selectedBoardAssigneeIds = ref<DiscussionAssignee[]>([]);
+const selectedCommitteeAssigneeIds = ref<DiscussionAssignee[]>([]);
+const selectedDiscussion = ref<Discussion | null>(null);
+const DiscussionModal = ref<HTMLDialogElement | null>(null);
+const assigneestatus = ref('individuals');
+const selectedAssigneeType = ref('');
+// Reactive properties to store fetched data
+const allBoards = ref<Board[]>([]);
+const allCommittees = ref<Committee[]>([]);
+const allUsers = ref<User[]>([]);
+
+const handleUnexpectedError = useUnexpectedErrorHandler();
+
+const {errorMessage: duedateerrorMessage} = useField('duedate');
+const {errorMessage: discussionassigneeserrorMessage} = useField('discussionassignees');
+
+const hasDueDatePassed = (duedate: string): boolean => {
+    const now = new Date();
+    const dueDate = new Date(duedate);
+    return now > dueDate;
+};
+
+
+const userSchema = yup.object({
+    id: yup.string().required(),
+    full_name: yup.string().required(),
+});
+
+const discussionassigneeSchema = yup.object({
+    id: yup.string().required(),
+    discussion_id: yup.string().nullable(),
+    assignee_id: yup.string().required(),
+    user: userSchema,
+});
+const discussionschema = yup.object({
+    id: yup.string().nullable(),
+    topic: yup.string().required(),
+    description: yup.string().required(),
+    closestatus: yup.string().required(),
+    archivestatus: yup.string().required(),
+    assigneetype: yup.string().required(),
+    assigneestatus: yup.string().required(),
+    discussionassignees: yup.array().of(discussionassigneeSchema).nullable(),
+});
+
+const {
+    handleSubmit,
+    setErrors,
+    setFieldValue,
+    values,
+} = useForm<{
+    id: string;
+    topic: string;
+    description: string;
+    closestatus: string;
+    archivestatus: string;
+    assigneetype: string;
+    assigneestatus: string;
+    discussionassignees: {
+        id: string;
+        discussion_id: string | null;
+        assignee_id: string;
+        user: {
+            id: string;
+            full_name: string;
+        };
+    }[] | [];
+}>({
+    validationSchema: discussionschema,
+    initialValues: {
+        id: '',
+        topic: '',
+        description: '',
+        closestatus: 'opened',
+        archivestatus: 'none',
+        assigneetype: '',
+        assigneestatus: '',
+        discussionassignees: [],        
+    },
+});
+
+const openCreateDiscussionModal = () => {
+    reset();
+    action.value = 'create';
+    showCreate.value = true;
+    DiscussionModal.value?.showModal();
+};
+
+const openEditDiscussionModal = (discussion: Discussion) => {
+    reset();
+    selectedDiscussion.value = discussion;
+    discussionId.value = discussion.id;
+    setFieldValue('topic', discussion.topic);
+    setFieldValue('description', discussion.description);
+    setFieldValue('closestatus', discussion.closestatus);
+    setFieldValue('archivestatus', discussion.archivestatus);
+    setFieldValue('assigneetype', discussion.assigneetype);
+    setFieldValue('assigneestatus', discussion.assigneestatus);
+    assigneestatus.value = discussion.assigneestatus;
+    mapdiscussionassigneesToReactiveRef(discussion.discussionassignees);
+    action.value = 'edit';
+    showCreate.value = true;
+    DiscussionModal.value?.showModal();
+};
+
+function mapdiscussionassigneesToReactiveRef(discussionassignees: DiscussionAssignee[]) {
+    selectedAssigneeIds.value = discussionassignees.map(discussionassignee => ({
+        id: discussionassignee.id,
+        full_name: discussionassignee.user.full_name,
+        discussion_id: discussionassignee.discussion_id,
+        assignee_id: discussionassignee.assignee_id,
+        user: discussionassignee.user,
+    }));
+    setFieldValue('discussionassignees', selectedAssigneeIds.value);
+}
+
+const selectedAssignees = () => {
+    setFieldValue('discussionassignees', selectedAssigneeIds.value);
+};
+
+const removeselectedUsers = () => {
+    setFieldValue('discussionassignees', selectedAssigneeIds.value);
+};
+
+const onSubmit = handleSubmit(async (values) => {
+    try {
+        const payload: DiscussionRequestPayload = {
+            id: values.id,
+            topic: values.topic,
+            description: values.description,
+            closestatus: values.closestatus,
+            archivestatus: values.archivestatus,
+            assigneetype: values.assigneetype,
+            assigneestatus: values.assigneestatus,
+            discussionassignees: values.discussionassignees,
+        };
+        if (action.value === 'create') {
+            await useCreateDiscussionRequest(payload, userId);
+        } else {
+            await useUpdateDiscussionRequest(payload, userId, payload.id);
+        }
+        DiscussionModal.value?.close();
+        await fetchDiscussions();
+        reset();
+    } catch (err) {
+        if (err instanceof ValidationError) {
+            setErrors(err.messages);
+        } else {
+            handleUnexpectedError(err);
+        }
+    }
+});
+
+const reset = () => {
+    action.value = 'create';
+    showCreate.value = false;
+    discussionId.value = null;
+    assigneestatus.value = 'all_members';
+    selectedAssigneeIds.value = [];
+    setFieldValue('id', '');
+    setFieldValue('topic', '');
+    setFieldValue('description', 'description ................');
+    setFieldValue('closestatus', 'opened');
+    setFieldValue('archivestatus', 'none');
+    setFieldValue('assigneetype', 'all_members');
+    setFieldValue('assigneestatus', 'all_members');
+    setFieldValue('discussionassignees', []);
+};
+
+const handleAssigneeTypeChange = (selectedAssignee: string) => {
+    selectedAssigneeIds.value = [];
+    selectedAssigneeType.value = selectedAssignee;
+    assigneestatus.value = selectedAssignee;
+    setFieldValue('assigneetype', selectedAssignee);
+    setFieldValue('assigneestatus', selectedAssignee);
+};
+
+//data
 
 // Sort options
 const sortGroupOptions = [
@@ -187,6 +387,10 @@ const discussions = ref([
     {id: 2, topic: 'TypeScript in Vue', content: 'testing testing testing', lastPost: '7:57am'},
     {id: 2, topic: 'TypeScript in Vue', content: 'testing testing testing', lastPost: '7:57am'},
 ]);
+const assigneeTypes = [
+    {name: 'Individuals', value: 'individuals'},
+    {name: 'Assign All Meeting Members', value: 'all_members'},
+];
 // filtering sort
 function applySort(option: string) {
     currentSort.value = option;
@@ -220,6 +424,62 @@ function handleDiscussionOption(optionId: string) {
 onMounted(() => {
     window.dispatchEvent(new CustomEvent('updateTitle', {detail: 'Discussions'}));
 });
+
+
+const AssigneeTypes = computed(() => assigneeTypes);
+
+const getDiscussions = () => {
+    return useQuery({
+        queryKey: ['getDiscussionsKey', userId],
+        queryFn: async () => {
+            const response = await useGetUserDiscussionsRequest(userId, {paginate: 'false'});
+            return response.data;
+        },
+    });
+};
+
+const {isLoading: isLoadingDiscussions, data: Discussions, refetch: fetchDiscussions} = getDiscussions();
+
+// Fetch functions
+const getBoards = async () => {
+    const response = await useGetBoardsRequest({paginate: 'false'});
+    allBoards.value = response.data.map(board => ({
+        id: board.id,
+        name: board.name,
+        class: 'board',
+    }));
+};
+const getCommittees = async () => {
+    const response = await useGetCommitteesRequest({paginate: 'false'});
+    allCommittees.value = response.data.map(committee => ({
+        id: committee.id,
+        name: committee.name,
+        class: 'committee',
+    }));
+};
+
+const fetchUsers = async () => {
+    const data = await useGetUsersRequest({paginate: 'false'});
+    allUsers.value = data.data.map(user => ({
+        id: user.id,
+        name: user.full_name,
+        class: 'user',
+    }));
+};
+
+// Fetch all member types on component mount or when dependencies change
+const getAllMembers = async () => {
+    await fetchUsers();
+    await getBoards();
+    await getCommittees();
+};
+
+onMounted(async() => {
+    getAllMembers();
+    authStore.initialize();
+    fetchDiscussions();
+});
+
 </script>
   
   <style scoped>

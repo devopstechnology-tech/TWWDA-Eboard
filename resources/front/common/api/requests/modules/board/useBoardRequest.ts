@@ -7,7 +7,7 @@ import {
     BoardRequestPayload, 
     nonPaginateResponse, 
     singleBoardResponse,
-} from '@/common/parsers/boadParser';
+} from '@/common/parsers/boardParser';
 
 export async function useGetBoardsRequest(options?: object): Promise<nonPaginateResponse> {
     const client = useClient();

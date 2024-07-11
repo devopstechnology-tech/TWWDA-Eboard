@@ -7,6 +7,7 @@ import {useField, useForm} from 'vee-validate';
 import {computed,onMounted,ref} from 'vue';
 import {useRoute} from 'vue-router';
 import * as yup from 'yup';
+import {nullable} from 'zod';
 import {
     useCreateBoardRequest, 
     useDeleteBoardRequest, 
@@ -14,6 +15,12 @@ import {
     useUpdateBoardMembersRequest, 
     useUpdateBoardRequest,
 } from '@/common/api/requests/modules/board/useBoardRequest';
+import {
+    useCreateCommitteeRequest, 
+    useGetCommitteesRequest, 
+    useUpdateCommitteeMembersRequest, 
+    useUpdateCommitteeRequest,
+} from '@/common/api/requests/modules/committee/useCommitteeRequest';
 import {useGetStaffsRequest} from '@/common/api/requests/staff/useStaffRequest';
 import FormDateTimeInput from '@/common/components/FormDateTimeInput.vue';
 import FormInput from '@/common/components/FormInput.vue';
@@ -24,6 +31,7 @@ import useUnexpectedErrorHandler from '@/common/composables/useUnexpectedErrorHa
 import {
     coverChangeImage,
     iconChangeImage,
+    loadIcon,
     resetCoverImage,
     resetIconImage,
     supportedImageTypes,
@@ -31,7 +39,8 @@ import {
     updateIconImage,
 } from '@/common/customisation/Breadcrumb';
 import ValidationError from '@/common/errors/ValidationError';
-import {Board, BoardMemberEditParams,BoardRequestPayload} from '@/common/parsers/boadParser';
+import {Board, BoardMemberEditParams,BoardMembersRequestPayload,BoardRequestPayload} from '@/common/parsers/boardParser';
+import {Committee, CommitteeMembersRequestPayload} from '@/common/parsers/committeeParser';
 import {SelectedResult} from '@/common/parsers/membershipParser';
 import {User} from '@/common/parsers/userParser';
 import useAuthStore from '@/common/stores/auth.store';
@@ -41,12 +50,15 @@ const authStore = useAuthStore();
 // Constants
 const showCreate = ref(false);
 const action = ref('create');
+const vaction = ref('board');
 const selectedBoard = ref<Board | null>(null);
 const selectedBoardId = ref(''); // for use when adding members
+const selectedCommitteeId = ref(''); // for use when adding members
 const selectedMemberIds = ref<string[]>([]);
 const BoardModal = ref<HTMLDialogElement | null>(null);
 const membersmodal = ref<HTMLDialogElement | null>(null);
 const allUsers = ref<User[]>([]);
+const allCommittees = ref<Committee[]>([]);
 const handleUnexpectedError = useUnexpectedErrorHandler();
 
 // Inputs forms handling
@@ -84,13 +96,13 @@ const {
 
 const onSubmit = handleSubmit(async (values) => {
     try { 
-        if(action.value === 'create'|| action.value === 'edit'){
-            const payload: BoardRequestPayload = {
-                name: values.name,
-                description: values.description,
-                icon: values.icon,
-                cover: values.cover,
-            };
+        const payload: BoardRequestPayload = {
+            name: values.name,
+            description: values.description,
+            icon: values.icon,
+            cover: values.cover,
+        };
+        if(vaction.value === 'board'){            
             if(action.value === 'create'){
                 await useCreateBoardRequest(payload);
             }else if(action.value === 'edit'){
@@ -99,10 +111,22 @@ const onSubmit = handleSubmit(async (values) => {
                     await useUpdateBoardRequest(payload, selectedBoard.value.id);
                 }
             }
+        }else if(vaction.value === 'committee'){
+            if(action.value === 'create'){
+                
+                await useCreateCommitteeRequest(payload, selectedBoardId.value);
+            }else if(action.value === 'edit'){      
+                await useUpdateCommitteeRequest(payload, selectedCommitteeId.value);
+            }
         }
         BoardModal.value?.close(); 
-        membersmodal.value?.close();  
-        await fetchBoards();
+        membersmodal.value?.close();
+        if(vaction.value === 'board'){        
+            await fetchBoards();
+        }
+        if(vaction.value === 'committee'){
+            await fetchCommittees();
+        }
         resetIconImage();
         resetCoverImage();
         resetBoardForm();
@@ -119,13 +143,29 @@ const onSubmit = handleSubmit(async (values) => {
 const onSubmitMembers = (async () => {
     try {
         if (selectedBoardId.value) {
-            const payload: BoardRequestPayload = {
+            const payload: BoardMembersRequestPayload = {
                 members: selectedMemberIds.value,
             };
             await useUpdateBoardMembersRequest(payload, selectedBoardId.value);                
         }
-        membersmodal.value?.close();  
-        await fetchBoards();
+        if(vaction.value === 'board'){            
+            const payload: BoardMembersRequestPayload = {
+                members: selectedMemberIds.value,
+            };
+            await useUpdateBoardMembersRequest(payload, selectedBoardId.value); 
+        }else if(vaction.value === 'committee'){
+            const payload: CommitteeMembersRequestPayload = {
+                members: selectedMemberIds.value,
+            };
+            await useUpdateCommitteeMembersRequest(payload, selectedBoardId.value, selectedCommitteeId.value); 
+        }
+        membersmodal.value?.close();        
+        if(vaction.value === 'board'){        
+            await fetchBoards();
+        }
+        if(vaction.value === 'committee'){
+            await fetchCommittees();
+        }
         resetBoardForm();
         selectedMemberIds.value = [];
         showCreate.value = false;  
@@ -139,12 +179,19 @@ const onSubmitMembers = (async () => {
 });
 const {errorMessage} = useField('members');
 
-const openCreateModal = () => {
-    action.value = 'create';
+const openCreateModal = (boardid:string, value:string) => {
+    if(value === 'board'){
+        vaction.value = 'board';
+       
+    }else if(value === 'committee'){
+        selectedBoardId.value = boardid as string;
+        vaction.value = 'committee';
+    } 
+    action.value = 'create';       
     showCreate.value = true;
     BoardModal.value?.showModal();
 };
-const openEditModal = (e: Board) => {
+const openEditModal = (e: Board, value:string) => {    
     selectedBoard.value = e;
     // Set field values here
     setFieldValue('name', e.name);
@@ -153,6 +200,13 @@ const openEditModal = (e: Board) => {
     setFieldValue('cover', e.cover);
     updateCoverImage(e.cover);
     updateIconImage(e.icon);
+    if(value === 'board'){
+        vaction.value = 'board';
+       
+    }else if(value === 'committee'){
+        selectedCommitteeId.value = e.id as string;
+        vaction.value = 'committee';
+    } 
     action.value = 'edit';
     showCreate.value = true;
     BoardModal.value?.showModal();
@@ -164,33 +218,27 @@ const resetBoardForm = () => {
     setFieldValue('icon', '');
     setFieldValue('cover', '');
     action.value = 'create';
+    vaction.value = 'board';
     showCreate.value = true;
+    selectedBoardId.value ='';
+    selectedCommitteeId.value ='';
 };
 
-// const onSubmitMembers = handleSubmitMembers(async (values) => {
-//     try {
-//         if (selectedBoardId.value) {
-//             setFieldValueMembers('members', selectedMemberIds.value);
-//             await useUpdateBoardMembersRequest(values, selectedBoardId.value);
-//         }
-//         selectedMemberIds.value = [];
-//         await fetchBoards();
-//         showCreate.value = false;
-//         membersmodal.value?.close();
-//     } catch (err) {
-//         if (err instanceof ValidationError) {
-//             setErrorsMembers(err.messages);
-//         } else {
-//             handleUnexpectedError(err);
-//         }
-//     }
-// });
-
-const openEditMembersModal = (params: BoardMemberEditParams) => {
-    selectedBoardId.value = params.id; // Store the board ID
+const openEditMembersModal = (params: BoardMemberEditParams, value:string) => { 
+    console.log('ff', params);  
     const memberIds = params.members.map(member => member.user.id.toString());
     selectedMemberIds.value = memberIds; 
     action.value = 'members';
+    if(value === 'board'){
+        vaction.value = 'board';
+        selectedBoardId.value = params.id as string;
+       
+    }else if(value === 'committee'){
+        selectedCommitteeId.value = params.id as string;
+        selectedBoardId.value = params.committeeable.details.id as string;
+        vaction.value = 'committee';
+    } 
+    // console.log('mm', selectedCommitteeId.value, selectedBoardId.value);
     showCreate.value = true;
     membersmodal.value?.showModal();
 };
@@ -205,6 +253,7 @@ const removeSelectedUsers = () => {
 const deleteBoard = async (board: Board) => {
     await useDeleteBoardRequest(board.id);
     await fetchBoards();
+    await fetchCommittees();
 };
 
 const Users = computed(() => {
@@ -225,7 +274,7 @@ const getUsers = async () => {
     allUsers.value = data.data;
 };
 onMounted(async () => {
-    window.dispatchEvent(new CustomEvent('updateTitle', {detail: 'Boards & Boards'}));
+    window.dispatchEvent(new CustomEvent('updateTitle', {detail: 'Boards & Committees'}));
     getUsers();
 });
 const getBoards = () => {
@@ -238,117 +287,202 @@ const getBoards = () => {
     });
 };
 const {isLoading, data: Boards, refetch: fetchBoards} = getBoards();
+
+const getCommittees = () => {
+    return useQuery({
+        queryKey: ['getCommitteesKey'],
+        queryFn: async () => {
+            const response = await useGetCommitteesRequest({paginate: 'false'});
+            return response.data;
+        },
+    });
+};
+const {isLoading:committeeloading, data: Committees, refetch: fetchCommittees} = getCommittees();
+const actionLabel = computed(() => {
+    if (action.value === 'create' && vaction.value === 'board') return 'Create Board';
+    if (action.value === 'edit' && vaction.value === 'board') return 'Edit Board';
+    if (action.value === 'create' && vaction.value === 'committee') return 'Create Committee';
+    if (action.value === 'edit' && vaction.value === 'committee') return 'Edit Committee';
+    return '';
+});
+
+
 </script>
 
 <template>
     <div class="container-fluid" v-if="authStore.hasPermission(['view board'])">
         <div class="row">
             <div class="col-12">
-                <!-- Custom Tabs -->
-                <div class="">
-                    <div class="card-header">
-                        <div class="float-left">
-                            <h1 class="h2 mb-2 lg:mb-0">Boards & Boards</h1>
-                        </div>
-                        <div class="float-right" >
-                            <button @click.prevent="openCreateModal" type="submit" class="btn btn-secondary bg-primary">
-                                <i class="far fa fa-plus mr-2 "></i>New Board
-                            </button>
-                        </div>
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between">
+                        <h1 class="h2 mb-2">Boards & Committees</h1>
+                        <button @click.prevent="openCreateModal('', 'board')" 
+                                class=" float-right btn btn-secondary bg-primary">
+                            <i class="fa fa-plus mr-2"></i>New Board
+                        </button>
                     </div><!-- /.card-header -->
+
                     <div class="card-body">
                         <div class="row">
-                            <div class="col-md-12 col-12" v-if="Boards">
-                                <div class="info-box shadow-lg p-6" v-for="board in Boards" :key="board.id">
-                                    <span class="info-box-icon bg-danger"><i :class="board.icon"></i></span>
+                            <!-- Boards Column -->
+                            <div class="col-md-6 col-12">
+                                <div class="info-box shadow-lg p-4 mb-4" 
+                                     v-for="board in Boards" :key="board.id">
+                                    <img class="img-circle elevation-2" 
+                                         :src="loadIcon(board.icon)" 
+                                         alt="User Avatar" 
+                                         style="width:128px; height: 128px">
                                     <div class="ml-3 flex-1">
-                                        <h3 class="h2 mb-2 lg:mb-0">
-                                            <router-link :to="{ name: 'BoardDetails', params: { boardId: board.id } }">
+                                        <h3 class="h2 mb-2" v-if="authStore.hasPermission(['view board'])">
+                                            <router-link 
+                                                :to="{ 
+                                                    name: 'BoardDetails', 
+                                                    params: { 
+                                                        boardId: board.id 
+                                                    } 
+                                                }" class="badge badge-soft bg-primary">
                                                 {{ board.name }}
                                             </router-link>
                                         </h3>
-                                        <div class="grid grid-cols-1 lg:grid-cols-12 gap-0 lg:gap-2">
-                                            <p class="text-gray-900 m-0 col-span-1 lg:col-span-2">
-                                                Owner: {{board.owner}}
-                                            </p>
-                                            <p class="text-gray-900 m-0 col-span-1 lg:col-span-1" v-if="board.members">
-                                                <span v-if="board.members?.length > 1">
-                                                    {{ board.members?.length }} Members
-                                                </span>
-                                                <span v-else-if="board.members?.length === 1">
-                                                    {{ board.members?.length }} Member
-                                                </span>
-                                                <span v-else>No Members, Add</span>
-                                                <br>
-                                                <a v-if="authStore.hasPermission([
-                                                       'add member to board',
-                                                       'edit board member',
-                                                       'remove board member',
-                                                   ])" 
-                                                   href=""
-                                                   @click.prevent="openEditMembersModal(
-                                                       { id: board.id,
-                                                         members: board.members?board.members:[]
-                                                       })"
-                                                   class="text-blue-500 hover:text-blue-700
-                                                transition duration-150 ease-in-out">
-                                                    <i class="far fa fa-plus mr-2 "></i> Members
-                                                </a>
-                                            </p>
-                                            <div class="text-muted m-0 col-span-1 lg:col-span-7 truncate"
-                                                 v-html="board.description"></div>
-                                            <div class="flex justify-end space-x-2 col-span-1 lg:col-span-2">
-                                                <!-- Edit Button/Link -->
-                                                <a v-if="authStore.hasPermission(['edit board'])" 
-                                                   href="" @click.prevent="openEditModal(board)"
-                                                   class="text-blue-500 hover:text-blue-700
-                                                transition duration-150 ease-in-out">
-                                                    <i class="far fa-edit"></i>
-                                                </a>
-                                                <a v-if="authStore.hasPermission(['delete board'])"
-                                                   href="" @click.prevent="deleteBoard(board)"
-                                                   class="text-blue-500 hover:text-blue-700
-                                                transition duration-150 ease-in-out">
-                                                    <i class="fas fa-trash-alt"></i>
-                                                </a>
-                                                <!-- View Button/Link -->
-                                                <router-link v-if="authStore.hasPermission(['view board'])" 
-                                                             :to="{ name: 'BoardDetails', params: { boardId: board.id } }"
-                                                             class="text-green-500
-                                                hover:text-green-700 transition duration-150 ease-in-out">
-                                                    <i class="far fa-eye"></i>
-                                                </router-link>
-                                            </div>
-                                        </div>
-                                    </div>
-                                <!-- /.info-box-content -->
-                                </div>
-                            </div>
-                            <div class="col-md-12 col-12" v-else>
-                                <div class="info-box shadow-lg p-6" >
-                                    <span class="info-box-icon bg-danger"><i class="far fa-star"></i></span>
-                                    <div class="ml-3 flex-1">
-                                        <h3 class="h2 mb-2 lg:mb-0">
-                                            <a href="">
-                                                create Board
+                                        <p class="text-gray-900 m-0">
+                                            Owner: {{ board.owner }}
+                                        </p>
+                                        <div v-if="board.members">
+                                            <span>
+                                                {{ board.members.length }} 
+                                                {{ board.members.length === 1 ? 'Member' : 'Members' }}
+                                            </span>
+                                            <br>
+                                            <a v-if="authStore.hasPermission(['add member to board'])"
+                                               href=""
+                                               @click.prevent="openEditMembersModal(board, 'board')"
+                                               class="text-blue-500 hover:text-blue-700 
+                                               transition duration-150 ease-in-out">
+                                                <i class="fa fa-plus mr-2"></i> Members
                                             </a>
-                                        </h3>
-                                    </div>
-                                <!-- /.info-box-content -->
+                                        </div>
+                                        <p class="text-muted m-0 truncate" v-html="board.description"></p>
+                                        <div class="d-flex justify-content-end mt-2">
+                                            <a v-if="authStore.hasPermission(['edit board'])"
+                                               href=""
+                                               @click.prevent="openEditModal(board, 'board')"
+                                               class="text-blue-500 hover:text-blue-700
+                                                transition duration-150 ease-in-out mr-2">
+                                                <i class="fa fa-edit"></i>
+                                            </a>
+                                            <a v-if="authStore.hasPermission(['delete board'])"
+                                               href=""
+                                               @click.prevent="deleteBoard(board)"
+                                               class="text-blue-500 hover:text-blue-700 
+                                               transition duration-150 ease-in-out mr-2">
+                                                <i class="fa fa-trash-alt"></i>
+                                            </a>
+                                            <router-link v-if="authStore.hasPermission(['view board'])"
+                                                         :to="{ name: 'BoardDetails', params: { boardId: board.id } }"
+                                                         class="text-green-500 hover:text-green-700 
+                                                         transition duration-150 ease-in-out">
+                                                <i class="fa fa-eye"></i>
+                                            </router-link>
+                                            <!-- Button to create new committee -->
+                                            <button @click.prevent="openCreateModal(board.id, 'committee')"
+                                                    class="btn btn-sm btn-primary ml-2">
+                                                <i class="fa fa-plus mr-1"></i> Committee
+                                            </button>
+                                        </div>
+                                    </div><!-- /.info-box-content -->
                                 </div>
-                            </div>
-                        </div>
-                        <!-- /.tab-content -->
+                            </div><!-- /.col-md-6 -->
+
+                            <!-- Committees Column -->
+                            <div class="col-md-6 col-12">
+                                <div class="info-box shadow-lg p-4 mb-4" 
+                                     v-for="committee in Committees" :key="committee.id">
+                                    <img class="img-circle elevation-2" 
+                                         :src="loadIcon(committee.icon)" 
+                                         alt="User Avatar" 
+                                         style="width:128px; height: 128px">
+                                    <div class="ml-3 flex-1">
+                                        <h3 class="h2 mb-2">
+                                           
+                                            <router-link 
+                                                :to="{                                                     
+                                                    name: 'CommitteeDetails', 
+                                                    params: {  
+                                                        committeeId: committee.id 
+                                                    }
+                                                }" class="badge badge-soft bg-primary">
+                                                {{ committee.name }}
+                                            </router-link>
+                                        </h3>
+                                        <h3 class="mb-1">
+                                            Board :<router-link 
+                                                :to="{ 
+                                                    name: 'BoardDetails', 
+                                                    params: { 
+                                                        boardId:committee.committeeable.details.id 
+                                                    }  
+                                                }" class="badge badge-soft">
+                                                {{ committee.committeeable.details.name }}
+                                            </router-link>
+                                        </h3>
+                                        <p class="text-gray-900 m-0">
+                                            Owner: {{ committee.owner }}
+                                        </p>
+                                        <div v-if="committee.members">
+                                            <span>
+                                                {{ committee.members.length }} 
+                                                {{ committee.members.length === 1 ? 'Member' : 'Members' }}
+                                            </span>
+                                            <br>
+                                            <a v-if="authStore.hasPermission(['add member to committee'])"
+                                               href=""
+                                               @click.prevent="openEditMembersModal(committee, 'committee')"
+                                               class="text-blue-500 hover:text-blue-700 
+                                               transition duration-150 ease-in-out">
+                                                <i class="fa fa-plus mr-2"></i> Members
+                                            </a>
+                                        </div>
+                                        <p class="text-muted m-0 truncate" v-html="committee.description"></p>
+                                        <div class="d-flex justify-content-end mt-2">
+                                            <a v-if="authStore.hasPermission(['edit committee'])"
+                                               href=""
+                                               @click.prevent="openEditModal(committee, 'committee')"
+                                               class="text-blue-500 hover:text-blue-700 
+                                               transition duration-150 ease-in-out mr-2">
+                                                <i class="fa fa-edit"></i>
+                                            </a>
+                                            <a v-if="authStore.hasPermission(['delete committee'])"
+                                               href=""
+                                               @click.prevent="deleteCommittee(committee)"
+                                               class="text-blue-500 hover:text-blue-700 
+                                               transition duration-150 ease-in-out mr-2">
+                                                <i class="fa fa-trash-alt"></i>
+                                            </a>
+                                            <router-link v-if="authStore.hasPermission(['view committee'])"
+                                                         :to="{ 
+                                                             name: 'CommitteeDetails', 
+                                                             params: { 
+                                                                 committeeId: committee.id 
+                                                             } 
+                                                         }"
+                                                         class="text-green-500 hover:text-green-700
+                                                          transition duration-150 ease-in-out">
+                                                <i class="fa fa-eye"></i>
+                                            </router-link>
+                                        </div>
+                                    </div><!-- /.info-box-content -->
+                                </div>
+                            </div><!-- /.col-md-6 -->
+                        </div><!-- /.row -->
                     </div><!-- /.card-body -->
-                </div>
-            <!-- ./card -->
-            </div>
-        </div>
+                </div><!-- /.card -->
+            </div><!-- /.col-12 -->
+        </div><!-- /.row -->
         <div class="flex justify-center items-center min-h-screen">
             <dialog id="boardModal" class="modal w-full max-w-4xl mx-auto p-0" ref="BoardModal">
                 <form method="dialog" class="modal-box rounded-xl relative bg-white shadow-xl">
                     <h3 class="font-bold text-lg text-center">
-                        {{ action == 'create' ? 'Create Board' : 'Edit Board' }}
+                        {{ actionLabel  }}
                     </h3>
                     <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
             
@@ -361,20 +495,20 @@ const {isLoading, data: Boards, refetch: fetchBoards} = getBoards();
                                         <div class="w-full md:w-1/3 px-1 md:px-2 mb-4">
                                             <FormInput
                                                 :labeled="true"
-                                                label="Board/Board Name"
+                                                label="Name"
                                                 name="name"
                                                 class="w-full text-sm  text-white tracking-wide"
-                                                placeholder="Enter Board/Board Name"
+                                                placeholder="Enter Name"
                                                 type="text"
                                             />
                                         </div>
                                         <div class="w-full md:w-1/3 px-1 md:px-2 mb-4">
                                             <FormUpload
                                                 :labeled="true"
-                                                label="Upload icon Image for the Board"
+                                                label="Upload icon Image"
                                                 name="icon"
                                                 class="w-full text-sm  text-white tracking-wide"
-                                                placeholder="Enter icon Image of the Board"
+                                                placeholder="Enter icon Image"
                                                 type="file"
                                                 :accept="supportedImageTypes.join(', ')"
                                                 @change="iconChangeImage($event)"
@@ -385,10 +519,10 @@ const {isLoading, data: Boards, refetch: fetchBoards} = getBoards();
                                         <div class="w-full md:w-1/3 px-1 md:px-2 mb-4">
                                             <FormUpload
                                                 :labeled="true"
-                                                label="Upload Cover Image for the Board"
+                                                label="Upload Cover Image"
                                                 name="cover"
                                                 class="w-full text-sm  text-white tracking-wide"
-                                                placeholder="Enter Cover Image of the Board"
+                                                placeholder="Enter Cover Image"
                                                 type="file"
                                                 :accept="supportedImageTypes.join(', ')"
                                                 @change="coverChangeImage($event)"
@@ -401,13 +535,13 @@ const {isLoading, data: Boards, refetch: fetchBoards} = getBoards();
                                         label="Description"
                                         name="description"
                                         theme="snow"
-                                        placeholder="Enter Board Description"
+                                        placeholder="Enter Description"
                                         toolbar="full"
                                         contentType="html"
                                         class="col-span-3 mb-4"
                                     />
                                     <button type="submit" class="btn btn-primary btn-md w-full mt-6">
-                                        {{action == 'create' ? 'Create Board' : 'Edit Board'}}
+                                        {{actionLabel  }}
                                     </button>
                                 </form>
                             </div>
@@ -445,7 +579,7 @@ const {isLoading, data: Boards, refetch: fetchBoards} = getBoards();
                                         :label="'name'"
                                         :class="['multiselect-container', { error: !!errorMessage }]"
                                         @select="selectedUsers()"
-                                        @deselect="removeselectedUsers()"
+                                        @deselect="removeSelectedUsers()"
                                     />
                                     <div v-if="errorMessage"  class="message">{{ errorMessage }}</div>
                                 </div>

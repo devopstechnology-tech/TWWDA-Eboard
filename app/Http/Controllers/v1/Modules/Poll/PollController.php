@@ -4,15 +4,16 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\v1\Modules\Poll;
 
+use Illuminate\Http\Response;
+use App\Models\Module\Poll\Poll;
+use Illuminate\Http\JsonResponse;
+use App\Models\Module\Board\Board;
 use App\Http\Controllers\Controller;
+use App\Models\Module\Meeting\Meeting;
 use App\Http\Requests\CreatePollRequest;
 use App\Http\Requests\UpdatePollRequest;
-use App\Models\Module\Board\Board;
-use App\Models\Module\Meeting\Meeting;
-use App\Models\Module\Poll\Poll;
+use App\Models\Module\Committe\Committee;
 use App\Repository\Contracts\PollInterface;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Response;
 
 class PollController extends Controller
 {
@@ -31,16 +32,60 @@ class PollController extends Controller
 
         return $this->response(Response::HTTP_OK, __('messages.records-fetched'), $polls, Poll::class);
     }
-    public function createmeetingpoll(CreatePollRequest $request, Meeting $meeting, Board $board): JsonResponse
+    public function createmeetingpoll(CreatePollRequest $request, Meeting $meeting): JsonResponse
     {
-        $poll = $this->pollRepository->createMeetingPoll($meeting, $board, $request->validated());
+        $poll = $this->pollRepository->createMeetingPoll($meeting, $request->validated());
 
         return $this->response(Response::HTTP_OK, __('messages.records-fetched'), $poll, Poll::class);
     }
-    public function updatemeetingpoll(UpdatePollRequest $request, Meeting $meeting, $board, Poll $poll): JsonResponse
+    
+    public function updatemeetingpoll(UpdatePollRequest $request, Meeting $meeting, Poll $poll): JsonResponse
     {
-        $poll = $this->pollRepository->updateMeetingPoll($meeting, $board, $poll, $request->validated());
+        $poll = $this->pollRepository->updateMeetingPoll($meeting, $poll, $request->validated());
 
         return $this->response(Response::HTTP_OK, __('messages.records-fetched'), $poll, Poll::class);
     }
+    //board
+    public function getboardpolls($board): JsonResponse
+    {
+        $polls = $this->pollRepository->getBoardPolls($board);
+
+        return $this->response(Response::HTTP_OK, __('messages.records-fetched'), $polls, Poll::class);
+    }
+    public function createboardpoll(CreatePollRequest $request, Board $board): JsonResponse
+    {
+        $poll = $this->pollRepository->createBoardPoll($board, $request->validated());
+
+        return $this->response(Response::HTTP_OK, __('messages.records-fetched'), $poll, Poll::class);
+    }
+    
+    public function updateboardpoll(UpdatePollRequest $request, Poll $poll): JsonResponse
+    {
+        $poll = $this->pollRepository->updateBoardPoll($poll, $request->validated());
+
+        return $this->response(Response::HTTP_OK, __('messages.records-fetched'), $poll, Poll::class);
+    }
+    //committee
+    public function getcommitteepolls($committee): JsonResponse
+    {
+        $polls = $this->pollRepository->getCommitteePolls($committee);
+
+        return $this->response(Response::HTTP_OK, __('messages.records-fetched'), $polls, Poll::class);
+    }
+    public function createcommitteepoll(CreatePollRequest $request, Committee $committee): JsonResponse
+    {
+        $poll = $this->pollRepository->createCommitteePoll($committee, $request->validated());
+
+        return $this->response(Response::HTTP_OK, __('messages.records-fetched'), $poll, Poll::class);
+    }
+    
+    public function updatecommitteepoll(UpdatePollRequest $request, Poll $poll): JsonResponse
+    {
+        $poll = $this->pollRepository->updateCommitteePoll($poll, $request->validated());
+
+        return $this->response(Response::HTTP_OK, __('messages.records-fetched'), $poll, Poll::class);
+    }
+
+
+
 }

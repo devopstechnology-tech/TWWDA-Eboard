@@ -21,7 +21,7 @@ return new class() extends Migration
             $table->longText('description')->nullable();
             $table->string('icon')->nullable();
             $table->string('cover')->nullable();
-            $table->string('status')->default(StatusEnum::Inactive->value);
+            $table->string('status')->default(StatusEnum::Active->value);
             $table->string('owner_id')->nullable();
             $table->softDeletes();
             $table->timestamps();

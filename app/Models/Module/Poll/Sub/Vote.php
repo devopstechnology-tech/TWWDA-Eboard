@@ -9,6 +9,7 @@ use App\Models\BaseModel;
 use App\Models\Module\Poll\Poll;
 use App\Models\Module\Member\Member;
 use App\Models\Module\Member\Membership;
+use App\Models\Module\Poll\AssigneePoll;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -22,9 +23,9 @@ class Vote extends BaseModel
     protected $fillable = [
         'option_id',
         'poll_id',
-        'membership_id',
-        'member_id',
+        'assginee_poll_id',
         'date',
+        'status',
     ];
 
     public function option()
@@ -35,12 +36,12 @@ class Vote extends BaseModel
     {
         return $this->belongsTo(Poll::class, 'poll_id');
     }
-    public function membership()
+    public function assignee()
     {
-        return $this->belongsTo(Membership::class, 'membership_id');
+        return $this->belongsTo(AssigneePoll::class, 'assginee_poll_id');
     }
-    public function member()
-    {
-        return $this->belongsTo(Member::class, 'member_id');
-    }
+    // public function member()
+    // {
+    //     return $this->belongsTo(Member::class, 'member_id');
+    // }
 }

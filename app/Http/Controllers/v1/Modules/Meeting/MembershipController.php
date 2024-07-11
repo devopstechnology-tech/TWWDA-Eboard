@@ -19,9 +19,9 @@ class MembershipController extends Controller
     public function __construct(private readonly MembershipInterface $membershipRepository)
     {
     }
-    public function getmeetingmemberships($meeting, $board): JsonResponse
+    public function getmeetingmemberships($meeting): JsonResponse
     {
-        $memberships = $this->membershipRepository->getMeetingMemberships($meeting, $board);
+        $memberships = $this->membershipRepository->getMeetingMemberships($meeting);
 
         return $this->response(Response::HTTP_OK, __('messages.records-fetched'), $memberships, Membership::class);
     }

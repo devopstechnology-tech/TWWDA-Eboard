@@ -14,8 +14,8 @@ class CreateCommitteeRequest extends FormRequest
         return [
             'name' => RuleSet::create()->required()->string(),
             'description' => RuleSet::create()->required()->string(),
-            'icon' => RuleSet::create()->nullable()->string(),
-            'cover' => RuleSet::create()->nullable()->string(),
+            'icon' => RuleSet::create()->nullable()->file()->mimes('jpeg,jpg,png,gif,webp'),
+            'cover' => RuleSet::create()->nullable()->file()->mimes('jpeg,jpg,png,gif,webp'),
         ];
     }
 }

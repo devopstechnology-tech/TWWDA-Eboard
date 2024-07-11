@@ -10,6 +10,7 @@ use App\Models\Module\Board\Board;
 use App\Models\Module\Meeting\Meeting;
 use App\Models\Module\Member\Membership;
 use App\Models\Module\Committe\Committee;
+use App\Models\Module\Task\Sub\AssigneeTask;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -47,8 +48,7 @@ class Task extends BaseModel
 
     public function taskassignees()
     {
-        return $this->belongsToMany(Membership::class, 'assignee_tasks')
-            ->withPivot('id', 'membership_id', 'task_id') // Include all necessary pivot fields
-            ->withTimestamps(); // If timestamps are important
+        return $this->hasMany(AssigneeTask::class, 'task_id')
+                    ->with('assignable.user');
     }
 }

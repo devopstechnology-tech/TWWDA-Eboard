@@ -15,8 +15,6 @@ class CreateBoardRequest extends FormRequest
             'name' => RuleSet::create()->required()->string(),
             'description' => RuleSet::create()->required()->string(),
             'icon' => RuleSet::create()->nullable()->file()->mimes('jpeg,jpg,png,gif,webp'),
-            // 'icon' => RuleSet::create()->nullable()->string(),
-            // 'cover' => RuleSet::create()->nullable()->string(),
             'cover' => RuleSet::create()->nullable()->file()->mimes('jpeg,jpg,png,gif,webp'),
         ];
     }

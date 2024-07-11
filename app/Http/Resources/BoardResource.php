@@ -12,17 +12,6 @@ class BoardResource extends BaseResource
     #[Format, IsDefault]
     public function base(): array
     {
-        // dd('me');
-
-        // if (!$this->resource->relationLoaded('owner')) {
-        //     $this->resource->load('owner');
-        // }
-        // if (!$this->resource->relationLoaded('members')) {
-        //     $this->resource->load('members.user');//fecthing only user
-        // }
-        // if (!$this->resource->relationLoaded('folders')) {
-        //     $this->resource->load('folders');//fecthing only user id
-        // }
         return [
             // Base resource fields here
             'id' => $this->resource->getRouteKey(),
@@ -45,12 +34,9 @@ class BoardResource extends BaseResource
             'id' => $this->resource->getRouteKey(),
             'name' => $this->resource->name,
             'description' => $this->resource->description,
-            // 'owner' => $this->whenLoaded('owner', $this->resource->owner->full_name,''),
             'owner_id' => $this->resource->owner_id,
             'icon' => $this->resource->icon,
             'cover' => $this->resource->cover,
-            // 'members' => $this->whenLoaded('members',
-            //           UserResource::collection($this->resource->members), []),
         ];
     }
 }

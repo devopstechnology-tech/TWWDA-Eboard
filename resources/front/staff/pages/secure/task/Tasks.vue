@@ -181,7 +181,7 @@ const {isLoading:isLoadingMemberships, data:MembershipData, refetch: fetchMember
 
 const getTasks = () => {
     return useQuery({
-        queryKey: ['getTasksKey'],
+        queryKey: ['getOwnTasksKey'],
         queryFn: async () => {
             const response = await useGetTasksRequest({paginate: 'false'});
             console.log(response);

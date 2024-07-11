@@ -11,6 +11,7 @@ use App\Models\Module\Poll\Sub\Vote;
 use App\Models\Module\Meeting\Meeting;
 use App\Models\Module\Poll\Sub\Option;
 use App\Models\Module\Member\Membership;
+use App\Models\Module\Poll\AssigneePoll;
 use App\Models\Module\Committe\Committee;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -59,14 +60,13 @@ class Poll extends BaseModel
         return $this->hasMany(Vote::class, 'poll_id');
     }
 
-    public function memberships()
-    {
-        return $this->belongsToMany(Membership::class, 'votes');
-    }
+    // public function memberships()
+    // {
+    //     return $this->belongsToMany(Membership::class, 'votes');
+    // }
     public function pollassignees()
     {
-        return $this->belongsToMany(Membership::class, 'assignee_polls')
-            ->withPivot('id', 'membership_id', 'poll_id') // Include all necessary pivot fields
-            ->withTimestamps(); // If timestamps are important
+        return $this->hasMany(AssigneePoll::class, 'poll_id')
+            ->with('assignable.user'); // If timestamps are important
     }
 }

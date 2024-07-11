@@ -17,14 +17,15 @@ class AssigneePoll extends  BaseModel
     use Uuids;
     protected $fillable = [
         'poll_id',
-        'membership_id',
+        'assignable_id',
+        'assignable_type',
     ];
     public function poll()
     {
         return $this->belongsTo(Poll::class, 'poll_id');
     }
-    public function membership()
+     public function assignable()
     {
-        return $this->belongsTo(Membership::class, 'membership_id');
+        return $this->morphTo();
     }
 }

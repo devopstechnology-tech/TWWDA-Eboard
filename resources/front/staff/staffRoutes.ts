@@ -101,44 +101,21 @@ const staffRoutes: RouteRecordRaw[] = [
                     // Ensure this component is created
                     name: 'BoardMediaDetails', // A unique name for the route
                     path: '/board/:boardId/folder/:folderId/media/:mediaId', // Dynamic segment to capture the board ID
-                    meta: {title: 'Media Details'},
+                    meta: {title: 'Board Media Details'},
                 },
+                
+                //board meeting
                 {
                     beforeEnter: requireStaffAuthentication,
-                    component: () => import('@/staff/pages/secure/meeting/MeetingsDetails.vue'),
+                    component: () => import('@/staff/pages/secure/meeting/board/BoardMeetingDetails.vue'),
                     // Ensure this component is created
                     name: 'BoardMeetingDetails', // A unique name for the route
                     path: '/board/:boardId/meeting/:meetingId/schedule/:scheduleId', // Dynamic segment to capture the board ID & meting id
                     meta: {title: 'Board Meeting Details'},
                 },
-                // {
-                //     beforeEnter: requireStaffAuthentication,
-                //     component: () => import('@/staff/pages/secure/meeting/includes/Minute.vue'),
-                //     // Ensure this component is created
-                //     name: 'BoardMeetingMinutes', // A unique name for the route
-                //     path: '/board/:boardId/meeting/:meetingId/minutes', // Dynamic segment to capture the board ID & meting id
-                //     meta: {title: 'Board Meeting Minutes Details'},
-                //     props: (route) => {
-                //         const agendas = route.query.agendas;
-                //         let parsedAgendas = null;
-                //         if (typeof agendas === 'string') { // Ensure agendas is a string before decoding and parsing
-                //             try {
-                //                 parsedAgendas = JSON.parse(decodeURIComponent(agendas));
-                //            } catch (error) {
-                //                 console.error('Failed to parse agendas:', error);
-                //                 parsedAgendas = null; // Set to null if parsing fails
-                //            }
-                //        }
-                //         return {
-                //             boardId: route.params.boardId,
-                //             meetingId: route.params.meetingId,
-                //             agendas: parsedAgendas,
-                //        };
-                //    },
-                //},
                 {
                     beforeEnter: requireStaffAuthentication,
-                    component: () => import('@/staff/pages/secure/meeting/includes/Minute.vue'),
+                    component: () => import('@/staff/pages/secure/meeting/board/includes/Minute.vue'),
                     // Ensure this component is created
                     name: 'BoardMeetingMinutes', // A unique name for the route
                     path: '/board/:boardId/meeting/:meetingId/schedule/:scheduleId/minutes', // Dynamic segment to capture the board ID & meting id
@@ -153,9 +130,9 @@ const staffRoutes: RouteRecordRaw[] = [
                 },
                 {
                     beforeEnter: requireStaffAuthentication,
-                    component: () => import('@/staff/pages/secure/meeting/includes/MinuteApproval.vue'),
+                    component: () => import('@/staff/pages/secure/meeting/board/includes/MinuteApproval.vue'),
                     // Ensure this component is created
-                    name: 'MinuteApproval', // A unique name for the route
+                    name: 'BoardMinuteApproval', // A unique name for the route
                     path: '/board/:boardId/meeting/:meetingId/schedule/:scheduleId/minutes/:minutesId', // Dynamic segment to capture the board ID & meting id
                     meta: {title: 'Minute Approval By Board/Chaiman'},
                     props: route => ({
@@ -166,9 +143,10 @@ const staffRoutes: RouteRecordRaw[] = [
                         // otherParam: route.query.otherParam  // Pass other parameters as needed
                     }),
                 },
+               
                 {
                     beforeEnter: requireStaffAuthentication,
-                    component: () => import('@/staff/pages/secure/meeting/includes/minute/Minutepdf.vue'),
+                    component: () => import('@/staff/pages/secure/meeting/board/includes/minute/Minutepdf.vue'),
                     // Ensure this component is created
                     name: 'MinuteView', // A unique name for the route
                     path: '/board/:boardId/meeting/:meetingId/schedule/:scheduleId/minutes/:minutesId/pdf', // Dynamic segment to capture the board ID & meting id
@@ -184,7 +162,7 @@ const staffRoutes: RouteRecordRaw[] = [
                 },
                 {
                     beforeEnter: requireStaffAuthentication,
-                    component: () => import('@/staff/pages/secure/meeting/includes/Signature.vue'),
+                    component: () => import('@/staff/pages/secure/meeting/board/includes/Signature.vue'),
                     // Ensure this component is created
                     name: 'SignatureAttendance', // A unique name for the route
                     path: '/board/:boardId/meeting/:meetingId/schedule/:scheduleId/attendee/:attendeeId/:mediaId', // Dynamic segment to capture the board ID & meting id
@@ -197,6 +175,109 @@ const staffRoutes: RouteRecordRaw[] = [
                         mediaId: route.params.mediaId,
                     }),
                 },
+               
+
+
+                //committee
+                {
+                    beforeEnter: requireStaffAuthentication,
+                    component: () => import('@/staff/pages/secure/committee/CommitteeDetail.vue'),
+                    // Ensure this component is created
+                    name: 'CommitteeDetails', // A unique name for the route
+                    path: 'committee/:committeeId', // Dynamic segment to capture the board ID
+                    meta: {title: 'Committee Details'},
+                },
+                {
+                    beforeEnter: requireStaffAuthentication,
+                    component: () => import('@/staff/pages/secure/committee/includes/document/document.vue'),
+                    // Ensure this component is created
+                    name: 'CommitteeMediaDetails', // A unique name for the route
+                    path: '/committee/:committeeId/folder/:folderId/media/:mediaId', // Dynamic segment to capture the committee ID
+                    meta: {title: 'Committee Media Details'},
+                },
+                {
+                    beforeEnter: requireStaffAuthentication,
+                    component: () => import('@/staff/pages/secure/meeting/committee/includes/MinuteApproval.vue'),
+                    // Ensure this component is created
+                    name: 'CommitteeMinuteApproval', // A unique name for the route
+                    path: '/committee/:committeeId/meeting/:meetingId/schedule/:scheduleId/minutes/:minutesId', // Dynamic segment to capture the committee ID & meting id
+                    meta: {title: 'Minute Approval By Committee/Chaiman'},
+                    props: route => ({
+                        committeeId: route.params.committeeId,
+                        meetingId: route.params.meetingId,
+                        scheduleId: route.params.scheduleId,
+                        minutesId: route.params.minutesId,  // Interpret as boolean
+                        // otherParam: route.query.otherParam  // Pass other parameters as needed
+                    }),
+                },
+
+                {
+                    beforeEnter: requireStaffAuthentication,
+                    component: () => import('@/staff/pages/secure/meeting/committee/CommitteeMeetingDetails.vue'),
+                    // Ensure this component is created
+                    name: 'CommitteeMeetingDetails', // A unique name for the route
+                    path: '/committee/:committeeId/meeting/:meetingId/schedule/:scheduleId', // Dynamic segment to capture the committee ID & meting id
+                    meta: {title: 'Committee Meeting Details'},
+                },
+                {
+                    beforeEnter: requireStaffAuthentication,
+                    component: () => import('@/staff/pages/secure/meeting/committee/includes/Minute.vue'),
+                    // Ensure this component is created
+                    name: 'CommitteeMeetingMinutes', // A unique name for the route
+                    path: '/committee/:committeeId/meeting/:meetingId/schedule/:scheduleId/minutes', // Dynamic segment to capture the committee ID & meting id
+                    meta: {title: 'Committee Meeting Minutes Details'},
+                    props: route => ({
+                        committeeId: route.params.committeeId,
+                        meetingId: route.params.meetingId,
+                        scheduleId: route.params.scheduleId,
+                        defaultMinutes: route.query.defaultMinutes === 'true',  // Interpret as boolean
+                        // otherParam: route.query.otherParam  // Pass other parameters as needed
+                    }),
+                },
+                
+                {
+                    beforeEnter: requireStaffAuthentication,
+                    component: () => import('@/staff/pages/secure/meeting/committee/includes/minute/Minutepdf.vue'),
+                    // Ensure this component is created
+                    name: 'MinuteView', // A unique name for the route
+                    path: '/committee/:committeeId/meeting/:meetingId/schedule/:scheduleId/minutes/:minutesId/pdf', // Dynamic segment to capture the committee ID & meting id
+                    meta: {title: 'Minute View'},
+                    props: route => ({
+                        committeeId: route.params.committeeId,
+                        meetingId: route.params.meetingId,
+                        scheduleId: route.params.scheduleId,
+                        minutesId: route.params.minutesId,  // Interpret as boolean
+                        // props: (route: { query: { content: unknown; }; }) => ({content: route.query.content}),
+                        // otherParam: route.query.otherParam  // Pass other parameters as needed
+                    }),
+                },
+                {
+                    beforeEnter: requireStaffAuthentication,
+                    component: () => import('@/staff/pages/secure/meeting/committee/includes/Signature.vue'),
+                    // Ensure this component is created
+                    name: 'SignatureAttendance', // A unique name for the route
+                    path: '/committee/:committeeId/meeting/:meetingId/schedule/:scheduleId/attendee/:attendeeId/:mediaId', // Dynamic segment to capture the committee ID & meting id
+                    meta: {title: 'Attendance Signature'},
+                    props: route => ({
+                        committeeId: route.params.committeeId,
+                        meetingId: route.params.meetingId,
+                        scheduleId: route.params.scheduleId,
+                        attendeeId: route.params.attendeeId,
+                        mediaId: route.params.mediaId,
+                    }),
+                },
+                {
+                    beforeEnter: requireStaffAuthentication,
+                    component: () => import('@/staff/pages/secure/meeting/committee/includes/document/document.vue'),
+                    // Ensure this component is created
+                    name: 'MeetingMediaDetails', // A unique name for the route
+                    path: '/committee/:committeeId/meeting/:meetingId/folder/:folderId/media/:mediaId', // Dynamic segment to capture the committee ID
+                    meta: {title: 'Media Details'},
+                },
+
+
+
+                
                 {
                     beforeEnter: requireStaffAuthentication,
                     component: () => import('@/staff/pages/secure/meeting/Meetings.vue'),
@@ -212,14 +293,7 @@ const staffRoutes: RouteRecordRaw[] = [
                     path: '/meeting/:id', // Dynamic segment to capture the board ID
                     meta: {title: 'Meetings Details'},
                 },
-                {
-                    beforeEnter: requireStaffAuthentication,
-                    component: () => import('@/staff/pages/secure/meeting/includes/document/document.vue'),
-                    // Ensure this component is created
-                    name: 'MediaDetails', // A unique name for the route
-                    path: '/board/:boardId/meeting/:meetingId/folder/:folderId/media/:mediaId', // Dynamic segment to capture the board ID
-                    meta: {title: 'Media Details'},
-                },
+               
                 {
                     beforeEnter: requireStaffAuthentication,
                     component: () => import('@/staff/pages/secure/almanac/Almanac.vue'),

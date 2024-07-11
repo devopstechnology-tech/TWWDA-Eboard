@@ -16,6 +16,7 @@ use App\Models\Module\Committe\Committee;
 use App\Repository\Contracts\BoardInterface;
 use App\Notifications\NewMeetingNotification;
 use App\Repository\Contracts\FolderInterface;
+use App\Repository\Contracts\MemberInterface;
 use App\Repository\Contracts\MeetingInterface;
 use App\Repository\Contracts\ScheduleInterface;
 use App\Repository\Contracts\CommitteeInterface;
@@ -27,6 +28,7 @@ class MeetingRepository extends BaseRepository implements MeetingInterface
     public function __construct(
         private readonly ScheduleInterface $scheduleRepository,
         private readonly BoardInterface $boardRepository,
+        private readonly MemberInterface $memberRepository,
         private readonly CommitteeInterface $committeeRepository,
         private readonly FolderInterface $folderRepository,
     ) {
@@ -67,11 +69,11 @@ class MeetingRepository extends BaseRepository implements MeetingInterface
         $meeting = Meeting::with($this->relationships())->findOrFail($meeting);
         return $meeting;
 
-        return MeetingResource::make($meeting);
+        // return MeetingResource::make($meeting);
     }
     public function getcommitteeMeeting($meeting)
     {
-        $meeting = Meeting::findOrFail($meeting);
+        $meeting = Meeting::with($this->relationships())->findOrFail($meeting);
         return $meeting;
     }
     public function getBoardMeetings($meeting)
@@ -84,10 +86,10 @@ class MeetingRepository extends BaseRepository implements MeetingInterface
         ];
         return $this->indexResource(Meeting::class, MeetingResource::class, $filters);
     }
-    public function getCommitteeMeetings($meeting)
+    public function getCommitteeMeetings($committee)
     {
         $filters = [
-            'committee_id' => $meeting,
+            'meetingable_id' => $committee,
             'meetingable_type' => Committee::class,
             'with' => $this->relationships(),
             'orderBy' => ['field' => 'created_at', 'direction' => 'asc']
@@ -102,15 +104,8 @@ class MeetingRepository extends BaseRepository implements MeetingInterface
 
         $meeting->status = PublishEnum::Published->value;
         $meeting->tempUserIds = $meeting->memberships()->pluck('user_id')->toArray();
-        // dd($meeting->tempUserIds);
         $meeting->isUpdate = false;
         $meeting->save();
-        // Fetch all User instances in a single query using the retrieved IDs
-        // $users = User::whereIn('id', $userIds)->get();
-
-        // foreach ($users as $user) {
-        //     $user->notify(new NewMeetingNotification($board, $meeting, $isUpdate));
-        // }
     }
     // Implement the methods
 
@@ -140,7 +135,7 @@ class MeetingRepository extends BaseRepository implements MeetingInterface
 
             $meeting->meetingable_type = Committee::class;
             $meeting->meetingable_id = $payload['committee_id'];
-            $member = $this->committeeRepository->fetchAuthMember($payload['committee_id']);
+            $member = $this->memberRepository->fetchCommitteeMember($payload['committee_id']);
         } elseif (!empty($payload['board_id'])) {
             $board = Board::find($payload['board_id']);
 
@@ -150,7 +145,7 @@ class MeetingRepository extends BaseRepository implements MeetingInterface
 
             $meeting->meetingable_type = Board::class;
             $meeting->meetingable_id = $payload['board_id'];
-            $member = $this->boardRepository->fetchAuthMember($payload['board_id']);
+            $member = $this->memberRepository->fetchBoardMember($payload['board_id']);
         }
         $meeting->save();
 
