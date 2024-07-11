@@ -9,6 +9,7 @@ use App\Models\Module\Meeting\Meeting;
 interface MeetingInterface
 {
     public function getAll();
+    public function getLatest();
 
     public function getBoardMeetings($meeting);
     public function getCommitteeMeetings($meeting);

@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import {
-    AGENDAS,
+    // AGENDAS,
     ALMANAC,
     BOARDS,
     CALENDAR,
     DASHBOARD,
     DISCUSSIONS,
-    MEETINGS,
-    NOTIFICATIONS,
+    // MEETINGS,
+    // NOTIFICATIONS,
     POLLS,
     SETTINGS,
     TASKS,

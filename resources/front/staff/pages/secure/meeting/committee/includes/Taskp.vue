@@ -164,7 +164,7 @@ const onSubmit = handleSubmit(async (values, {resetForm}) => {
             await useCreateMeetingTaskRequest(payload, meetingId);
         } else {
             const task_id = taskId.value as string;
-            await useUpdateMeetingTaskRequest(payload, meetingId, committeeId, task_id);
+            await useUpdateMeetingTaskRequest(payload, meetingId, task_id);
         }
         TaskModal.value?.close();
         await fetchMeetingTasks();
@@ -186,7 +186,6 @@ const reset = () => {
     selectedMembershipIds.value = [];
     setFieldValue('meeting_id', meetingId);
     setFieldValue('committee_id', committeeId);
-    setFieldValue('committee_id', null);
     setFieldValue('title', '');
     setFieldValue('duedate', '');
     setFieldValue('description', 'description ................');

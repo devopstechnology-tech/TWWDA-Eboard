@@ -13,6 +13,7 @@ interface PollInterface
 {
     // Define your methods here
     public function getAll();
+    public function getLatest();
     public function getPoll(Poll |string $poll);
     // public function updatePoll(Meeting|string $meeting, array $payload): Poll;
     //meeting

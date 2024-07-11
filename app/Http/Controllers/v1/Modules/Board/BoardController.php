@@ -31,6 +31,15 @@ class BoardController extends Controller
 
         return $this->response(Response::HTTP_OK, __('messages.records-fetched'), $board, Board::class);
     }
+    public function latest(): JsonResponse
+    {
+        // ds("mix me down");
+        // dd("mix me down");
+        // $this->authorize('viewAny', Board::class);
+        $board = $this->boardRepository->getLatest();
+
+        return $this->response(Response::HTTP_OK, __('messages.records-fetched'), $board, Board::class);
+    }
 
     public function show(Board $board): JsonResponse
     {

@@ -132,7 +132,7 @@ const onSubmit = handleSubmit(async (values, {resetForm}) =>{
     try {
         const payload: MinuteRequestPayload = {
             schedule_id: values.schedule_id,
-            committee_id: null,
+            committee_id: committeeId,
             membership_id: null,
             // // minutedetails
             minute_id: minuteId.value? minuteId.value.toString() : null,
@@ -188,7 +188,6 @@ const reset = ()=>{
     isAddingNewParent.value = false;
     setFieldValue('schedule_id', scheduleId);
     setFieldValue('committee_id', committeeId);
-    setFieldValue('committee_id', null);
     setFieldValue('membership_id', null);
     //minutedetails
     setFieldValue('minute_id', minuteId.value);

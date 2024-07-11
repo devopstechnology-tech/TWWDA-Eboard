@@ -1,1 +1,0 @@
-var o=Object.defineProperty;var r=(t,s)=>o(t,"name",{value:s,configurable:!0});import{q as a}from"./main-9b499219.js";import{Q as n}from"./index-df77389a.js";import{u as i}from"./staff_routes-8adeed43.js";async function p(t){const s=a(),e=n.stringify(t,{arrayFormat:"brackets"});return await s.get(i()+"?"+e).json()}r(p,"useGetStaffsRequest");export{p as u};

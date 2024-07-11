@@ -372,7 +372,7 @@ const FetchedSchedule = computed(() => {
 });
 
 const getmemberships = async () => {
-    const response = await useGetMembershipsRequest(meetingId, committeeId, {paginate: 'false'});
+    const response = await useGetMembershipsRequest(meetingId, {paginate: 'false'});
     allMemberships.value = response.data;
 };
 

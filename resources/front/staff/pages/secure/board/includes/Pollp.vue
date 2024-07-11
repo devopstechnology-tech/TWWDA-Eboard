@@ -343,6 +343,7 @@ const handleAssigneeTypeChange = (selectedAssignee: string) => {
     assigneestatus.value = selectedAssignee;  
     setFieldValue('assigneetype', selectedAssignee);
     setFieldValue('assigneestatus', selectedAssignee);
+    setFieldValue('pollassignees', []);
 };
 
 // Add an empty option on initialization

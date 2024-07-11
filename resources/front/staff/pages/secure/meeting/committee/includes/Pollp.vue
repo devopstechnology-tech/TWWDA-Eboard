@@ -68,7 +68,6 @@ const pollassigneeSchema = yup.object({
 const pollschema = yup.object({
     meeting_id: yup.string().nullable(),
     committee_id: yup.string().nullable(),
-    committee_id: yup.string().nullable(),
     question:yup.string().required(),
     description:yup.string().required(),
     questionoptiontype:yup.string().required(),
@@ -87,7 +86,6 @@ const {
     values,
 } = useForm<{
     meeting_id:string| null;
-    committee_id:string| null;
     committee_id:string| null;
     question:string;
     description:string;
@@ -119,7 +117,6 @@ const {
     initialValues: {
         meeting_id:meetingId,
         committee_id:committeeId,
-        committee_id:null,
         question:'',
         description:'',
         questionoptiontype:'',
@@ -200,7 +197,6 @@ const onSubmit = handleSubmit(async (values, {resetForm}) => {
         const payload: PollRequestPayload = {
             meeting_id: values.meeting_id,
             committee_id: values.committee_id,
-            committee_id: values.committee_id,
             question: values.question,
             description: values.description,
             questionoptiontype: values.questionoptiontype,
@@ -213,10 +209,10 @@ const onSubmit = handleSubmit(async (values, {resetForm}) => {
             status: values.status,
         };
         if (action.value === 'create') {
-            await useCreateMeetingPollRequest(payload, meetingId, committeeId);
+            await useCreateMeetingPollRequest(payload, meetingId);
         } else {
             const poll_id = pollId.value as string;
-            await useUpdateMeetingPollRequest(payload, meetingId, committeeId, poll_id);
+            await useUpdateMeetingPollRequest(payload, meetingId, poll_id);
         }
         PollModal.value?.close();
         await fetchMeetingPolls();
@@ -239,7 +235,6 @@ const reset = () => {
     selectedMembershipIds.value = [];
     setFieldValue('meeting_id', meetingId);
     setFieldValue('committee_id', committeeId);
-    setFieldValue('committee_id', null);
     setFieldValue('question', '');
     setFieldValue('description', '');
     setFieldValue('questionoptiontype', 'single');
@@ -354,6 +349,7 @@ const handleAssigneeTypeChange = (selectedAssignee: string) => {
     assigneestatus.value = selectedAssignee;  
     setFieldValue('assigneetype', selectedAssignee);
     setFieldValue('assigneestatus', selectedAssignee);
+    setFieldValue('pollassignees', []);
 };
 
 // Add an empty option on initialization

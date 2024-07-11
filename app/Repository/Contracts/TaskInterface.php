@@ -13,6 +13,7 @@ interface TaskInterface
 {
     // Define your methods here
     public function getAll();
+    public function getLatest();
     public function getTask(Task |string $poll);
     public function updateTask(Meeting|string $meeting, array $payload): Task;
     //meeting

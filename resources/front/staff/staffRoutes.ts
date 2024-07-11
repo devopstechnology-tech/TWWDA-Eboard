@@ -164,7 +164,7 @@ const staffRoutes: RouteRecordRaw[] = [
                     beforeEnter: requireStaffAuthentication,
                     component: () => import('@/staff/pages/secure/meeting/board/includes/Signature.vue'),
                     // Ensure this component is created
-                    name: 'SignatureAttendance', // A unique name for the route
+                    name: 'BoardSignatureAttendance', // A unique name for the route
                     path: '/board/:boardId/meeting/:meetingId/schedule/:scheduleId/attendee/:attendeeId/:mediaId', // Dynamic segment to capture the board ID & meting id
                     meta: {title: 'Attendance Signature'},
                     props: route => ({
@@ -255,7 +255,7 @@ const staffRoutes: RouteRecordRaw[] = [
                     beforeEnter: requireStaffAuthentication,
                     component: () => import('@/staff/pages/secure/meeting/committee/includes/Signature.vue'),
                     // Ensure this component is created
-                    name: 'SignatureAttendance', // A unique name for the route
+                    name: 'CommitteeSignatureAttendance', // A unique name for the route
                     path: '/committee/:committeeId/meeting/:meetingId/schedule/:scheduleId/attendee/:attendeeId/:mediaId', // Dynamic segment to capture the committee ID & meting id
                     meta: {title: 'Attendance Signature'},
                     props: route => ({

@@ -8,6 +8,7 @@ interface AlmanacInterface
 {
     // Define your methods here
     public function getAll();
+    public function getLatest();
     public function importAlmanac(array $payload);
     public function createAlmanac(array $payload): Almanac;
     public function updateAlmanac(Almanac|string $almanac, array $payload): Almanac;

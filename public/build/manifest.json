@@ -27,250 +27,250 @@
     "file": "assets/FormUpload-d64ae23b.css",
     "src": "FormUpload.css"
   },
-  "_Breadcrumb-74d93201.js": {
-    "file": "assets/Breadcrumb-74d93201.js",
+  "_Breadcrumb-ecf3abcd.js": {
+    "file": "assets/Breadcrumb-ecf3abcd.js",
     "imports": [
       "resources/front/main.ts"
     ]
   },
-  "_FormDateTimeInput.vue_vue_type_style_index_0_lang-fbef2fd1.js": {
+  "_FormDateTimeInput.vue_vue_type_style_index_0_lang-abff0e84.js": {
     "css": [
       "assets/FormDateTimeInput-b1f31b79.css"
     ],
-    "file": "assets/FormDateTimeInput.vue_vue_type_style_index_0_lang-fbef2fd1.js",
+    "file": "assets/FormDateTimeInput.vue_vue_type_style_index_0_lang-abff0e84.js",
     "imports": [
       "resources/front/main.ts",
-      "_useUnexpectedErrorHandler-f37df04f.js"
+      "_useUnexpectedErrorHandler-2f1b2730.js"
     ]
   },
-  "_FormDynamicInput-4c66f355.js": {
+  "_FormDynamicInput-57fd3f34.js": {
     "css": [
       "assets/FormDynamicInput-39e752e9.css"
     ],
-    "file": "assets/FormDynamicInput-4c66f355.js",
+    "file": "assets/FormDynamicInput-57fd3f34.js",
     "imports": [
-      "_index-df77389a.js",
+      "_index-053adef9.js",
       "resources/front/main.ts",
-      "_folder_routes-6d34764d.js",
-      "_useUnexpectedErrorHandler-f37df04f.js"
+      "_folder_routes-48149054.js",
+      "_useUnexpectedErrorHandler-2f1b2730.js"
     ]
   },
-  "_FormInput-360d6aac.js": {
+  "_FormInput-4bdc1ca0.js": {
     "css": [
       "assets/FormInput-5a96f937.css"
     ],
-    "file": "assets/FormInput-360d6aac.js",
+    "file": "assets/FormInput-4bdc1ca0.js",
     "imports": [
       "resources/front/main.ts",
-      "_useUnexpectedErrorHandler-f37df04f.js"
+      "_useUnexpectedErrorHandler-2f1b2730.js"
     ]
   },
-  "_FormQuillEditor-fc7ac95e.js": {
+  "_FormQuillEditor-e4b30354.js": {
     "css": [
       "assets/FormQuillEditor-9ad316e8.css"
     ],
-    "file": "assets/FormQuillEditor-fc7ac95e.js",
+    "file": "assets/FormQuillEditor-e4b30354.js",
     "imports": [
       "resources/front/main.ts",
-      "_useUnexpectedErrorHandler-f37df04f.js"
+      "_useUnexpectedErrorHandler-2f1b2730.js"
     ]
   },
-  "_FormRadioInput-98e80d8a.js": {
+  "_FormRadioInput-35542934.js": {
     "css": [
       "assets/FormRadioInput-061f2ee3.css"
     ],
-    "file": "assets/FormRadioInput-98e80d8a.js",
+    "file": "assets/FormRadioInput-35542934.js",
     "imports": [
       "resources/front/main.ts",
-      "_useUnexpectedErrorHandler-f37df04f.js"
+      "_useUnexpectedErrorHandler-2f1b2730.js"
     ]
   },
-  "_FormTextBox-90b70c6e.js": {
+  "_FormTextBox-4a2981cb.js": {
     "css": [
       "assets/FormTextBox-f8b84419.css"
     ],
-    "file": "assets/FormTextBox-90b70c6e.js",
+    "file": "assets/FormTextBox-4a2981cb.js",
     "imports": [
       "resources/front/main.ts",
-      "_useUnexpectedErrorHandler-f37df04f.js"
+      "_useUnexpectedErrorHandler-2f1b2730.js"
     ]
   },
-  "_FormUpload-c235b23e.js": {
+  "_FormUpload-637793d3.js": {
     "css": [
       "assets/FormUpload-d64ae23b.css"
     ],
-    "file": "assets/FormUpload-c235b23e.js",
+    "file": "assets/FormUpload-637793d3.js",
     "imports": [
-      "_useUnexpectedErrorHandler-f37df04f.js",
+      "_useUnexpectedErrorHandler-2f1b2730.js",
       "resources/front/main.ts"
     ]
   },
-  "_LoadingComponent.vue_vue_type_script_setup_true_lang-c51888d4.js": {
-    "file": "assets/LoadingComponent.vue_vue_type_script_setup_true_lang-c51888d4.js",
-    "imports": [
-      "resources/front/main.ts"
-    ]
-  },
-  "_attendance_routes-22107f1a.js": {
-    "file": "assets/attendance_routes-22107f1a.js",
+  "_LoadingComponent.vue_vue_type_script_setup_true_lang-18662810.js": {
+    "file": "assets/LoadingComponent.vue_vue_type_script_setup_true_lang-18662810.js",
     "imports": [
       "resources/front/main.ts"
     ]
   },
-  "_folder_routes-6d34764d.js": {
-    "file": "assets/folder_routes-6d34764d.js",
+  "_attendance_routes-07e71fee.js": {
+    "file": "assets/attendance_routes-07e71fee.js",
     "imports": [
       "resources/front/main.ts"
     ]
   },
-  "_index-df77389a.js": {
-    "file": "assets/index-df77389a.js",
+  "_folder_routes-48149054.js": {
+    "file": "assets/folder_routes-48149054.js",
     "imports": [
       "resources/front/main.ts"
     ]
   },
-  "_membership_routes-82bd5969.js": {
-    "file": "assets/membership_routes-82bd5969.js",
+  "_index-053adef9.js": {
+    "file": "assets/index-053adef9.js",
     "imports": [
       "resources/front/main.ts"
     ]
   },
-  "_pspdfkit.store-3ef68173.js": {
-    "file": "assets/pspdfkit.store-3ef68173.js",
+  "_membership_routes-2da0f288.js": {
+    "file": "assets/membership_routes-2da0f288.js",
     "imports": [
       "resources/front/main.ts"
     ]
   },
-  "_staff_routes-8adeed43.js": {
-    "file": "assets/staff_routes-8adeed43.js",
+  "_pspdfkit.store-a91838ef.js": {
+    "file": "assets/pspdfkit.store-a91838ef.js",
     "imports": [
       "resources/front/main.ts"
     ]
   },
-  "_useAlmanacRequest-85148b3b.js": {
-    "file": "assets/useAlmanacRequest-85148b3b.js",
+  "_staff_routes-45a2bbdb.js": {
+    "file": "assets/staff_routes-45a2bbdb.js",
     "imports": [
-      "_index-df77389a.js",
       "resources/front/main.ts"
     ]
   },
-  "_useBoardRequest-2247a6a5.js": {
-    "file": "assets/useBoardRequest-2247a6a5.js",
+  "_useAlmanacRequest-ea50bab5.js": {
+    "file": "assets/useAlmanacRequest-ea50bab5.js",
     "imports": [
-      "_index-df77389a.js",
+      "_index-053adef9.js",
       "resources/front/main.ts"
     ]
   },
-  "_useCommitteeRequest-f6f4ffc4.js": {
-    "file": "assets/useCommitteeRequest-f6f4ffc4.js",
+  "_useBoardRequest-61ad7599.js": {
+    "file": "assets/useBoardRequest-61ad7599.js",
     "imports": [
-      "_index-df77389a.js",
+      "_index-053adef9.js",
       "resources/front/main.ts"
     ]
   },
-  "_useConflictRequest-ca7ff719.js": {
-    "file": "assets/useConflictRequest-ca7ff719.js",
+  "_useCommitteeRequest-fdd0f16f.js": {
+    "file": "assets/useCommitteeRequest-fdd0f16f.js",
     "imports": [
-      "_index-df77389a.js",
-      "_attendance_routes-22107f1a.js",
+      "_index-053adef9.js",
       "resources/front/main.ts"
     ]
   },
-  "_useFileRequest-eb873f34.js": {
-    "file": "assets/useFileRequest-eb873f34.js",
+  "_useConflictRequest-46181bf0.js": {
+    "file": "assets/useConflictRequest-46181bf0.js",
+    "imports": [
+      "_index-053adef9.js",
+      "_attendance_routes-07e71fee.js",
+      "resources/front/main.ts"
+    ]
+  },
+  "_useFileRequest-487c7d03.js": {
+    "file": "assets/useFileRequest-487c7d03.js",
     "imports": [
       "resources/front/main.ts",
-      "_folder_routes-6d34764d.js"
+      "_folder_routes-48149054.js"
     ]
   },
-  "_useMembershipRequest-619957a2.js": {
-    "file": "assets/useMembershipRequest-619957a2.js",
+  "_useMembershipRequest-ae7237bb.js": {
+    "file": "assets/useMembershipRequest-ae7237bb.js",
     "imports": [
-      "_index-df77389a.js",
+      "_index-053adef9.js",
       "resources/front/main.ts",
-      "_membership_routes-82bd5969.js"
+      "_membership_routes-2da0f288.js"
     ]
   },
-  "_useMinuteRequest-2d0f7362.js": {
-    "file": "assets/useMinuteRequest-2d0f7362.js",
+  "_useMinuteRequest-25870890.js": {
+    "file": "assets/useMinuteRequest-25870890.js",
     "imports": [
-      "_index-df77389a.js",
+      "_index-053adef9.js",
       "resources/front/main.ts"
     ]
   },
-  "_useMutation-679456c9.js": {
-    "file": "assets/useMutation-679456c9.js",
-    "imports": [
-      "resources/front/main.ts",
-      "_useQueryClient-0be5c548.js"
-    ]
-  },
-  "_usePollRequest-adad518d.js": {
-    "file": "assets/usePollRequest-adad518d.js",
-    "imports": [
-      "_index-df77389a.js",
-      "resources/front/main.ts"
-    ]
-  },
-  "_useQuery-7facd994.js": {
-    "file": "assets/useQuery-7facd994.js",
-    "imports": [
-      "_useQueryClient-0be5c548.js",
-      "resources/front/main.ts"
-    ]
-  },
-  "_useQueryClient-0be5c548.js": {
-    "file": "assets/useQueryClient-0be5c548.js",
-    "imports": [
-      "resources/front/main.ts"
-    ]
-  },
-  "_useScheduleRequest-e2b3060f.js": {
-    "file": "assets/useScheduleRequest-e2b3060f.js",
-    "imports": [
-      "_index-df77389a.js",
-      "resources/front/main.ts"
-    ]
-  },
-  "_useSignatureFileRequest-327890f7.js": {
-    "file": "assets/useSignatureFileRequest-327890f7.js",
+  "_useMutation-352ba9ae.js": {
+    "file": "assets/useMutation-352ba9ae.js",
     "imports": [
       "resources/front/main.ts",
-      "_attendance_routes-22107f1a.js"
+      "_useQueryClient-78663db9.js"
     ]
   },
-  "_useStaffAuthenticateRequest-a41ecdd9.js": {
-    "file": "assets/useStaffAuthenticateRequest-a41ecdd9.js",
+  "_usePollRequest-ac4b87eb.js": {
+    "file": "assets/usePollRequest-ac4b87eb.js",
     "imports": [
-      "resources/front/main.ts",
-      "_staff_routes-8adeed43.js"
-    ]
-  },
-  "_useStaffRequest-4eed05d9.js": {
-    "file": "assets/useStaffRequest-4eed05d9.js",
-    "imports": [
-      "resources/front/main.ts",
-      "_index-df77389a.js",
-      "_staff_routes-8adeed43.js"
-    ]
-  },
-  "_useTaskRequest-a11374e2.js": {
-    "file": "assets/useTaskRequest-a11374e2.js",
-    "imports": [
-      "_index-df77389a.js",
+      "_index-053adef9.js",
       "resources/front/main.ts"
     ]
   },
-  "_useUnexpectedErrorHandler-f37df04f.js": {
-    "file": "assets/useUnexpectedErrorHandler-f37df04f.js",
+  "_useQuery-64b3e593.js": {
+    "file": "assets/useQuery-64b3e593.js",
+    "imports": [
+      "_useQueryClient-78663db9.js",
+      "resources/front/main.ts"
+    ]
+  },
+  "_useQueryClient-78663db9.js": {
+    "file": "assets/useQueryClient-78663db9.js",
     "imports": [
       "resources/front/main.ts"
     ]
   },
-  "_useUserRequest-dfc5ef80.js": {
-    "file": "assets/useUserRequest-dfc5ef80.js",
+  "_useScheduleRequest-05dc2857.js": {
+    "file": "assets/useScheduleRequest-05dc2857.js",
     "imports": [
-      "_index-df77389a.js",
+      "_index-053adef9.js",
+      "resources/front/main.ts"
+    ]
+  },
+  "_useSignatureFileRequest-e2785d67.js": {
+    "file": "assets/useSignatureFileRequest-e2785d67.js",
+    "imports": [
+      "resources/front/main.ts",
+      "_attendance_routes-07e71fee.js"
+    ]
+  },
+  "_useStaffAuthenticateRequest-75d2cda9.js": {
+    "file": "assets/useStaffAuthenticateRequest-75d2cda9.js",
+    "imports": [
+      "resources/front/main.ts",
+      "_staff_routes-45a2bbdb.js"
+    ]
+  },
+  "_useStaffRequest-4d0920bc.js": {
+    "file": "assets/useStaffRequest-4d0920bc.js",
+    "imports": [
+      "resources/front/main.ts",
+      "_index-053adef9.js",
+      "_staff_routes-45a2bbdb.js"
+    ]
+  },
+  "_useTaskRequest-e083a7cb.js": {
+    "file": "assets/useTaskRequest-e083a7cb.js",
+    "imports": [
+      "_index-053adef9.js",
+      "resources/front/main.ts"
+    ]
+  },
+  "_useUnexpectedErrorHandler-2f1b2730.js": {
+    "file": "assets/useUnexpectedErrorHandler-2f1b2730.js",
+    "imports": [
+      "resources/front/main.ts"
+    ]
+  },
+  "_useUserRequest-4c0546ed.js": {
+    "file": "assets/useUserRequest-4c0546ed.js",
+    "imports": [
+      "_index-053adef9.js",
       "resources/front/main.ts"
     ]
   },
@@ -384,7 +384,7 @@
       "resources/front/staff/pages/secure/settings/settings.vue",
       "resources/front/staff/Main.vue"
     ],
-    "file": "assets/main-9b499219.js",
+    "file": "assets/main-451c20d4.js",
     "isEntry": true,
     "src": "resources/front/main.ts"
   },
@@ -396,21 +396,21 @@
     "css": [
       "assets/Main-384ab1f1.css"
     ],
-    "file": "assets/Main-ab74d2e9.js",
+    "file": "assets/Main-b9c90745.js",
     "imports": [
       "resources/front/main.ts",
-      "_Breadcrumb-74d93201.js",
-      "_staff_routes-8adeed43.js",
-      "_useUnexpectedErrorHandler-f37df04f.js",
-      "_index-df77389a.js",
-      "_useQuery-7facd994.js",
-      "_useQueryClient-0be5c548.js"
+      "_Breadcrumb-ecf3abcd.js",
+      "_staff_routes-45a2bbdb.js",
+      "_useUnexpectedErrorHandler-2f1b2730.js",
+      "_index-053adef9.js",
+      "_useQuery-64b3e593.js",
+      "_useQueryClient-78663db9.js"
     ],
     "isDynamicEntry": true,
     "src": "resources/front/staff/Main.vue"
   },
   "resources/front/staff/StaffRoot.vue": {
-    "file": "assets/StaffRoot-27a256f1.js",
+    "file": "assets/StaffRoot-5ee7ba24.js",
     "imports": [
       "resources/front/main.ts"
     ],
@@ -418,16 +418,16 @@
     "src": "resources/front/staff/StaffRoot.vue"
   },
   "resources/front/staff/pages/public/ChangePassword.vue": {
-    "file": "assets/ChangePassword-23511a04.js",
+    "file": "assets/ChangePassword-1855851d.js",
     "imports": [
-      "_useUnexpectedErrorHandler-f37df04f.js",
+      "_useUnexpectedErrorHandler-2f1b2730.js",
       "resources/front/main.ts",
-      "_useStaffAuthenticateRequest-a41ecdd9.js",
-      "_FormInput-360d6aac.js",
-      "_LoadingComponent.vue_vue_type_script_setup_true_lang-c51888d4.js",
-      "_useMutation-679456c9.js",
-      "_staff_routes-8adeed43.js",
-      "_useQueryClient-0be5c548.js"
+      "_useStaffAuthenticateRequest-75d2cda9.js",
+      "_FormInput-4bdc1ca0.js",
+      "_LoadingComponent.vue_vue_type_script_setup_true_lang-18662810.js",
+      "_useMutation-352ba9ae.js",
+      "_staff_routes-45a2bbdb.js",
+      "_useQueryClient-78663db9.js"
     ],
     "isDynamicEntry": true,
     "src": "resources/front/staff/pages/public/ChangePassword.vue"
@@ -440,13 +440,13 @@
     "css": [
       "assets/ForgotPassword-f1e0f1b5.css"
     ],
-    "file": "assets/ForgotPassword-8f10c3b3.js",
+    "file": "assets/ForgotPassword-f0153db4.js",
     "imports": [
-      "_useUnexpectedErrorHandler-f37df04f.js",
-      "_useStaffAuthenticateRequest-a41ecdd9.js",
-      "_FormInput-360d6aac.js",
+      "_useUnexpectedErrorHandler-2f1b2730.js",
+      "_useStaffAuthenticateRequest-75d2cda9.js",
+      "_FormInput-4bdc1ca0.js",
       "resources/front/main.ts",
-      "_staff_routes-8adeed43.js"
+      "_staff_routes-45a2bbdb.js"
     ],
     "isDynamicEntry": true,
     "src": "resources/front/staff/pages/public/ForgotPassword.vue"
@@ -459,39 +459,51 @@
     "css": [
       "assets/Login-d79d6ad9.css"
     ],
-    "file": "assets/Login-7bd105ec.js",
+    "file": "assets/Login-cb90ca90.js",
     "imports": [
-      "_useUnexpectedErrorHandler-f37df04f.js",
+      "_useUnexpectedErrorHandler-2f1b2730.js",
       "resources/front/main.ts",
-      "_useStaffAuthenticateRequest-a41ecdd9.js",
-      "_FormInput-360d6aac.js",
-      "_LoadingComponent.vue_vue_type_script_setup_true_lang-c51888d4.js",
-      "_useMutation-679456c9.js",
-      "_staff_routes-8adeed43.js",
-      "_useQueryClient-0be5c548.js"
+      "_useStaffAuthenticateRequest-75d2cda9.js",
+      "_FormInput-4bdc1ca0.js",
+      "_LoadingComponent.vue_vue_type_script_setup_true_lang-18662810.js",
+      "_useMutation-352ba9ae.js",
+      "_staff_routes-45a2bbdb.js",
+      "_useQueryClient-78663db9.js"
     ],
     "isDynamicEntry": true,
     "src": "resources/front/staff/pages/public/Login.vue"
   },
   "resources/front/staff/pages/public/Register.vue": {
-    "file": "assets/Register-81a7d0be.js",
+    "file": "assets/Register-288308af.js",
     "imports": [
-      "_useUnexpectedErrorHandler-f37df04f.js",
+      "_useUnexpectedErrorHandler-2f1b2730.js",
       "resources/front/main.ts",
-      "_useUserRequest-dfc5ef80.js",
-      "_FormInput-360d6aac.js",
-      "_LoadingComponent.vue_vue_type_script_setup_true_lang-c51888d4.js",
-      "_useMutation-679456c9.js",
-      "_index-df77389a.js",
-      "_useQueryClient-0be5c548.js"
+      "_useUserRequest-4c0546ed.js",
+      "_FormInput-4bdc1ca0.js",
+      "_LoadingComponent.vue_vue_type_script_setup_true_lang-18662810.js",
+      "_useMutation-352ba9ae.js",
+      "_index-053adef9.js",
+      "_useQueryClient-78663db9.js"
     ],
     "isDynamicEntry": true,
     "src": "resources/front/staff/pages/public/Register.vue"
   },
+  "resources/front/staff/pages/secure/Dashboard.css": {
+    "file": "assets/Dashboard-c4562acc.css",
+    "src": "resources/front/staff/pages/secure/Dashboard.css"
+  },
   "resources/front/staff/pages/secure/Dashboard.vue": {
-    "file": "assets/Dashboard-40cddbe8.js",
+    "css": [
+      "assets/Dashboard-c4562acc.css"
+    ],
+    "file": "assets/Dashboard-9531231c.js",
     "imports": [
-      "resources/front/main.ts"
+      "_useBoardRequest-61ad7599.js",
+      "resources/front/main.ts",
+      "_useCommitteeRequest-fdd0f16f.js",
+      "_useQuery-64b3e593.js",
+      "_index-053adef9.js",
+      "_useQueryClient-78663db9.js"
     ],
     "isDynamicEntry": true,
     "src": "resources/front/staff/pages/secure/Dashboard.vue"
@@ -504,51 +516,51 @@
     "css": [
       "assets/Almanac-f52e11f0.css"
     ],
-    "file": "assets/Almanac-196eac82.js",
+    "file": "assets/Almanac-04abb502.js",
     "imports": [
       "resources/front/main.ts",
-      "_Breadcrumb-74d93201.js",
-      "_useUnexpectedErrorHandler-f37df04f.js",
-      "_useAlmanacRequest-85148b3b.js",
-      "_FormDateTimeInput.vue_vue_type_style_index_0_lang-fbef2fd1.js",
-      "_FormInput-360d6aac.js",
-      "_FormQuillEditor-fc7ac95e.js",
-      "_FormUpload-c235b23e.js",
-      "_useQuery-7facd994.js",
-      "_index-df77389a.js",
-      "_useQueryClient-0be5c548.js"
+      "_Breadcrumb-ecf3abcd.js",
+      "_useUnexpectedErrorHandler-2f1b2730.js",
+      "_useAlmanacRequest-ea50bab5.js",
+      "_FormDateTimeInput.vue_vue_type_style_index_0_lang-abff0e84.js",
+      "_FormInput-4bdc1ca0.js",
+      "_FormQuillEditor-e4b30354.js",
+      "_FormUpload-637793d3.js",
+      "_useQuery-64b3e593.js",
+      "_index-053adef9.js",
+      "_useQueryClient-78663db9.js"
     ],
     "isDynamicEntry": true,
     "src": "resources/front/staff/pages/secure/almanac/Almanac.vue"
   },
   "resources/front/staff/pages/secure/board/BoardDetails.css": {
-    "file": "assets/BoardDetails-aab7906c.css",
+    "file": "assets/BoardDetails-9c6ceaea.css",
     "src": "resources/front/staff/pages/secure/board/BoardDetails.css"
   },
   "resources/front/staff/pages/secure/board/BoardDetails.vue": {
     "css": [
-      "assets/BoardDetails-aab7906c.css"
+      "assets/BoardDetails-9c6ceaea.css"
     ],
-    "file": "assets/BoardDetails-fc6a3108.js",
+    "file": "assets/BoardDetails-5fa86f99.js",
     "imports": [
       "resources/front/main.ts",
-      "_useBoardRequest-2247a6a5.js",
-      "_Breadcrumb-74d93201.js",
-      "_useUnexpectedErrorHandler-f37df04f.js",
-      "_FormDynamicInput-4c66f355.js",
-      "_FormInput-360d6aac.js",
-      "_FormUpload-c235b23e.js",
-      "_useQuery-7facd994.js",
-      "_FormDateTimeInput.vue_vue_type_style_index_0_lang-fbef2fd1.js",
-      "_FormQuillEditor-fc7ac95e.js",
-      "_FormRadioInput-98e80d8a.js",
-      "_useStaffRequest-4eed05d9.js",
-      "_usePollRequest-adad518d.js",
-      "_useTaskRequest-a11374e2.js",
-      "_index-df77389a.js",
-      "_folder_routes-6d34764d.js",
-      "_useQueryClient-0be5c548.js",
-      "_staff_routes-8adeed43.js"
+      "_useBoardRequest-61ad7599.js",
+      "_Breadcrumb-ecf3abcd.js",
+      "_useUnexpectedErrorHandler-2f1b2730.js",
+      "_FormDynamicInput-57fd3f34.js",
+      "_FormInput-4bdc1ca0.js",
+      "_FormUpload-637793d3.js",
+      "_useQuery-64b3e593.js",
+      "_FormDateTimeInput.vue_vue_type_style_index_0_lang-abff0e84.js",
+      "_FormQuillEditor-e4b30354.js",
+      "_FormRadioInput-35542934.js",
+      "_useStaffRequest-4d0920bc.js",
+      "_usePollRequest-ac4b87eb.js",
+      "_useTaskRequest-e083a7cb.js",
+      "_index-053adef9.js",
+      "_folder_routes-48149054.js",
+      "_useQueryClient-78663db9.js",
+      "_staff_routes-45a2bbdb.js"
     ],
     "isDynamicEntry": true,
     "src": "resources/front/staff/pages/secure/board/BoardDetails.vue"
@@ -561,21 +573,21 @@
     "css": [
       "assets/Boards-ae4c3b00.css"
     ],
-    "file": "assets/Boards-c2c853a1.js",
+    "file": "assets/Boards-c3c31e89.js",
     "imports": [
       "resources/front/main.ts",
-      "_useUnexpectedErrorHandler-f37df04f.js",
-      "_useBoardRequest-2247a6a5.js",
-      "_useCommitteeRequest-f6f4ffc4.js",
-      "_useStaffRequest-4eed05d9.js",
-      "_FormInput-360d6aac.js",
-      "_FormQuillEditor-fc7ac95e.js",
-      "_FormUpload-c235b23e.js",
-      "_Breadcrumb-74d93201.js",
-      "_useQuery-7facd994.js",
-      "_index-df77389a.js",
-      "_staff_routes-8adeed43.js",
-      "_useQueryClient-0be5c548.js"
+      "_useUnexpectedErrorHandler-2f1b2730.js",
+      "_useBoardRequest-61ad7599.js",
+      "_useCommitteeRequest-fdd0f16f.js",
+      "_useStaffRequest-4d0920bc.js",
+      "_FormInput-4bdc1ca0.js",
+      "_FormQuillEditor-e4b30354.js",
+      "_FormUpload-637793d3.js",
+      "_Breadcrumb-ecf3abcd.js",
+      "_useQuery-64b3e593.js",
+      "_index-053adef9.js",
+      "_staff_routes-45a2bbdb.js",
+      "_useQueryClient-78663db9.js"
     ],
     "isDynamicEntry": true,
     "src": "resources/front/staff/pages/secure/board/Boards.vue"
@@ -588,15 +600,15 @@
     "css": [
       "assets/document-14f5d131.css"
     ],
-    "file": "assets/document-02005e53.js",
+    "file": "assets/document-7d0443d2.js",
     "imports": [
       "resources/front/main.ts",
-      "_useUnexpectedErrorHandler-f37df04f.js",
-      "_useFileRequest-eb873f34.js",
-      "_pspdfkit.store-3ef68173.js",
-      "_useQuery-7facd994.js",
-      "_folder_routes-6d34764d.js",
-      "_useQueryClient-0be5c548.js"
+      "_useUnexpectedErrorHandler-2f1b2730.js",
+      "_useFileRequest-487c7d03.js",
+      "_pspdfkit.store-a91838ef.js",
+      "_useQuery-64b3e593.js",
+      "_folder_routes-48149054.js",
+      "_useQueryClient-78663db9.js"
     ],
     "isDynamicEntry": true,
     "src": "resources/front/staff/pages/secure/board/includes/document/document.vue"
@@ -609,46 +621,46 @@
     "css": [
       "assets/Calendar-0ca705df.css"
     ],
-    "file": "assets/Calendar-464eb2a6.js",
+    "file": "assets/Calendar-5f9f5ade.js",
     "imports": [
       "resources/front/main.ts",
-      "_useAlmanacRequest-85148b3b.js",
-      "_useScheduleRequest-e2b3060f.js",
-      "_useQuery-7facd994.js",
-      "_index-df77389a.js",
-      "_useQueryClient-0be5c548.js"
+      "_useAlmanacRequest-ea50bab5.js",
+      "_useScheduleRequest-05dc2857.js",
+      "_useQuery-64b3e593.js",
+      "_index-053adef9.js",
+      "_useQueryClient-78663db9.js"
     ],
     "isDynamicEntry": true,
     "src": "resources/front/staff/pages/secure/calendar/Calendar.vue"
   },
   "resources/front/staff/pages/secure/committee/CommitteeDetail.css": {
-    "file": "assets/CommitteeDetail-be854dcd.css",
+    "file": "assets/CommitteeDetail-b9fa2bf1.css",
     "src": "resources/front/staff/pages/secure/committee/CommitteeDetail.css"
   },
   "resources/front/staff/pages/secure/committee/CommitteeDetail.vue": {
     "css": [
-      "assets/CommitteeDetail-be854dcd.css"
+      "assets/CommitteeDetail-b9fa2bf1.css"
     ],
-    "file": "assets/CommitteeDetail-36e6570c.js",
+    "file": "assets/CommitteeDetail-b8113881.js",
     "imports": [
       "resources/front/main.ts",
-      "_useCommitteeRequest-f6f4ffc4.js",
-      "_Breadcrumb-74d93201.js",
-      "_useUnexpectedErrorHandler-f37df04f.js",
-      "_FormDynamicInput-4c66f355.js",
-      "_FormInput-360d6aac.js",
-      "_FormUpload-c235b23e.js",
-      "_useQuery-7facd994.js",
-      "_FormDateTimeInput.vue_vue_type_style_index_0_lang-fbef2fd1.js",
-      "_FormQuillEditor-fc7ac95e.js",
-      "_FormRadioInput-98e80d8a.js",
-      "_useStaffRequest-4eed05d9.js",
-      "_usePollRequest-adad518d.js",
-      "_useTaskRequest-a11374e2.js",
-      "_index-df77389a.js",
-      "_folder_routes-6d34764d.js",
-      "_useQueryClient-0be5c548.js",
-      "_staff_routes-8adeed43.js"
+      "_useCommitteeRequest-fdd0f16f.js",
+      "_Breadcrumb-ecf3abcd.js",
+      "_useUnexpectedErrorHandler-2f1b2730.js",
+      "_FormDynamicInput-57fd3f34.js",
+      "_FormInput-4bdc1ca0.js",
+      "_FormUpload-637793d3.js",
+      "_useQuery-64b3e593.js",
+      "_FormDateTimeInput.vue_vue_type_style_index_0_lang-abff0e84.js",
+      "_FormQuillEditor-e4b30354.js",
+      "_FormRadioInput-35542934.js",
+      "_useStaffRequest-4d0920bc.js",
+      "_usePollRequest-ac4b87eb.js",
+      "_useTaskRequest-e083a7cb.js",
+      "_index-053adef9.js",
+      "_folder_routes-48149054.js",
+      "_useQueryClient-78663db9.js",
+      "_staff_routes-45a2bbdb.js"
     ],
     "isDynamicEntry": true,
     "src": "resources/front/staff/pages/secure/committee/CommitteeDetail.vue"
@@ -661,15 +673,15 @@
     "css": [
       "assets/document-879de037.css"
     ],
-    "file": "assets/document-91dae301.js",
+    "file": "assets/document-f8d6145b.js",
     "imports": [
       "resources/front/main.ts",
-      "_useUnexpectedErrorHandler-f37df04f.js",
-      "_useFileRequest-eb873f34.js",
-      "_pspdfkit.store-3ef68173.js",
-      "_useQuery-7facd994.js",
-      "_folder_routes-6d34764d.js",
-      "_useQueryClient-0be5c548.js"
+      "_useUnexpectedErrorHandler-2f1b2730.js",
+      "_useFileRequest-487c7d03.js",
+      "_pspdfkit.store-a91838ef.js",
+      "_useQuery-64b3e593.js",
+      "_folder_routes-48149054.js",
+      "_useQueryClient-78663db9.js"
     ],
     "isDynamicEntry": true,
     "src": "resources/front/staff/pages/secure/committee/includes/document/document.vue"
@@ -682,7 +694,7 @@
     "css": [
       "assets/discussionDetails-ef6be939.css"
     ],
-    "file": "assets/discussionDetails-c80737a9.js",
+    "file": "assets/discussionDetails-1269ac6a.js",
     "imports": [
       "resources/front/main.ts"
     ],
@@ -697,50 +709,50 @@
     "css": [
       "assets/discussions-37433030.css"
     ],
-    "file": "assets/discussions-e2175166.js",
+    "file": "assets/discussions-90d9aba6.js",
     "imports": [
       "resources/front/main.ts",
-      "_useUnexpectedErrorHandler-f37df04f.js",
-      "_index-df77389a.js",
-      "_useBoardRequest-2247a6a5.js",
-      "_useCommitteeRequest-f6f4ffc4.js",
-      "_useUserRequest-dfc5ef80.js",
-      "_useQuery-7facd994.js",
-      "_useQueryClient-0be5c548.js"
+      "_useUnexpectedErrorHandler-2f1b2730.js",
+      "_index-053adef9.js",
+      "_useBoardRequest-61ad7599.js",
+      "_useCommitteeRequest-fdd0f16f.js",
+      "_useUserRequest-4c0546ed.js",
+      "_useQuery-64b3e593.js",
+      "_useQueryClient-78663db9.js"
     ],
     "isDynamicEntry": true,
     "src": "resources/front/staff/pages/secure/discussion/discussions.vue"
   },
   "resources/front/staff/pages/secure/meeting/board/BoardMeetingDetails.css": {
-    "file": "assets/BoardMeetingDetails-edd4850a.css",
+    "file": "assets/BoardMeetingDetails-ad699fdf.css",
     "src": "resources/front/staff/pages/secure/meeting/board/BoardMeetingDetails.css"
   },
   "resources/front/staff/pages/secure/meeting/board/BoardMeetingDetails.vue": {
     "css": [
-      "assets/BoardMeetingDetails-edd4850a.css"
+      "assets/BoardMeetingDetails-ad699fdf.css"
     ],
-    "file": "assets/BoardMeetingDetails-ad15ea61.js",
+    "file": "assets/BoardMeetingDetails-22c652f2.js",
     "imports": [
       "resources/front/main.ts",
-      "_useUnexpectedErrorHandler-f37df04f.js",
-      "_useConflictRequest-ca7ff719.js",
-      "_FormDynamicInput-4c66f355.js",
-      "_Breadcrumb-74d93201.js",
-      "_useMinuteRequest-2d0f7362.js",
-      "_useMembershipRequest-619957a2.js",
-      "_FormInput-360d6aac.js",
-      "_FormQuillEditor-fc7ac95e.js",
-      "_useQuery-7facd994.js",
-      "_FormDateTimeInput.vue_vue_type_style_index_0_lang-fbef2fd1.js",
-      "_FormTextBox-90b70c6e.js",
-      "_FormUpload-c235b23e.js",
-      "_usePollRequest-adad518d.js",
-      "_useTaskRequest-a11374e2.js",
-      "_index-df77389a.js",
-      "_attendance_routes-22107f1a.js",
-      "_folder_routes-6d34764d.js",
-      "_membership_routes-82bd5969.js",
-      "_useQueryClient-0be5c548.js"
+      "_useUnexpectedErrorHandler-2f1b2730.js",
+      "_useConflictRequest-46181bf0.js",
+      "_FormDynamicInput-57fd3f34.js",
+      "_Breadcrumb-ecf3abcd.js",
+      "_useMinuteRequest-25870890.js",
+      "_useMembershipRequest-ae7237bb.js",
+      "_FormInput-4bdc1ca0.js",
+      "_FormQuillEditor-e4b30354.js",
+      "_useQuery-64b3e593.js",
+      "_FormDateTimeInput.vue_vue_type_style_index_0_lang-abff0e84.js",
+      "_FormTextBox-4a2981cb.js",
+      "_FormUpload-637793d3.js",
+      "_usePollRequest-ac4b87eb.js",
+      "_useTaskRequest-e083a7cb.js",
+      "_index-053adef9.js",
+      "_attendance_routes-07e71fee.js",
+      "_folder_routes-48149054.js",
+      "_membership_routes-2da0f288.js",
+      "_useQueryClient-78663db9.js"
     ],
     "isDynamicEntry": true,
     "src": "resources/front/staff/pages/secure/meeting/board/BoardMeetingDetails.vue"
@@ -753,17 +765,17 @@
     "css": [
       "assets/Minute-f3b9bc3b.css"
     ],
-    "file": "assets/Minute-c51ce694.js",
+    "file": "assets/Minute-58e9a4dd.js",
     "imports": [
       "resources/front/main.ts",
-      "_useUnexpectedErrorHandler-f37df04f.js",
-      "_useMinuteRequest-2d0f7362.js",
-      "_useScheduleRequest-e2b3060f.js",
-      "_FormQuillEditor-fc7ac95e.js",
-      "_Breadcrumb-74d93201.js",
-      "_useQuery-7facd994.js",
-      "_index-df77389a.js",
-      "_useQueryClient-0be5c548.js"
+      "_useUnexpectedErrorHandler-2f1b2730.js",
+      "_useMinuteRequest-25870890.js",
+      "_useScheduleRequest-05dc2857.js",
+      "_FormQuillEditor-e4b30354.js",
+      "_Breadcrumb-ecf3abcd.js",
+      "_useQuery-64b3e593.js",
+      "_index-053adef9.js",
+      "_useQueryClient-78663db9.js"
     ],
     "isDynamicEntry": true,
     "src": "resources/front/staff/pages/secure/meeting/board/includes/Minute.vue"
@@ -776,15 +788,15 @@
     "css": [
       "assets/MinuteApproval-d6106027.css"
     ],
-    "file": "assets/MinuteApproval-137a7a63.js",
+    "file": "assets/MinuteApproval-8d3c056f.js",
     "imports": [
       "resources/front/main.ts",
-      "_useUnexpectedErrorHandler-f37df04f.js",
-      "_useMinuteRequest-2d0f7362.js",
-      "_Breadcrumb-74d93201.js",
-      "_useQuery-7facd994.js",
-      "_index-df77389a.js",
-      "_useQueryClient-0be5c548.js"
+      "_useUnexpectedErrorHandler-2f1b2730.js",
+      "_useMinuteRequest-25870890.js",
+      "_Breadcrumb-ecf3abcd.js",
+      "_useQuery-64b3e593.js",
+      "_index-053adef9.js",
+      "_useQueryClient-78663db9.js"
     ],
     "isDynamicEntry": true,
     "src": "resources/front/staff/pages/secure/meeting/board/includes/MinuteApproval.vue"
@@ -797,22 +809,22 @@
     "css": [
       "assets/Signature-08213541.css"
     ],
-    "file": "assets/Signature-30dac39e.js",
+    "file": "assets/Signature-4197beaf.js",
     "imports": [
       "resources/front/main.ts",
-      "_useUnexpectedErrorHandler-f37df04f.js",
-      "_useSignatureFileRequest-327890f7.js",
-      "_Breadcrumb-74d93201.js",
-      "_pspdfkit.store-3ef68173.js",
-      "_useQuery-7facd994.js",
-      "_attendance_routes-22107f1a.js",
-      "_useQueryClient-0be5c548.js"
+      "_useUnexpectedErrorHandler-2f1b2730.js",
+      "_useSignatureFileRequest-e2785d67.js",
+      "_Breadcrumb-ecf3abcd.js",
+      "_pspdfkit.store-a91838ef.js",
+      "_useQuery-64b3e593.js",
+      "_attendance_routes-07e71fee.js",
+      "_useQueryClient-78663db9.js"
     ],
     "isDynamicEntry": true,
     "src": "resources/front/staff/pages/secure/meeting/board/includes/Signature.vue"
   },
   "resources/front/staff/pages/secure/meeting/board/includes/minute/Minutepdf.vue": {
-    "file": "assets/Minutepdf-1b8fdc14.js",
+    "file": "assets/Minutepdf-6ef9e04e.js",
     "imports": [
       "resources/front/main.ts"
     ],
@@ -820,79 +832,79 @@
     "src": "resources/front/staff/pages/secure/meeting/board/includes/minute/Minutepdf.vue"
   },
   "resources/front/staff/pages/secure/meeting/committee/CommitteeMeetingDetails.css": {
-    "file": "assets/CommitteeMeetingDetails-bb579944.css",
+    "file": "assets/CommitteeMeetingDetails-f105b47e.css",
     "src": "resources/front/staff/pages/secure/meeting/committee/CommitteeMeetingDetails.css"
   },
   "resources/front/staff/pages/secure/meeting/committee/CommitteeMeetingDetails.vue": {
     "css": [
-      "assets/CommitteeMeetingDetails-bb579944.css"
+      "assets/CommitteeMeetingDetails-f105b47e.css"
     ],
-    "file": "assets/CommitteeMeetingDetails-44993841.js",
+    "file": "assets/CommitteeMeetingDetails-53066b2a.js",
     "imports": [
       "resources/front/main.ts",
-      "_useUnexpectedErrorHandler-f37df04f.js",
-      "_useConflictRequest-ca7ff719.js",
-      "_FormDynamicInput-4c66f355.js",
-      "_Breadcrumb-74d93201.js",
-      "_useMinuteRequest-2d0f7362.js",
-      "_useMembershipRequest-619957a2.js",
-      "_FormInput-360d6aac.js",
-      "_FormQuillEditor-fc7ac95e.js",
-      "_useQuery-7facd994.js",
-      "_FormDateTimeInput.vue_vue_type_style_index_0_lang-fbef2fd1.js",
-      "_FormTextBox-90b70c6e.js",
-      "_FormUpload-c235b23e.js",
-      "_usePollRequest-adad518d.js",
-      "_useTaskRequest-a11374e2.js",
-      "_index-df77389a.js",
-      "_attendance_routes-22107f1a.js",
-      "_folder_routes-6d34764d.js",
-      "_membership_routes-82bd5969.js",
-      "_useQueryClient-0be5c548.js"
+      "_useUnexpectedErrorHandler-2f1b2730.js",
+      "_useConflictRequest-46181bf0.js",
+      "_FormDynamicInput-57fd3f34.js",
+      "_Breadcrumb-ecf3abcd.js",
+      "_useMinuteRequest-25870890.js",
+      "_useMembershipRequest-ae7237bb.js",
+      "_FormInput-4bdc1ca0.js",
+      "_FormQuillEditor-e4b30354.js",
+      "_useQuery-64b3e593.js",
+      "_FormDateTimeInput.vue_vue_type_style_index_0_lang-abff0e84.js",
+      "_FormTextBox-4a2981cb.js",
+      "_FormUpload-637793d3.js",
+      "_usePollRequest-ac4b87eb.js",
+      "_useTaskRequest-e083a7cb.js",
+      "_index-053adef9.js",
+      "_attendance_routes-07e71fee.js",
+      "_folder_routes-48149054.js",
+      "_membership_routes-2da0f288.js",
+      "_useQueryClient-78663db9.js"
     ],
     "isDynamicEntry": true,
     "src": "resources/front/staff/pages/secure/meeting/committee/CommitteeMeetingDetails.vue"
   },
   "resources/front/staff/pages/secure/meeting/committee/includes/Minute.css": {
-    "file": "assets/Minute-a71ca2c9.css",
+    "file": "assets/Minute-3d5c4c44.css",
     "src": "resources/front/staff/pages/secure/meeting/committee/includes/Minute.css"
   },
   "resources/front/staff/pages/secure/meeting/committee/includes/Minute.vue": {
     "css": [
-      "assets/Minute-a71ca2c9.css"
+      "assets/Minute-3d5c4c44.css"
     ],
-    "file": "assets/Minute-895a8741.js",
+    "file": "assets/Minute-71ba3f3c.js",
     "imports": [
       "resources/front/main.ts",
-      "_useUnexpectedErrorHandler-f37df04f.js",
-      "_useMinuteRequest-2d0f7362.js",
-      "_useScheduleRequest-e2b3060f.js",
-      "_FormQuillEditor-fc7ac95e.js",
-      "_Breadcrumb-74d93201.js",
-      "_useQuery-7facd994.js",
-      "_index-df77389a.js",
-      "_useQueryClient-0be5c548.js"
+      "_useUnexpectedErrorHandler-2f1b2730.js",
+      "_useMinuteRequest-25870890.js",
+      "_useScheduleRequest-05dc2857.js",
+      "_FormQuillEditor-e4b30354.js",
+      "_Breadcrumb-ecf3abcd.js",
+      "_useQuery-64b3e593.js",
+      "_index-053adef9.js",
+      "_useQueryClient-78663db9.js"
     ],
     "isDynamicEntry": true,
     "src": "resources/front/staff/pages/secure/meeting/committee/includes/Minute.vue"
   },
   "resources/front/staff/pages/secure/meeting/committee/includes/MinuteApproval.css": {
-    "file": "assets/MinuteApproval-6d9905db.css",
+    "file": "assets/MinuteApproval-a41c87d7.css",
     "src": "resources/front/staff/pages/secure/meeting/committee/includes/MinuteApproval.css"
   },
   "resources/front/staff/pages/secure/meeting/committee/includes/MinuteApproval.vue": {
     "css": [
-      "assets/MinuteApproval-6d9905db.css"
+      "assets/MinuteApproval-a41c87d7.css"
     ],
-    "file": "assets/MinuteApproval-9f7a51a2.js",
+    "file": "assets/MinuteApproval-fd6a1465.js",
     "imports": [
       "resources/front/main.ts",
-      "_useUnexpectedErrorHandler-f37df04f.js",
-      "_useMinuteRequest-2d0f7362.js",
-      "_Breadcrumb-74d93201.js",
-      "_useQuery-7facd994.js",
-      "_index-df77389a.js",
-      "_useQueryClient-0be5c548.js"
+      "_useUnexpectedErrorHandler-2f1b2730.js",
+      "_useMinuteRequest-25870890.js",
+      "_Breadcrumb-ecf3abcd.js",
+      "_useQuery-64b3e593.js",
+      "_index-053adef9.js",
+      "_useQueryClient-78663db9.js"
     ],
     "isDynamicEntry": true,
     "src": "resources/front/staff/pages/secure/meeting/committee/includes/MinuteApproval.vue"
@@ -905,16 +917,16 @@
     "css": [
       "assets/Signature-8ba3bda4.css"
     ],
-    "file": "assets/Signature-cffb8676.js",
+    "file": "assets/Signature-4cb90e66.js",
     "imports": [
       "resources/front/main.ts",
-      "_useUnexpectedErrorHandler-f37df04f.js",
-      "_useSignatureFileRequest-327890f7.js",
-      "_Breadcrumb-74d93201.js",
-      "_pspdfkit.store-3ef68173.js",
-      "_useQuery-7facd994.js",
-      "_attendance_routes-22107f1a.js",
-      "_useQueryClient-0be5c548.js"
+      "_useUnexpectedErrorHandler-2f1b2730.js",
+      "_useSignatureFileRequest-e2785d67.js",
+      "_Breadcrumb-ecf3abcd.js",
+      "_pspdfkit.store-a91838ef.js",
+      "_useQuery-64b3e593.js",
+      "_attendance_routes-07e71fee.js",
+      "_useQueryClient-78663db9.js"
     ],
     "isDynamicEntry": true,
     "src": "resources/front/staff/pages/secure/meeting/committee/includes/Signature.vue"
@@ -927,21 +939,21 @@
     "css": [
       "assets/document-854ba3d8.css"
     ],
-    "file": "assets/document-d9d6fe85.js",
+    "file": "assets/document-36765749.js",
     "imports": [
       "resources/front/main.ts",
-      "_useUnexpectedErrorHandler-f37df04f.js",
-      "_useFileRequest-eb873f34.js",
-      "_pspdfkit.store-3ef68173.js",
-      "_useQuery-7facd994.js",
-      "_folder_routes-6d34764d.js",
-      "_useQueryClient-0be5c548.js"
+      "_useUnexpectedErrorHandler-2f1b2730.js",
+      "_useFileRequest-487c7d03.js",
+      "_pspdfkit.store-a91838ef.js",
+      "_useQuery-64b3e593.js",
+      "_folder_routes-48149054.js",
+      "_useQueryClient-78663db9.js"
     ],
     "isDynamicEntry": true,
     "src": "resources/front/staff/pages/secure/meeting/committee/includes/document/document.vue"
   },
   "resources/front/staff/pages/secure/meeting/committee/includes/minute/Minutepdf.vue": {
-    "file": "assets/Minutepdf-dc5ebaf4.js",
+    "file": "assets/Minutepdf-bcb25046.js",
     "imports": [
       "resources/front/main.ts"
     ],
@@ -949,7 +961,7 @@
     "src": "resources/front/staff/pages/secure/meeting/committee/includes/minute/Minutepdf.vue"
   },
   "resources/front/staff/pages/secure/notification/Notifications.vue": {
-    "file": "assets/Notifications-260425cd.js",
+    "file": "assets/Notifications-71659fb1.js",
     "imports": [
       "resources/front/main.ts"
     ],
@@ -964,7 +976,7 @@
     "css": [
       "assets/NotificationsDetails-3a6c0a18.css"
     ],
-    "file": "assets/NotificationsDetails-38110d87.js",
+    "file": "assets/NotificationsDetails-5fd0ea1b.js",
     "imports": [
       "resources/front/main.ts"
     ],
@@ -979,18 +991,18 @@
     "css": [
       "assets/Tasks-0336b2ed.css"
     ],
-    "file": "assets/Polls-315608c8.js",
+    "file": "assets/Polls-19d3bdc5.js",
     "imports": [
       "resources/front/main.ts",
-      "_useUnexpectedErrorHandler-f37df04f.js",
-      "_membership_routes-82bd5969.js",
-      "_usePollRequest-adad518d.js",
-      "_FormDateTimeInput.vue_vue_type_style_index_0_lang-fbef2fd1.js",
-      "_FormInput-360d6aac.js",
-      "_FormTextBox-90b70c6e.js",
-      "_useQuery-7facd994.js",
-      "_index-df77389a.js",
-      "_useQueryClient-0be5c548.js"
+      "_useUnexpectedErrorHandler-2f1b2730.js",
+      "_membership_routes-2da0f288.js",
+      "_usePollRequest-ac4b87eb.js",
+      "_FormDateTimeInput.vue_vue_type_style_index_0_lang-abff0e84.js",
+      "_FormInput-4bdc1ca0.js",
+      "_FormTextBox-4a2981cb.js",
+      "_useQuery-64b3e593.js",
+      "_index-053adef9.js",
+      "_useQueryClient-78663db9.js"
     ],
     "isDynamicEntry": true,
     "src": "resources/front/staff/pages/secure/poll/Polls.vue"
@@ -1003,7 +1015,7 @@
     "css": [
       "assets/TasksDetails-e3b0c442.css"
     ],
-    "file": "assets/PollsDetails-75e63f31.js",
+    "file": "assets/PollsDetails-1e880c06.js",
     "imports": [
       "resources/front/main.ts"
     ],
@@ -1018,14 +1030,14 @@
     "css": [
       "assets/settings-894c65c7.css"
     ],
-    "file": "assets/settings-99e11780.js",
+    "file": "assets/settings-d76816dd.js",
     "imports": [
       "resources/front/main.ts",
-      "_useUnexpectedErrorHandler-f37df04f.js",
-      "_FormInput-360d6aac.js",
-      "_FormTextBox-90b70c6e.js",
-      "_FormUpload-c235b23e.js",
-      "_Breadcrumb-74d93201.js"
+      "_useUnexpectedErrorHandler-2f1b2730.js",
+      "_FormInput-4bdc1ca0.js",
+      "_FormTextBox-4a2981cb.js",
+      "_FormUpload-637793d3.js",
+      "_Breadcrumb-ecf3abcd.js"
     ],
     "isDynamicEntry": true,
     "src": "resources/front/staff/pages/secure/settings/settings.vue"
@@ -1038,20 +1050,20 @@
     "css": [
       "assets/Tasks-0336b2ed.css"
     ],
-    "file": "assets/Tasks-70e3edb0.js",
+    "file": "assets/Tasks-ea8a561d.js",
     "imports": [
       "resources/front/main.ts",
-      "_useUnexpectedErrorHandler-f37df04f.js",
-      "_useMembershipRequest-619957a2.js",
-      "_useTaskRequest-a11374e2.js",
-      "_FormDateTimeInput.vue_vue_type_style_index_0_lang-fbef2fd1.js",
-      "_FormInput-360d6aac.js",
-      "_FormTextBox-90b70c6e.js",
-      "_Breadcrumb-74d93201.js",
-      "_useQuery-7facd994.js",
-      "_index-df77389a.js",
-      "_membership_routes-82bd5969.js",
-      "_useQueryClient-0be5c548.js"
+      "_useUnexpectedErrorHandler-2f1b2730.js",
+      "_useMembershipRequest-ae7237bb.js",
+      "_useTaskRequest-e083a7cb.js",
+      "_FormDateTimeInput.vue_vue_type_style_index_0_lang-abff0e84.js",
+      "_FormInput-4bdc1ca0.js",
+      "_FormTextBox-4a2981cb.js",
+      "_Breadcrumb-ecf3abcd.js",
+      "_useQuery-64b3e593.js",
+      "_index-053adef9.js",
+      "_membership_routes-2da0f288.js",
+      "_useQueryClient-78663db9.js"
     ],
     "isDynamicEntry": true,
     "src": "resources/front/staff/pages/secure/task/Tasks.vue"
@@ -1064,7 +1076,7 @@
     "css": [
       "assets/TasksDetails-e3b0c442.css"
     ],
-    "file": "assets/TasksDetails-3cff9d1b.js",
+    "file": "assets/TasksDetails-7379b0ea.js",
     "imports": [
       "resources/front/main.ts"
     ],
@@ -1072,17 +1084,17 @@
     "src": "resources/front/staff/pages/secure/task/TasksDetails.vue"
   },
   "resources/front/staff/pages/secure/user/ProfileDetails.vue": {
-    "file": "assets/ProfileDetails-d95c1aa3.js",
+    "file": "assets/ProfileDetails-a8e09be8.js",
     "imports": [
       "resources/front/main.ts",
-      "_useUnexpectedErrorHandler-f37df04f.js",
-      "_FormDateTimeInput.vue_vue_type_style_index_0_lang-fbef2fd1.js",
-      "_FormInput-360d6aac.js",
-      "_FormUpload-c235b23e.js",
-      "_FormQuillEditor-fc7ac95e.js",
-      "_Breadcrumb-74d93201.js",
-      "_useQuery-7facd994.js",
-      "_useQueryClient-0be5c548.js"
+      "_useUnexpectedErrorHandler-2f1b2730.js",
+      "_FormDateTimeInput.vue_vue_type_style_index_0_lang-abff0e84.js",
+      "_FormInput-4bdc1ca0.js",
+      "_FormUpload-637793d3.js",
+      "_FormQuillEditor-e4b30354.js",
+      "_Breadcrumb-ecf3abcd.js",
+      "_useQuery-64b3e593.js",
+      "_useQueryClient-78663db9.js"
     ],
     "isDynamicEntry": true,
     "src": "resources/front/staff/pages/secure/user/ProfileDetails.vue"
@@ -1095,18 +1107,18 @@
     "css": [
       "assets/Users-5efdd9e1.css"
     ],
-    "file": "assets/Users-35d30a06.js",
+    "file": "assets/Users-646de484.js",
     "imports": [
       "resources/front/main.ts",
-      "_Breadcrumb-74d93201.js",
-      "_useUnexpectedErrorHandler-f37df04f.js",
-      "_useUserRequest-dfc5ef80.js",
-      "_index-df77389a.js",
-      "_staff_routes-8adeed43.js",
-      "_FormInput-360d6aac.js",
-      "_LoadingComponent.vue_vue_type_script_setup_true_lang-c51888d4.js",
-      "_useQuery-7facd994.js",
-      "_useQueryClient-0be5c548.js"
+      "_Breadcrumb-ecf3abcd.js",
+      "_useUnexpectedErrorHandler-2f1b2730.js",
+      "_useUserRequest-4c0546ed.js",
+      "_index-053adef9.js",
+      "_staff_routes-45a2bbdb.js",
+      "_FormInput-4bdc1ca0.js",
+      "_LoadingComponent.vue_vue_type_script_setup_true_lang-18662810.js",
+      "_useQuery-64b3e593.js",
+      "_useQueryClient-78663db9.js"
     ],
     "isDynamicEntry": true,
     "src": "resources/front/staff/pages/secure/user/Users.vue"

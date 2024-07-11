@@ -9,6 +9,7 @@ use App\Models\Module\Board\Board;
 interface BoardInterface
 {
     public function getAll();
+    public function getLatest();
 
     public function get(Board|string $board): Board;
     public function getMembers(Board|string $board): Board;

@@ -9,6 +9,11 @@ import {
     singleCommitteeResponse, 
 } from '@/common/parsers/committeeParser';
 
+export async function useGetLatestCommitteesRequest(options?: object): Promise<nonPaginateResponse> {
+    const client = useClient();
+    const cn = Qs.stringify(options, {arrayFormat: 'brackets'});
+    return await client.get(committeeRoute() + '/latest'+ '?' + cn).json();
+}
 export async function useGetCommitteesRequest(options?: object): Promise<nonPaginateResponse> {
     const client = useClient();
     const cn = Qs.stringify(options, {arrayFormat: 'brackets'});

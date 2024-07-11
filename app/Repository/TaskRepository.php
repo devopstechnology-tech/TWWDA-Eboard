@@ -40,6 +40,15 @@ class TaskRepository extends BaseRepository implements TaskInterface
         ];
         return $this->indexResource(Task::class, TaskResource::class, $filters);
     }
+    public function getLatest()
+    {
+        $filters = [
+            'limit' => 4,
+            'with' => $this->relationships(),
+            'orderBy' => ['field' => 'id', 'direction' => 'asc']
+        ];
+        return $this->indexResource(Task::class, TaskResource::class, $filters);
+    }
     public function getTask(Task |string $task)
     {
         if (!($task instanceof Task)) {

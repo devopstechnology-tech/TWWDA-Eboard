@@ -11,6 +11,7 @@ use App\Models\Module\Meeting\Schedule;
 interface ScheduleInterface
 {
     public function getAll();
+    public function getLatest();
     public function get(Schedule|string $schedule): Schedule;
     public function createSchedule(Meeting $meeting, Member $member, array $payload): void;
     public function updateSchedule(Meeting|string $meeting, array $payload): void;

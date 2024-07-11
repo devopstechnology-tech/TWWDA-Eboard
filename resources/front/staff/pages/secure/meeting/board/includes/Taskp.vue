@@ -169,10 +169,10 @@ const onSubmit = handleSubmit(async (values, {resetForm}) => {
             taskassignees: values.taskassignees,
         };
         if (action.value === 'create') {
-            await useCreateMeetingTaskRequest(payload, meetingId, boardId);
+            await useCreateMeetingTaskRequest(payload, meetingId);
         } else {
             const task_id = taskId.value as string;
-            await useUpdateMeetingTaskRequest(payload, meetingId, boardId, task_id);
+            await useUpdateMeetingTaskRequest(payload, meetingId, task_id);
         }
         TaskModal.value?.close();
         await fetchMeetingTasks();

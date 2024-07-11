@@ -111,7 +111,7 @@ const onSubmit = handleSubmit(async (values, { resetForm }) => {
     try {
         const payload: MinuteRequestPayload = {
             schedule_id: values.schedule_id,
-            committee_id: null,
+            committee_id: committeeId,
             membership_id: null,
             // // minutedetails
             minute_id: minuteId.value ? minuteId.value.toString() : null,

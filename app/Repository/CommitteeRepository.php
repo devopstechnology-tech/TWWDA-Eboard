@@ -47,6 +47,18 @@ class CommitteeRepository extends BaseRepository implements CommitteeInterface
        ];
        return $this->indexResource(Committee::class, CommitteeResource::class, $filters);
    }
+   public function getLatest()
+   {
+       // Adjust the implementation based on your actual logic
+       // For example, using a hypothetical CommitteeResource for transformation
+       $filters = [
+           'limit' => 4,
+           // 'owner_id' => Auth::user()->id,
+           'with' => $this->relationships(),
+           'orderBy' => ['field' => 'created_at', 'direction' => 'asc']
+       ];
+       return $this->indexResource(Committee::class, CommitteeResource::class, $filters);
+   }
 
    public function get(Committee|string $committee): Committee
    {

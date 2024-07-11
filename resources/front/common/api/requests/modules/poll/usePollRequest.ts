@@ -98,7 +98,6 @@ export async function useCreateMeetingPollRequest(payload: PollRequestPayload, m
 export async function useUpdateMeetingPollRequest(
     payload: PollRequestPayload, 
     meetingid: string,  
-    boardid: string, 
     pollid:string,
 ){
     const client = useClient();

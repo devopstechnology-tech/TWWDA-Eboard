@@ -26,6 +26,12 @@ class TaskController extends Controller
 
         return $this->response(Response::HTTP_OK, __('messages.records-fetched'), $tasks, Task::class);
     }
+    public function latest(): JsonResponse
+    {
+        $tasks = $this->taskRepository->getLatest();
+
+        return $this->response(Response::HTTP_OK, __('messages.records-fetched'), $tasks, Task::class);
+    }
     public function updatetask(UpdateTaskRequest $request, Meeting $meeting, Board $board): JsonResponse
     {
         $task = $this->taskRepository->updateTask($meeting, $request->validated());

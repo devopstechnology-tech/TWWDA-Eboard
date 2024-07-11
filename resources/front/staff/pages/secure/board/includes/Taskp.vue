@@ -196,6 +196,7 @@ const handleAssigneeTypeChange = (selectedAssignee: string) => {
     assigneestatus.value = selectedAssignee;
     setFieldValue('assigneetype', selectedAssignee);
     setFieldValue('assigneestatus', selectedAssignee);
+    setFieldValue('taskassignees', []);
 };
 
 const assigneeTypes = [

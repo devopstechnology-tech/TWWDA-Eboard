@@ -28,6 +28,10 @@ class ScheduleRepository extends BaseRepository implements ScheduleInterface
     {
         return [
             'meeting',
+            'meeting.owner',
+            'meeting.meetingable',
+            'meeting.folders',
+            'meeting.schedules',
         ];
     }
 
@@ -35,6 +39,15 @@ class ScheduleRepository extends BaseRepository implements ScheduleInterface
     public function getAll()
     {
         $filters = [
+            'with' => $this->relationships(),
+            'orderBy' => ['field' => 'id', 'direction' => 'asc']
+        ];
+        return $this->indexResource(Schedule::class, ScheduleResource::class, $filters);
+    }
+    public function getLatest()
+    {
+        $filters = [
+            'limit' => 4,
             'with' => $this->relationships(),
             'orderBy' => ['field' => 'id', 'direction' => 'asc']
         ];

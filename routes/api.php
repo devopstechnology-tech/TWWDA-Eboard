@@ -83,13 +83,15 @@ Route::group(['prefix' => 'v1'], function () {
             Route::post('profiles/update/{profile}', [ProfileController::class, 'update']);
 
             //////////////////////////// Board/////////////////
-            Route::apiResource('boards', BoardController::class);
+            Route::get('boards/latest', [BoardController::class, 'latest']);
             Route::post('boards/update/{board}', [BoardController::class, 'update']);
             Route::post('boards/members/{board}', [BoardController::class, 'updatemembers']);
+            Route::apiResource('boards', BoardController::class);
            
              //////////////////////////// Committee/////////////////
             //  Route::apiResource('committees', CommitteeController::class);
              Route::get('committees', [CommitteeController::class, 'index']);
+             Route::get('committees/latest', [CommitteeController::class, 'latest']);
              Route::get('committees/{committee}', [CommitteeController::class, 'show']);
              Route::post('committees/create/{board}', [CommitteeController::class, 'store']);
              Route::post('committees/update/{committee}', [CommitteeController::class, 'update']);
@@ -148,6 +150,7 @@ Route::group(['prefix' => 'v1'], function () {
 
             Route::apiResource('meetings', MeetingController::class);
             Route::get('meeting', [MeetingController::class, 'index']);
+            Route::get('meeting/latest', [MeetingController::class, 'latest']);
             Route::get('meeting/board/{board}', [MeetingController::class, 'boardmeeting']);
             Route::get('meetings/board/{board}', [MeetingController::class, 'boardmeetings']);            
             Route::post('meetings/board', [MeetingController::class, 'store']);
@@ -161,6 +164,7 @@ Route::group(['prefix' => 'v1'], function () {
 
             //////////////////////////// scdeulesh/////////////////
             Route::get('schedules', [ScheduleController::class, 'index']);
+            Route::get('schedules/latest', [ScheduleController::class, 'latest']);
             Route::get('schedules/{meeting}', [ScheduleController::class, 'schedule']);
             Route::post('schedules/show/{schedule}', [ScheduleController::class, 'show']);
             Route::post('schedules', [ScheduleController::class, 'store']);
@@ -188,6 +192,7 @@ Route::group(['prefix' => 'v1'], function () {
             Route::post('attendances/signattendance/{attendance}', [AttendanceController::class, 'signattendance']);
 
             Route::apiResource('tasks', TaskController::class);
+            Route::get('tasks/latest', [TaskController::class, 'latest']);
             Route::get('tasks/meeting/{meeting}', [TaskController::class, 'getmeetingtasks']);
             Route::post('tasks/meeting/create/{meeting}', [TaskController::class, 'createmeetingtask']);
             Route::patch('tasks/meeting/update/{meeting}/{task}', [TaskController::class, 'updatemeetingtask']);
@@ -207,6 +212,7 @@ Route::group(['prefix' => 'v1'], function () {
 
             //////////////////////////// polls/////////////////
             Route::apiResource('polls', PollController::class);
+            Route::get('polls/latest', [PollController::class, 'latest']);
             Route::get('polls/meeting/{meeting}', [PollController::class, 'getmeetingpolls']);
             Route::post('polls/meeting/create/{meeting}', [PollController::class, 'createmeetingpoll']);
             Route::patch('polls/meeting/update/{meeting}/{poll}', [PollController::class, 'updatemeetingpoll']);
@@ -273,6 +279,7 @@ Route::group(['prefix' => 'v1'], function () {
 
             //////////////////////////// almanacs/////////////////
             Route::get('almanacs', [AlmanacController::class, 'index']);
+            Route::get('almanacs/latest', [AlmanacController::class, 'latest']);
             Route::post('almanacs/export/{export}', [AlmanacController::class, 'export']);
             Route::post('almanacs/import', [AlmanacController::class, 'import']);
             Route::post('almanacs/create', [AlmanacController::class, 'store']);

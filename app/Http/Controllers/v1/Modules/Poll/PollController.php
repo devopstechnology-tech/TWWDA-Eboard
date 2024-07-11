@@ -26,6 +26,12 @@ class PollController extends Controller
 
         return $this->response(Response::HTTP_OK, __('messages.records-fetched'), $polls, Poll::class);
     }
+    public function latest(): JsonResponse
+    {
+        $polls = $this->pollRepository->getLatest();
+
+        return $this->response(Response::HTTP_OK, __('messages.records-fetched'), $polls, Poll::class);
+    }
     public function getmeetingpolls($meeting): JsonResponse
     {
         $polls = $this->pollRepository->getMeetingPolls($meeting);

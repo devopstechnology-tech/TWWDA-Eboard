@@ -55,6 +55,17 @@ class MeetingRepository extends BaseRepository implements MeetingInterface
         ];
         return $this->indexResource(Meeting::class, MeetingResource::class, $filters);
     }
+    public function getLatest()
+    {
+        // Adjust the implementation based on your actual logic
+        // For example, using a hypothetical MeetingResource for transformation
+        $filters = [
+           'limit' => 4,
+            'with' => $this->relationships(),
+            'orderBy' => ['field' => 'created_at', 'direction' => 'asc']
+        ];
+        return $this->indexResource(Meeting::class, MeetingResource::class, $filters);
+    }
 
     public function get(Meeting|string $meeting): Meeting
     {

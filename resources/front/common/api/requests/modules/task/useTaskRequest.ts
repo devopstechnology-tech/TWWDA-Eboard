@@ -100,7 +100,6 @@ export async function useCreateMeetingTaskRequest(payload: TaskRequestPayload, m
 export async function useUpdateMeetingTaskRequest(
     payload: TaskRequestPayload, 
     meetingid: string,  
-    boardid: string, 
     taskid:string,
 ){
     const client = useClient();

@@ -29,6 +29,13 @@ class MeetingController extends Controller
 
         return $this->response(Response::HTTP_OK, __('messages.records-fetched'), $meeting, Meeting::class);
     }
+    public function latest(): JsonResponse
+    {
+        // $this->authorize('viewAny', Meeting::class);
+        $meeting = $this->meetingRepository->getLatest();
+
+        return $this->response(Response::HTTP_OK, __('messages.records-fetched'), $meeting, Meeting::class);
+    }
     public function boardmeetings($meeting): JsonResponse
     {
         // $this->authorize('viewAny', Meeting::class);

@@ -54,6 +54,16 @@ class PollRepository extends BaseRepository implements PollInterface
         ]; 
         return $this->indexResource(Poll::class, PollResource::class, $filters);
     }
+    public function getLatest()
+    {
+        $filters = [
+            'limit' => 4,
+            'with' => $this->relationships(),
+            'orderBy' => ['field' => 'id', 'direction' => 'asc'],
+            'includeDeleted' => 'with' // Options are 'with', 'only', or not set (to exclude)
+        ]; 
+        return $this->indexResource(Poll::class, PollResource::class, $filters);
+    }
     public function getPoll(Poll |string $poll)
     {
         if (!($poll instanceof Poll)) {

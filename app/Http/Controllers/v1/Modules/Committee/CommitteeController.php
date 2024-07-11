@@ -33,6 +33,15 @@ class CommitteeController extends Controller
  
          return $this->response(Response::HTTP_OK, __('messages.records-fetched'), $committee, Committee::class);
      }
+     public function latest(): JsonResponse
+     {
+         // ds("mix me down");
+         // dd("mix me down");
+         // $this->authorize('viewAny', Committee::class);
+         $committee = $this->committeeRepository->getLatest();
+ 
+         return $this->response(Response::HTTP_OK, __('messages.records-fetched'), $committee, Committee::class);
+     }
  
      public function show(Committee $committee): JsonResponse
      {

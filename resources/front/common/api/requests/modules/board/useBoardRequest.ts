@@ -9,6 +9,11 @@ import {
     singleBoardResponse,
 } from '@/common/parsers/boardParser';
 
+export async function useGetLatestBoardsRequest(options?: object): Promise<nonPaginateResponse> {
+    const client = useClient();
+    const cn = Qs.stringify(options, {arrayFormat: 'brackets'});
+    return await client.get(boardRoute() + '/latest' + '?' + cn).json();
+}
 export async function useGetBoardsRequest(options?: object): Promise<nonPaginateResponse> {
     const client = useClient();
     const cn = Qs.stringify(options, {arrayFormat: 'brackets'});

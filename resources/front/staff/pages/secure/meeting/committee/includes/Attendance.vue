@@ -136,7 +136,7 @@ function handleMeetingUpdated(event) {
 }
 const navigateToSignaturePage = (attendee) => {
     router.push({
-        name: 'SignatureAttendance',
+        name: 'CommitteeSignatureAttendance',
         params: {
             committeeId: route.params.committeeId,
             meetingId: route.params.meetingId,

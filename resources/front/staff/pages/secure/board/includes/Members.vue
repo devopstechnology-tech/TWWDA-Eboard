@@ -11,6 +11,7 @@ import * as yup from 'yup';
 import {
   useCreateBoardMemberRequest,
     useGetBoardMembersRequest,
+    useUpdateBoardMemberPositionRequest,
     useUpdateBoardMemberRequest,
 } from '@/common/api/requests/modules/member/useMemberRequest';
 import {useGetBoardPositionsRequest} from '@/common/api/requests/modules/member/usePositionRequest';
@@ -115,7 +116,7 @@ const onSubmit = handleSubmit(async (values, {resetForm}) => {
                 id: values.id,
                 position_id: values.position_id,
             };
-            await useUpdateMemberPositionRequest(payload, boardId);
+            await useUpdateBoardMemberPositionRequest(payload, boardId);
         }
         await fetchBoardMembers();
         reset();

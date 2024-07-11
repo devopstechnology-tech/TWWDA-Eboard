@@ -10,6 +10,7 @@ use App\Models\Module\Committe\Committee;
 interface CommitteeInterface
 {
     public function getAll();
+    public function getLatest();
     public function fetchAuthMember(string $committee);
 
     public function get(Committee|string $committee): Committee;

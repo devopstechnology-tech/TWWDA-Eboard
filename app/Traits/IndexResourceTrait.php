@@ -12,6 +12,11 @@ trait IndexResourceTrait
     public function indexResource($model, $resource, $filters = [])
     {
         $data = $model::query();
+        // Apply 'limit' filter for limiting results
+        if (isset($filters['limit'])) {
+            $data->limit($filters['limit']);
+        }
+        unset($filters['limit']); 
         // Decide whether to include deleted items based on 'includeDeleted' filter
         if (isset($filters['includeDeleted'])) {
             if ($filters['includeDeleted'] === 'only') {
@@ -57,6 +62,7 @@ trait IndexResourceTrait
             // Default sorting by 'created_at' if no 'orderBy' is specified
             $data->orderBy('created_at', 'asc');
         }
+        
 
         $data = $model::appendToQueryFromRequestQueryParameters($data);
 

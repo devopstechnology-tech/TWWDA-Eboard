@@ -26,6 +26,12 @@ class AlmanacController extends Controller
 
         return $this->response(Response::HTTP_OK, __('messages.records-fetched'), $almanacs, Almanac::class);
     }
+    public function latest(): JsonResponse
+    {
+        $almanacs = $this->almanacRepository->getLatest();
+
+        return $this->response(Response::HTTP_OK, __('messages.records-fetched'), $almanacs, Almanac::class);
+    }
 
     public function export(Request $request, $almanac): BinaryFileResponse
     {

@@ -23,6 +23,17 @@ class AlmanacRepository extends BaseRepository implements AlmanacInterface
         ];
         return $this->indexResource(Almanac::class, AlmanacResource::class, $filters);
     }
+    public function getLatest()
+    {
+        $filters = [
+            'limit' => 4,
+            // 'with' => $this->relationships(),
+            'whereNot' => ['type' => 'sample'],
+            'orderBy' => ['field' => 'start', 'direction' => 'asc'],
+            // 'includeDeleted' => ''
+        ];
+        return $this->indexResource(Almanac::class, AlmanacResource::class, $filters);
+    }
 
     public function importAlmanac(array $payload)
     {

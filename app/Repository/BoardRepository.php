@@ -44,6 +44,18 @@ class BoardRepository extends BaseRepository implements BoardInterface
         ];
         return $this->indexResource(Board::class, BoardResource::class, $filters);
     }
+    public function getLatest()
+    {
+        // Adjust the implementation based on your actual logic
+        // For example, using a hypothetical BoardResource for transformation
+        $filters = [
+            // 'owner_id' => Auth::user()->id,
+            'limit' => 4,  // Limit to 4 records
+            'with' => $this->relationships(),
+            'orderBy' => ['field' => 'created_at', 'direction' => 'asc']
+        ];
+        return $this->indexResource(Board::class, BoardResource::class, $filters);
+    }
 
     public function get(Board|string $board): Board
     {

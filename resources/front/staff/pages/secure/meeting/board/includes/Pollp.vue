@@ -214,10 +214,10 @@ const onSubmit = handleSubmit(async (values, {resetForm}) => {
             status: values.status,
         };
         if (action.value === 'create') {
-            await useCreateMeetingPollRequest(payload, meetingId, boardId);
+            await useCreateMeetingPollRequest(payload, meetingId);
         } else {
             const poll_id = pollId.value as string;
-            await useUpdateMeetingPollRequest(payload, meetingId, boardId, poll_id);
+            await useUpdateMeetingPollRequest(payload, meetingId, poll_id);
         }
         PollModal.value?.close();
         await fetchMeetingPolls();
@@ -356,6 +356,7 @@ const handleAssigneeTypeChange = (selectedAssignee: string) => {
     assigneestatus.value = selectedAssignee;  
     setFieldValue('assigneetype', selectedAssignee);
     setFieldValue('assigneestatus', selectedAssignee);
+    setFieldValue('pollassignees', []);
 };
 
 // Add an empty option on initialization
