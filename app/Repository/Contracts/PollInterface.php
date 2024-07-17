@@ -31,4 +31,7 @@ interface PollInterface
     public function getCommitteePolls($committee);
     public function createCommitteePoll(Committee $committee, array $payload): Poll;
     public function updateCommitteePoll(Poll $poll, array $payload): Poll;
+
+    //vote
+    public function VotePoll(Poll $poll, array $payload);
 }

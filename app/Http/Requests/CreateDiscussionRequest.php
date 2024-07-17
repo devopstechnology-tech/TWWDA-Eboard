@@ -18,8 +18,6 @@ class CreateDiscussionRequest extends FormRequest
             'description' => RuleSet::create()->required()->string(),
             'closestatus' => RuleSet::create()->required()->string(),
             'archivestatus' => RuleSet::create()->required()->string(),
-            'assigneetype' => RuleSet::create()->required()->string(),
-            'assigneestatus' => RuleSet::create()->required()->string(),
             'discussionassignees' => RuleSet::create()->sometimes(),
         ];
     }

@@ -43,6 +43,13 @@ class CommitteeController extends Controller
          return $this->response(Response::HTTP_OK, __('messages.records-fetched'), $committee, Committee::class);
      }
  
+     public function boardcommittee($board): JsonResponse
+     {
+         // $this->authorize('view', [Committee::class, $committee->id]);
+         $committee = $this->committeeRepository->getBoardCommittee($board);
+ 
+         return $this->response(Response::HTTP_OK, __('messages.record-fetched'), $committee, Committee::class);
+     }
      public function show(Committee $committee): JsonResponse
      {
          // $this->authorize('view', [Committee::class, $committee->id]);

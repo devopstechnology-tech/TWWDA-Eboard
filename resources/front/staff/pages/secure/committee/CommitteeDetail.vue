@@ -23,10 +23,13 @@ const committee = ref<Committee>();
 // Get the route instance
 const route = useRoute();
 const router = useRouter();
-
+const boardId = route.params.boardId as string;
 function goBack() {
     router.push({
-        name: BOARDS,
+        name: 'BoardDetails', 
+        params: { 
+            boardId: boardId, 
+        }, 
     });
 }
 // Extract the id parameter from the route
@@ -152,7 +155,7 @@ onMounted(async () => {
                                     </div>
                                     <div class="tab-pane fade" id="custom-tabs-four-tasks"
                                          role="tabpanel" aria-labelledby="custom-tabs-four-tasks-tab">
-                                         <TaskPolls/>
+                                        <TaskPolls/>
                                     </div>
                                     <div class="tab-pane fade" id="custom-tabs-four-goals"
                                          role="tabpanel" aria-labelledby="custom-tabs-four-goals-tab">
@@ -160,7 +163,7 @@ onMounted(async () => {
                                     </div>
                                     <div class="tab-pane fade" id="custom-tabs-four-members"
                                          role="tabpanel" aria-labelledby="custom-tabs-four-members-tab">
-                                         <Members/>
+                                        <Members/>
                                     </div>
                                 </div>
                             </div>

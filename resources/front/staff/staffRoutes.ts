@@ -184,7 +184,7 @@ const staffRoutes: RouteRecordRaw[] = [
                     component: () => import('@/staff/pages/secure/committee/CommitteeDetail.vue'),
                     // Ensure this component is created
                     name: 'CommitteeDetails', // A unique name for the route
-                    path: 'committee/:committeeId', // Dynamic segment to capture the board ID
+                    path: '/board/:boardId/committee/:committeeId', // Dynamic segment to capture the board ID
                     meta: {title: 'Committee Details'},
                 },
                 {
@@ -192,7 +192,7 @@ const staffRoutes: RouteRecordRaw[] = [
                     component: () => import('@/staff/pages/secure/committee/includes/document/document.vue'),
                     // Ensure this component is created
                     name: 'CommitteeMediaDetails', // A unique name for the route
-                    path: '/committee/:committeeId/folder/:folderId/media/:mediaId', // Dynamic segment to capture the committee ID
+                    path: '/board/:boardId/committee/:committeeId/folder/:folderId/media/:mediaId', // Dynamic segment to capture the committee ID
                     meta: {title: 'Committee Media Details'},
                 },
                 {
@@ -200,7 +200,7 @@ const staffRoutes: RouteRecordRaw[] = [
                     component: () => import('@/staff/pages/secure/meeting/committee/includes/MinuteApproval.vue'),
                     // Ensure this component is created
                     name: 'CommitteeMinuteApproval', // A unique name for the route
-                    path: '/committee/:committeeId/meeting/:meetingId/schedule/:scheduleId/minutes/:minutesId', // Dynamic segment to capture the committee ID & meting id
+                    path: '/board/:boardId/committee/:committeeId/meeting/:meetingId/schedule/:scheduleId/minutes/:minutesId', // Dynamic segment to capture the committee ID & meting id
                     meta: {title: 'Minute Approval By Committee/Chaiman'},
                     props: route => ({
                         committeeId: route.params.committeeId,
@@ -216,7 +216,7 @@ const staffRoutes: RouteRecordRaw[] = [
                     component: () => import('@/staff/pages/secure/meeting/committee/CommitteeMeetingDetails.vue'),
                     // Ensure this component is created
                     name: 'CommitteeMeetingDetails', // A unique name for the route
-                    path: '/committee/:committeeId/meeting/:meetingId/schedule/:scheduleId', // Dynamic segment to capture the committee ID & meting id
+                    path: '/board/:boardId/committee/:committeeId/meeting/:meetingId/schedule/:scheduleId', // Dynamic segment to capture the committee ID & meting id
                     meta: {title: 'Committee Meeting Details'},
                 },
                 {
@@ -224,7 +224,7 @@ const staffRoutes: RouteRecordRaw[] = [
                     component: () => import('@/staff/pages/secure/meeting/committee/includes/Minute.vue'),
                     // Ensure this component is created
                     name: 'CommitteeMeetingMinutes', // A unique name for the route
-                    path: '/committee/:committeeId/meeting/:meetingId/schedule/:scheduleId/minutes', // Dynamic segment to capture the committee ID & meting id
+                    path: '/board/:boardId/committee/:committeeId/meeting/:meetingId/schedule/:scheduleId/minutes', // Dynamic segment to capture the committee ID & meting id
                     meta: {title: 'Committee Meeting Minutes Details'},
                     props: route => ({
                         committeeId: route.params.committeeId,
@@ -240,7 +240,7 @@ const staffRoutes: RouteRecordRaw[] = [
                     component: () => import('@/staff/pages/secure/meeting/committee/includes/minute/Minutepdf.vue'),
                     // Ensure this component is created
                     name: 'MinuteView', // A unique name for the route
-                    path: '/committee/:committeeId/meeting/:meetingId/schedule/:scheduleId/minutes/:minutesId/pdf', // Dynamic segment to capture the committee ID & meting id
+                    path: '/board/:boardId/committee/:committeeId/meeting/:meetingId/schedule/:scheduleId/minutes/:minutesId/pdf', // Dynamic segment to capture the committee ID & meting id
                     meta: {title: 'Minute View'},
                     props: route => ({
                         committeeId: route.params.committeeId,
@@ -256,7 +256,7 @@ const staffRoutes: RouteRecordRaw[] = [
                     component: () => import('@/staff/pages/secure/meeting/committee/includes/Signature.vue'),
                     // Ensure this component is created
                     name: 'CommitteeSignatureAttendance', // A unique name for the route
-                    path: '/committee/:committeeId/meeting/:meetingId/schedule/:scheduleId/attendee/:attendeeId/:mediaId', // Dynamic segment to capture the committee ID & meting id
+                    path: '/board/:boardId/committee/:committeeId/meeting/:meetingId/schedule/:scheduleId/attendee/:attendeeId/:mediaId', // Dynamic segment to capture the committee ID & meting id
                     meta: {title: 'Attendance Signature'},
                     props: route => ({
                         committeeId: route.params.committeeId,
@@ -271,7 +271,7 @@ const staffRoutes: RouteRecordRaw[] = [
                     component: () => import('@/staff/pages/secure/meeting/committee/includes/document/document.vue'),
                     // Ensure this component is created
                     name: 'MeetingMediaDetails', // A unique name for the route
-                    path: '/committee/:committeeId/meeting/:meetingId/folder/:folderId/media/:mediaId', // Dynamic segment to capture the committee ID
+                    path: '/board/:boardId/committee/:committeeId/meeting/:meetingId/folder/:folderId/media/:mediaId', // Dynamic segment to capture the committee ID
                     meta: {title: 'Media Details'},
                 },
 

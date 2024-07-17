@@ -1,6 +1,7 @@
 
 import {array, object, output, string} from 'zod';
-import {DiscussionAssignee, discussionassigneeParser} from '@/common/parsers/DiscussionAssigneeParser';
+import {dassigneeParser, DiscussionAssignee, discussionassigneeParser} from '@/common/parsers/DiscussionAssigneeParser';
+import {chatParser} from './chatParser';
 
 export const discussionParser = object({
     id:string(),    
@@ -8,9 +9,17 @@ export const discussionParser = object({
     description:string(),
     closestatus:string(),
     archivestatus:string(),
-    assigneetype:string(),
-    assigneestatus:string(),
-    discussionassignees:array(discussionassigneeParser),
+    created_at:string(),
+    author:object({
+        email: string(),
+        first: string(),
+        full_name: string(),
+        id: string(),
+        last: string(),
+    }),
+    assignees:array(discussionassigneeParser),
+    dassignees:array(dassigneeParser),
+    chats:array(chatParser),
 });
 
 export interface DiscussionRequestPayload{ //to db
@@ -19,8 +28,8 @@ export interface DiscussionRequestPayload{ //to db
     description:string,
     closestatus:string,
     archivestatus:string,
-    assigneetype:string,
-    assigneestatus:string,
+    message:string|null,
+    assignee_sender_id:string|null,
     discussionassignees:DiscussionAssignee[],
 }
 

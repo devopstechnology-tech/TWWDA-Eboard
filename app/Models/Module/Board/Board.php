@@ -14,7 +14,7 @@ use App\Models\Module\Meeting\Meeting;
 use App\Models\Module\Committe\Committee;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use App\Models\Module\Discussion\Sub\DiscussionAssignee;
+use App\Models\Module\Discussions\Sub\DiscussionAssignee;
 
 class Board extends BaseModel
 {

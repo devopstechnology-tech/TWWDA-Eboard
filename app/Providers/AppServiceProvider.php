@@ -33,6 +33,7 @@ use App\Repository\PollRepository;
 use App\Repository\RoleRepository;
 use App\Repository\TaskRepository;
 use App\Repository\UserRepository;
+use App\Repository\VoteRepository;
 use App\Models\System\Modification;
 use App\Models\System\Notification;
 use App\Observers\LoginLogObserver;
@@ -41,6 +42,7 @@ use App\Repository\StaffRepository;
 use App\Repository\UsersRepository;
 use Illuminate\Support\Facades\URL;
 use App\Models\Module\Member\Member;
+use App\Models\Module\Poll\Sub\Vote;
 use App\Observers\CommitteeObserver;
 use App\Repository\AgendaRepository;
 use App\Repository\FolderRepository;
@@ -78,7 +80,6 @@ use App\Repository\MembershipRepository;
 use App\Services\Contracts\SmsInterface;
 use App\Models\Module\Committe\Committee;
 use App\Repository\ActivityLogRepository;
-use App\Models\Module\Discussion\Sub\Chat;
 use App\Repository\AssigneePollRepository;
 use App\Repository\AssigneeTaskRepository;
 use App\Repository\DetailMinuteRepository;
@@ -86,6 +87,7 @@ use App\Repository\MeetingGuestRepository;
 use App\Repository\MinuteReviewRepository;
 use App\Repository\ModificationRepository;
 use App\Repository\NotificationRepository;
+use App\Models\Module\Discussions\Sub\Chat;
 use App\Models\Module\Meeting\MeetingGuest;
 use App\Models\System\PasswordResetRequest;
 use App\Repository\Contracts\ChatInterface;
@@ -93,14 +95,15 @@ use App\Repository\Contracts\PollInterface;
 use App\Repository\Contracts\RoleInterface;
 use App\Repository\Contracts\TaskInterface;
 use App\Repository\Contracts\UserInterface;
+use App\Repository\Contracts\VoteInterface;
 use App\Repository\MeetingMemberRepository;
-use App\Models\Module\Discussion\Discussion;
 use App\Models\Module\Meeting\MeetingMember;
 use App\Models\Module\Task\Sub\AssigneeTask;
 use App\Repository\AgendaAssigneeRepository;
 use App\Repository\Contracts\BoardInterface;
 use App\Repository\Contracts\StaffInterface;
 use App\Repository\Contracts\UsersInterface;
+use App\Models\Module\Discussions\Discussion;
 use App\Repository\CommitteeMemberRepository;
 use App\Repository\Contracts\AgendaInterface;
 use App\Repository\Contracts\FolderInterface;
@@ -138,8 +141,8 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use App\Models\Module\Meeting\Minute\SubDetailMinute;
 use App\Repository\Contracts\AgendaAssigneeInterface;
 use App\Repository\Contracts\CommitteeMemberInterface;
-use App\Models\Module\Discussion\Sub\DiscussionAssignee;
 use App\Repository\Contracts\SubAgendaAssigneeInterface;
+use App\Models\Module\Discussions\Sub\DiscussionAssignee;
 use App\Repository\Contracts\DiscussionAssigneeInterface;
 
 class AppServiceProvider extends ServiceProvider
@@ -190,6 +193,7 @@ class AppServiceProvider extends ServiceProvider
             'poll' => Poll::class,
             'assigneepoll' => AssigneePoll::class,
             'option' => Option::class,
+            'vote' => Vote::class,
             'schedule' => Schedule::class,
             'task' => Task::class,
             'assigneetask' => AssigneeTask::class,
@@ -249,6 +253,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(PollInterface::class, PollRepository::class);
         $this->app->singleton(AssigneePollInterface::class, AssigneePollRepository::class);
         $this->app->singleton(OptionInterface::class, OptionRepository::class);
+        $this->app->singleton(VoteInterface::class, VoteRepository::class);
         $this->app->singleton(ScheduleInterface::class, ScheduleRepository::class);
         $this->app->singleton(TaskInterface::class, TaskRepository::class);
         $this->app->singleton(AssigneeTaskInterface::class, AssigneeTaskRepository::class);

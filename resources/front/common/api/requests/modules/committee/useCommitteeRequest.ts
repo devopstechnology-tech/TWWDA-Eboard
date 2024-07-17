@@ -14,10 +14,13 @@ export async function useGetLatestCommitteesRequest(options?: object): Promise<n
     const cn = Qs.stringify(options, {arrayFormat: 'brackets'});
     return await client.get(committeeRoute() + '/latest'+ '?' + cn).json();
 }
-export async function useGetCommitteesRequest(options?: object): Promise<nonPaginateResponse> {
+export async function useGetCommitteesRequest(
+    boardId:string, 
+    options?: object,
+): Promise<nonPaginateResponse> {
     const client = useClient();
     const cn = Qs.stringify(options, {arrayFormat: 'brackets'});
-    return await client.get(committeeRoute() + '?' + cn).json();
+    return await client.get(committeeRoute() +'/'+ boardId + '?' + cn).json();
 }
 export async function useCreateCommitteeRequest(
     payload: CommitteeRequestPayload,

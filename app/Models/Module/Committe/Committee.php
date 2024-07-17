@@ -13,7 +13,7 @@ use App\Models\Module\Member\Member;
 use App\Models\Module\Meeting\Meeting;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use App\Models\Module\Discussion\Sub\DiscussionAssignee;
+use App\Models\Module\Discussions\Sub\DiscussionAssignee;
 
 class Committee extends BaseModel
 {

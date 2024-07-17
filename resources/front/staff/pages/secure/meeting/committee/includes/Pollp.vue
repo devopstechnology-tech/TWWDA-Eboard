@@ -278,34 +278,43 @@ const isDueSoon = (dueDate) => {
     return (due - now) < oneDay;
 };
 
-const calculateVoteStats = (poll) => {
-    if (!poll.votes || poll.votes?.length === 0) {
+const calculateVoteStats = (poll: Poll) => {
+    if (!poll.votes || poll.votes.length === 0) {
         return 'No votes yet';
     }
 
-    // Recalculate totalVotes to be sure it's correct
-    const totalVotes = poll.votes.reduce((acc, option) => acc + option.voteCount, 0);
-    const totalMembers = poll.totalMembers;
+    const totalVotes = poll.votes.length;
+    const totalMembers = poll.pollassignees.length;
 
-    // Check if totalVotes exceeds totalMembers which shouldn't normally happen
     if (totalVotes > totalMembers) {
         console.error('Total votes exceed total members, which is unexpected.');
         return 'Voting data error';
     }
 
-    // Proceed if there are votes
-    if (totalVotes === 0) {
-        return 'No votes yet';
+    const voteCounts = poll.votes.reduce((acc, vote) => {
+        const optionId = JSON.parse(vote.option_id).id;
+        acc[optionId] = (acc[optionId] || 0) + 1;
+        return acc;
+    }, {} as Record<string, number>);
+
+    const mostVotedOptionId = Object.keys(voteCounts).reduce((a, b) => voteCounts[a] > voteCounts[b] ? a : b);
+    const mostVotedOption = poll.options.find(option => option.id === mostVotedOptionId);
+
+    if (!mostVotedOption) {
+        console.error('Most voted option not found in poll options.');
+        return 'Voting data error';
     }
 
-    const mostVotedOption = poll?.votes.reduce((prev, current) => {
-        return (prev.voteCount > current.voteCount) ? prev : current;
-    });
-
     const notVoted = totalMembers - totalVotes;
-    const votePercentage = (mostVotedOption.voteCount / totalVotes * 100).toFixed(1);
+    const votePercentage = ((voteCounts[mostVotedOptionId] / totalVotes) * 100).toFixed(1);
 
-    return `${votePercentage}% voted for ${mostVotedOption.title}<br>${totalVotes} voted / ${notVoted} not yet`;
+    const optionPercentages = poll.options.map(option => {
+        const count = voteCounts[option.id] || 0;
+        const percentage = ((count / totalVotes) * 100).toFixed(1);
+        return `${percentage}% voted for ${option.title}`;
+    }).join('<br>');
+
+    return `${optionPercentages}<br>Total votes: ${totalVotes} / ${notVoted} not yet`;
 };
 
 const statusClass = (status) => {

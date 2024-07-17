@@ -315,164 +315,86 @@ const actionLabel = computed(() => {
             <div class="col-12">
                 <div class="card">
                     <div class="card-header d-flex justify-content-between">
-                        <h1 class="h2 mb-2">Boards & Committees</h1>
-                        <button @click.prevent="openCreateModal('', 'board')" 
-                                class=" float-right btn btn-secondary bg-primary">
-                            <i class="fa fa-plus mr-2"></i>New Board
-                        </button>
+                        <h2 class="card-header-title h3">Boards</h2>
+                        <div class="ml-auto flex items-center space-x-2">
+                            <button class="btn btn-primary btn-sm"
+                                    @click.prevent="openCreateModal('', 'board')">
+                                New Board
+                            </button>
+                        </div>
                     </div><!-- /.card-header -->
 
                     <div class="card-body">
                         <div class="row">
                             <!-- Boards Column -->
-                            <div class="col-md-6 col-12">
-                                <div class="info-box shadow-lg p-4 mb-4" 
-                                     v-for="board in Boards" :key="board.id">
-                                    <img class="img-circle elevation-2" 
-                                         :src="loadIcon(board.icon)" 
-                                         alt="User Avatar" 
-                                         style="width:128px; height: 128px">
-                                    <div class="ml-3 flex-1">
-                                        <h3 class="h2 mb-2" v-if="authStore.hasPermission(['view board'])">
-                                            <router-link 
-                                                :to="{ 
-                                                    name: 'BoardDetails', 
-                                                    params: { 
-                                                        boardId: board.id 
-                                                    } 
-                                                }" class="badge badge-soft bg-primary">
-                                                {{ board.name }}
-                                            </router-link>
-                                        </h3>
-                                        <p class="text-gray-900 m-0">
-                                            Owner: {{ board.owner }}
-                                        </p>
-                                        <div v-if="board.members">
-                                            <span>
-                                                {{ board.members.length }} 
-                                                {{ board.members.length === 1 ? 'Member' : 'Members' }}
-                                            </span>
-                                            <br>
-                                            <a v-if="authStore.hasPermission(['add member to board'])"
-                                               href=""
-                                               @click.prevent="openEditMembersModal(board, 'board')"
-                                               class="text-blue-500 hover:text-blue-700 
-                                               transition duration-150 ease-in-out">
-                                                <i class="fa fa-plus mr-2"></i> Members
-                                            </a>
-                                        </div>
-                                        <p class="text-muted m-0 truncate" v-html="board.description"></p>
-                                        <div class="d-flex justify-content-end mt-2">
-                                            <a v-if="authStore.hasPermission(['edit board'])"
-                                               href=""
-                                               @click.prevent="openEditModal(board, 'board')"
-                                               class="text-blue-500 hover:text-blue-700
-                                                transition duration-150 ease-in-out mr-2">
-                                                <i class="fa fa-edit"></i>
-                                            </a>
-                                            <a v-if="authStore.hasPermission(['delete board'])"
-                                               href=""
-                                               @click.prevent="deleteBoard(board)"
-                                               class="text-blue-500 hover:text-blue-700 
-                                               transition duration-150 ease-in-out mr-2">
-                                                <i class="fa fa-trash-alt"></i>
-                                            </a>
-                                            <router-link v-if="authStore.hasPermission(['view board'])"
-                                                         :to="{ name: 'BoardDetails', params: { boardId: board.id } }"
-                                                         class="text-green-500 hover:text-green-700 
-                                                         transition duration-150 ease-in-out">
-                                                <i class="fa fa-eye"></i>
-                                            </router-link>
-                                            <!-- Button to create new committee -->
-                                            <button @click.prevent="openCreateModal(board.id, 'committee')"
-                                                    class="btn btn-sm btn-primary ml-2">
-                                                <i class="fa fa-plus mr-1"></i> Committee
-                                            </button>
-                                        </div>
-                                    </div><!-- /.info-box-content -->
-                                </div>
-                            </div><!-- /.col-md-6 -->
-
-                            <!-- Committees Column -->
-                            <div class="col-md-6 col-12">
-                                <div class="info-box shadow-lg p-4 mb-4" 
-                                     v-for="committee in Committees" :key="committee.id">
-                                    <img class="img-circle elevation-2" 
-                                         :src="loadIcon(committee.icon)" 
-                                         alt="User Avatar" 
-                                         style="width:128px; height: 128px">
-                                    <div class="ml-3 flex-1">
-                                        <h3 class="h2 mb-2">
-                                           
-                                            <router-link 
-                                                :to="{                                                     
-                                                    name: 'CommitteeDetails', 
-                                                    params: {  
-                                                        committeeId: committee.id 
-                                                    }
-                                                }" class="badge badge-soft bg-primary">
-                                                {{ committee.name }}
-                                            </router-link>
-                                        </h3>
-                                        <h3 class="mb-1">
-                                            Board :<router-link 
-                                                :to="{ 
-                                                    name: 'BoardDetails', 
-                                                    params: { 
-                                                        boardId:committee.committeeable.details.id 
-                                                    }  
-                                                }" class="badge badge-soft">
-                                                {{ committee.committeeable.details.name }}
-                                            </router-link>
-                                        </h3>
-                                        <p class="text-gray-900 m-0">
-                                            Owner: {{ committee.owner }}
-                                        </p>
-                                        <div v-if="committee.members">
-                                            <span>
-                                                {{ committee.members.length }} 
-                                                {{ committee.members.length === 1 ? 'Member' : 'Members' }}
-                                            </span>
-                                            <br>
-                                            <a v-if="authStore.hasPermission(['add member to committee'])"
-                                               href=""
-                                               @click.prevent="openEditMembersModal(committee, 'committee')"
-                                               class="text-blue-500 hover:text-blue-700 
-                                               transition duration-150 ease-in-out">
-                                                <i class="fa fa-plus mr-2"></i> Members
-                                            </a>
-                                        </div>
-                                        <p class="text-muted m-0 truncate" v-html="committee.description"></p>
-                                        <div class="d-flex justify-content-end mt-2">
-                                            <a v-if="authStore.hasPermission(['edit committee'])"
-                                               href=""
-                                               @click.prevent="openEditModal(committee, 'committee')"
-                                               class="text-blue-500 hover:text-blue-700 
-                                               transition duration-150 ease-in-out mr-2">
-                                                <i class="fa fa-edit"></i>
-                                            </a>
-                                            <a v-if="authStore.hasPermission(['delete committee'])"
-                                               href=""
-                                               @click.prevent="deleteCommittee(committee)"
-                                               class="text-blue-500 hover:text-blue-700 
-                                               transition duration-150 ease-in-out mr-2">
-                                                <i class="fa fa-trash-alt"></i>
-                                            </a>
-                                            <router-link v-if="authStore.hasPermission(['view committee'])"
-                                                         :to="{ 
-                                                             name: 'CommitteeDetails', 
-                                                             params: { 
-                                                                 committeeId: committee.id 
-                                                             } 
-                                                         }"
-                                                         class="text-green-500 hover:text-green-700
-                                                          transition duration-150 ease-in-out">
-                                                <i class="fa fa-eye"></i>
-                                            </router-link>
-                                        </div>
-                                    </div><!-- /.info-box-content -->
-                                </div>
-                            </div><!-- /.col-md-6 -->
+                            <div class="card-body">
+                                <div class="row">
+                                    <!-- Boards Column -->
+                                    <div class="col-md-4 col-6 d-flex" v-for="board in Boards" :key="board.id">
+                                        <div class="info-box shadow-lg p-4 mb-4 d-flex flex-column flex-grow-1">
+                                            <div class="d-flex flex-column flex-grow-1 align-items-center">
+                                                <img class="img-circle elevation-2" 
+                                                     :src="loadIcon(board.icon)" 
+                                                     alt="User Avatar" 
+                                                     style="width:128px; height: 128px">
+                                                <div class="ml-3 flex-1 w-100">
+                                                    <h3 class="h2 mb-2" v-if="authStore.hasPermission(['view board'])">
+                                                        <router-link 
+                                                            :to="{ 
+                                                                name: 'BoardDetails', 
+                                                                params: { 
+                                                                    boardId: board.id 
+                                                                } 
+                                                            }" class="badge badge-soft bg-primary text-wrap">
+                                                            {{ board.name }}
+                                                        </router-link>
+                                                    </h3>
+                                                    <p class="text-gray-900 m-0">
+                                                        Owner: {{ board.owner }}
+                                                    </p>
+                                                    <div v-if="board.members">
+                                                        <span>
+                                                            {{ board.members.length }} 
+                                                            {{ board.members.length === 1 ? 'Member' : 'Members' }}
+                                                        </span>
+                                                        <br>
+                                                        <a v-if="authStore.hasPermission(['add member to board'])"
+                                                           href=""
+                                                           @click.prevent="openEditMembersModal(board, 'board')"
+                                                           class="text-blue-500 hover:text-blue-700 
+                               transition duration-150 ease-in-out">
+                                                            <i class="fa fa-plus mr-2"></i> Members
+                                                        </a>
+                                                    </div>
+                                                    <p class="text-muted m-0 truncate" v-html="board.description"></p>
+                                                </div><!-- /.info-box-content -->
+                                            </div>
+                                            <div class="d-flex justify-content-end mt-2 w-100">
+                                                <a v-if="authStore.hasPermission(['edit board'])"
+                                                   href=""
+                                                   @click.prevent="openEditModal(board, 'board')"
+                                                   class="text-blue-500 hover:text-blue-700
+                        transition duration-150 ease-in-out mr-2">
+                                                    <i class="fa fa-edit"></i>
+                                                </a>
+                                                <a v-if="authStore.hasPermission(['delete board'])"
+                                                   href=""
+                                                   @click.prevent="deleteBoard(board)"
+                                                   class="text-blue-500 hover:text-blue-700 
+                       transition duration-150 ease-in-out mr-2">
+                                                    <i class="fa fa-trash-alt"></i>
+                                                </a>
+                                                <router-link v-if="authStore.hasPermission(['view board'])"
+                                                             :to="{ name: 'BoardDetails', params: { boardId: board.id } }"
+                                                             class="text-green-500 hover:text-green-700 
+                                 transition duration-150 ease-in-out">
+                                                    <i class="fa fa-eye"></i>
+                                                </router-link>
+                                            </div>
+                                        </div><!-- /.info-box -->
+                                    </div><!-- /.col-md-4 -->
+                                </div><!-- /.row -->
+                            </div><!-- /.card-body -->
                         </div><!-- /.row -->
                     </div><!-- /.card-body -->
                 </div><!-- /.card -->

@@ -22,6 +22,7 @@ use App\Http\Controllers\v1\Modules\Meeting\MinuteController;
 use App\Http\Controllers\v1\Modules\General\AlmanacController;
 use App\Http\Controllers\v1\Modules\Meeting\MeetingController;
 use App\Http\Controllers\v1\Modules\Member\PositionController;
+use App\Http\Controllers\v1\Modules\Discussions\ChatController;
 use App\Http\Controllers\v1\Modules\Meeting\ScheduleController;
 use App\Http\Controllers\v1\Staff\System\ActivityLogController;
 use App\Http\Controllers\v1\Modules\Board\BoardMemberController;
@@ -31,8 +32,8 @@ use App\Http\Controllers\v1\Modules\User\NotificationController;
 use App\Http\Controllers\v1\Modules\Meeting\MembershipController;
 use App\Http\Controllers\v1\Modules\Committee\CommitteeController;
 use App\Http\Controllers\v1\Modules\Meeting\MeetingGuestController;
-use App\Http\Controllers\v1\Modules\Discussion\DiscussionController;
 use App\Http\Controllers\v1\Modules\Meeting\MeetingMemberController;
+use App\Http\Controllers\v1\Modules\Discussions\DiscussionController;
 use App\Http\Controllers\v1\Modules\Committee\CommitteeMemberController;
 
 Route::group(['prefix' => 'v1'], function () {
@@ -92,7 +93,8 @@ Route::group(['prefix' => 'v1'], function () {
             //  Route::apiResource('committees', CommitteeController::class);
              Route::get('committees', [CommitteeController::class, 'index']);
              Route::get('committees/latest', [CommitteeController::class, 'latest']);
-             Route::get('committees/{committee}', [CommitteeController::class, 'show']);
+             Route::get('committees/{board}', [CommitteeController::class, 'boardcommittee']);
+            //  Route::get('committees/{committee}', [CommitteeController::class, 'show']);
              Route::post('committees/create/{board}', [CommitteeController::class, 'store']);
              Route::post('committees/update/{committee}', [CommitteeController::class, 'update']);
              Route::post('committees/members/{board}/{committee}', [CommitteeController::class, 'updatemembers']);
@@ -213,7 +215,9 @@ Route::group(['prefix' => 'v1'], function () {
             //////////////////////////// polls/////////////////
             Route::apiResource('polls', PollController::class);
             Route::get('polls/latest', [PollController::class, 'latest']);
-            Route::get('polls/meeting/{meeting}', [PollController::class, 'getmeetingpolls']);
+            Route::post('polls/vote/{poll}', [PollController::class, 'votepoll']);
+
+            Route::get('polls/meeting/{meeting}', [PollController::class, 'getmeetingpolls']);            
             Route::post('polls/meeting/create/{meeting}', [PollController::class, 'createmeetingpoll']);
             Route::patch('polls/meeting/update/{meeting}/{poll}', [PollController::class, 'updatemeetingpoll']);
             Route::patch('polls/meeting/update/{meeting}', [PollController::class, 'updatepoll']);
@@ -233,7 +237,19 @@ Route::group(['prefix' => 'v1'], function () {
             // discussions
             Route::get('discussions', [DiscussionController::class, 'index']);
             Route::get('discussions/{user}', [DiscussionController::class, 'userdiscussions']);
+            Route::post('discussions/{user}', [DiscussionController::class, 'store']);
+            Route::patch('discussions/update/{discussion}', [DiscussionController::class, 'update']);
+            Route::patch('discussions/update/member/{discussion}', [DiscussionController::class, 'updatemember']);
+            Route::get('discussions/leave/{discussion}', [DiscussionController::class, 'leave']);
+            Route::get('discussions/close/{discussion}', [DiscussionController::class, 'close']);
+            Route::get('discussions/delete/{discussion}', [DiscussionController::class, 'delete']);
 
+
+            //chat 
+            Route::post('chats/{member}', [ChatController::class, 'store']);
+            Route::patch('chats/update/{chat}', [ChatController::class, 'update']);
+      
+      
             //////////////////////////// folders/////////////////
             Route::apiResource('folders', FolderController::class);
             //////////////////////////// superadin all folders/////////////////
