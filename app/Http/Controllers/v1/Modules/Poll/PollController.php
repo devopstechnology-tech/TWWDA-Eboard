@@ -11,6 +11,7 @@ use App\Models\Module\Board\Board;
 use App\Http\Controllers\Controller;
 use App\Models\Module\Meeting\Meeting;
 use App\Http\Requests\CreatePollRequest;
+use App\Http\Requests\CreateVoteRequest;
 use App\Http\Requests\UpdatePollRequest;
 use App\Models\Module\Committe\Committee;
 use App\Repository\Contracts\PollInterface;
@@ -33,6 +34,12 @@ class PollController extends Controller
         return $this->response(Response::HTTP_OK, __('messages.records-fetched'), $polls, Poll::class);
     }
     public function getmeetingpolls($meeting): JsonResponse
+    {
+        $polls = $this->pollRepository->getMeetingPolls($meeting);
+
+        return $this->response(Response::HTTP_OK, __('messages.records-fetched'), $polls, Poll::class);
+    }
+    public function show($meeting): JsonResponse
     {
         $polls = $this->pollRepository->getMeetingPolls($meeting);
 
@@ -88,6 +95,13 @@ class PollController extends Controller
     public function updatecommitteepoll(UpdatePollRequest $request, Poll $poll): JsonResponse
     {
         $poll = $this->pollRepository->updateCommitteePoll($poll, $request->validated());
+
+        return $this->response(Response::HTTP_OK, __('messages.records-fetched'), $poll, Poll::class);
+    }
+    //vote
+    public function votepoll(CreateVoteRequest $request, Poll $poll): JsonResponse
+    {
+        $poll = $this->pollRepository->VotePoll($poll, $request->validated());
 
         return $this->response(Response::HTTP_OK, __('messages.records-fetched'), $poll, Poll::class);
     }

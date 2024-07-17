@@ -23,10 +23,12 @@ class DiscussionResource extends BaseResource
             'description' => $this->resource->description,
             'closestatus' => $this->resource->closestatus,
             'archivestatus' => $this->resource->archivestatus,
+            'created_at' => $this->resource->created_at,
             'user_id' => $this->resource->user_id,
             'author' =>  new UserResource($this->resource->author),
-            'assignees' => DiscussionAssigneeResource::collection($this->resource->assignees ?? collect()),
-            'chats' => ChatResource::collection($this->resource->chats ?? collect()),
+            'dassignees' => $this->resource->dassignees,
+            'assignees' => DiscussionAssigneeResource::collection($this->resource->assignees ?? collect())->format('short'),
+            'chats' => ChatResource::collection($this->resource->chats ?? collect())->format('short'),
         ];
     }
 

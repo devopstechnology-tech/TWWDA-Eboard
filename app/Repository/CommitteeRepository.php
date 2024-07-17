@@ -59,6 +59,16 @@ class CommitteeRepository extends BaseRepository implements CommitteeInterface
        ];
        return $this->indexResource(Committee::class, CommitteeResource::class, $filters);
    }
+   public function getBoardCommittee($board)
+    {
+        $filters = [
+            'committeeable_id' => $board,
+            // 'committeeable_type' => Board::class,
+            'with' => $this->relationships(),
+            'orderBy' => ['field' => 'created_at', 'direction' => 'asc']
+        ];
+        return $this->indexResource(Committee::class, CommitteeResource::class, $filters);
+    }
 
    public function get(Committee|string $committee): Committee
    {
@@ -82,6 +92,7 @@ class CommitteeRepository extends BaseRepository implements CommitteeInterface
        $member = $committee->members()->where('user_id', Auth::user()->id)->first();
        return $member;
    }
+   
 
    public function create(Board $board, array $payload): Committee
    {

@@ -451,12 +451,9 @@ const onPublish = async (id: string) => {
                                  type="button" @click.prevent="openCreateMeetingModal" class="btn btn-tool">
                             <i class="far fa fa-plus mr-2 "></i>
                         </button>
-                    </div>
-                   
+                    </div>                   
                     <!-- /.card-tools -->
-                </div>
-
-             
+                </div>             
                 <!-- /.card-header -->
                 <div class="card-body" v-if="authStore.hasPermission(['view meeting'])">
                     <ul class="products-list product-list-in-card pl-2 pr-2"  v-if="filteredMeetings.length > 0">

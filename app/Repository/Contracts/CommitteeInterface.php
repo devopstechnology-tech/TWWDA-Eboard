@@ -11,6 +11,7 @@ interface CommitteeInterface
 {
     public function getAll();
     public function getLatest();
+    public function getBoardCommittee($board);
     public function fetchAuthMember(string $committee);
 
     public function get(Committee|string $committee): Committee;

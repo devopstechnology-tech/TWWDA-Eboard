@@ -15,8 +15,8 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->string('discussion_id')->nullable();
             $table->string('user_id')->nullable(); // default if classese involved
-            $table->string('assignee_id')->nullable();
-            $table->string('assignee_type')->nullable();
+            $table->string('assignable_id')->nullable();
+            $table->string('assignable_type')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });

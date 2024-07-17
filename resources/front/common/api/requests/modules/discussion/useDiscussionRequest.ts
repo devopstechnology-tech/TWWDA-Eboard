@@ -28,9 +28,33 @@ export async function useUpdateDiscussionRequest(
 ){
     const client = useClient();
     const response = await 
-    client.patch(discussionRoute() + '/update/' + userid + '/' + discussionid,{
+    client.patch(discussionRoute() + '/update/' + discussionid,{
         json: payload,
     });
+    return response.json();
+}
+export async function useLeaveDiscussionRequest(
+    discussionid:string,
+){
+    const client = useClient();
+    const response = await 
+    client.get(discussionRoute() + '/leave/' + discussionid);
+    return response.json();
+}
+export async function useCloseDiscussionRequest(
+    discussionid:string,
+){
+    const client = useClient();
+    const response = await 
+    client.get(discussionRoute() + '/close/' + discussionid);
+    return response.json();
+}
+export async function useDeleteDiscussionRequest(  
+    discussionid:string,
+){
+    const client = useClient();
+    const response = await 
+    client.get(discussionRoute() + '/delete/' + discussionid);
     return response.json();
 }
 

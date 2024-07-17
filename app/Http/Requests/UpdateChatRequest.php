@@ -15,6 +15,12 @@ class UpdateChatRequest extends FormRequest
     {
         return [
             // Your rules here for update
+            'id' => RuleSet::create()->sometimes(),
+            'discussion_id' => RuleSet::create()->required()->string(),
+            'assignee_sender_id' => RuleSet::create()->sometimes(),
+            'assignee_receiver_id' => RuleSet::create()->sometimes(),
+            'message' => RuleSet::create()->required()->string(),
+            'file' => RuleSet::create()->sometimes(),
         ];
     }
 }

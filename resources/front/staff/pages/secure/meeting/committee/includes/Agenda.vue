@@ -432,7 +432,7 @@ onMounted(() => {
                                             <div class="font-medium flex-1">
                                                 {{ formatAgendaEntry(pIndex)}}.{{ agenda.title }}
                                                 <div class="text-sm text-gray-800 font-normal" 
-                                                v-html="agenda.description">
+                                                     v-html="agenda.description">
                                                 </div>
                                             </div>
                                             <div class="flex items-center gap-2 mt-1 h-6">
@@ -453,7 +453,7 @@ onMounted(() => {
                                             <div class="font-medium flex-1">
                                                 {{ formatAgendaEntry(pIndex)}}.{{ agenda.title }}
                                                 <div class="text-sm text-gray-800 font-normal"
-                                                v-html="agenda.description">
+                                                     v-html="agenda.description">
                                                 </div>
                                             </div>
                                             <div class="flex items-center gap-2 mt-1 h-6">
@@ -514,7 +514,7 @@ onMounted(() => {
                                                     <div class="font-medium flex-1">
                                                         {{ formatAgendaEntry(pIndex, cIndex) }}. {{ child.title }}
                                                         <div class="text-sm text-gray-800 font-normal"
-                                                        v-html="child.description">
+                                                             v-html="child.description">
                                                         </div>
                                                     </div>
                                                     <div class="flex items-center gap-2 mt-1 h-6">

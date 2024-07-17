@@ -6,6 +6,7 @@ use App\Enums\StatusEnum;
 use Illuminate\Support\Str;
 use App\Models\Config\Setting;
 use Illuminate\Database\Seeder;
+use App\Providers\MailConfigServiceProvider;
 
 class SettingsTableSeeder extends Seeder
 {
@@ -177,5 +178,6 @@ class SettingsTableSeeder extends Seeder
             'mailtype' => json_encode($activeMailType),   // Store the active mail configuration
             'mailtypes' => json_encode($mailTypes),      // Store the full list with the valueNames emptied
         ]);
+        MailConfigServiceProvider::configureMailSettings();
     }
 }

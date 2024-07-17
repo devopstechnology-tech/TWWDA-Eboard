@@ -60,6 +60,11 @@ class MemberRepository extends BaseRepository implements MemberInterface
         ];
         return $this->indexResource(Member::class, MemberResource::class, $filters);
     }
+    public function getBoardCollectionMembers($board)
+    {
+        return Member::where('board_id', $board)->get();
+    }    
+
     public function updateBoardMembers(Board|string $board, array $payload): Board
     {
         return $this->boardRepository->updateMembers($board, $payload);
@@ -69,6 +74,7 @@ class MemberRepository extends BaseRepository implements MemberInterface
         return $this->boardRepository->updateMemberPosition($board, $payload);
     }
 
+    //committee
     public function getCommitteeMembers($committee)
     {
         $filters = [
@@ -77,6 +83,10 @@ class MemberRepository extends BaseRepository implements MemberInterface
             'orderBy' => ['field' => 'created_at', 'direction' => 'asc']
         ];
         return $this->indexResource(Member::class, MemberResource::class, $filters);
+    }
+    public function getCommitteeCollectionMembers($committee)
+    {
+        return Member::where('committee_id', $committee)->get();
     }
     public function fetchCommitteeMember($committee)
     {

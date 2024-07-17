@@ -1,5 +1,5 @@
 <template>
-    <div :class="['field-container', { error: !!errorMessage }]">
+    <div :class="['field-container ql-custom', { error: !!errorMessage }]">
         <label v-if="label" :for="name" class="block text-gray-700 text-sm font-bold mb-2">{{ label }}</label>
         <QuillEditor
             v-model:content="localContent"
@@ -72,5 +72,8 @@ watch(value, (newValue) => {
   .mt-1 {
     margin-top: 0.25rem;
   }
+  .ql-custom{
+    margin-bottom: 3.5rem !important;
+}
   </style>
   

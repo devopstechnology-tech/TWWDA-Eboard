@@ -1,47 +1,36 @@
 <template>
-    <h3 class="my-3 text-gray-900 dark:text-white text-xs leading-none font-normal">{{ title }}</h3>
-    <ul
-        class="items-center w-full text-sm font-medium text-gray-900
-        bg-white rounded-lg lg:flex dark:bg-gray-710 dark:border-gray-600 dark:text-black">
-        <li class="" v-for="(option,i) in options" :key="i">
-            <div class="col-md-12">
-                <div class="form-group clearfix">
-                    <div class="icheck-primary d-inline">
-                        <input v-model="value" :value="option.value" type="radio" :id="'radio-' + (i + 1)" :name="name"/>
-                        <label :for="'radio-' + (i + 1)" class="ml-2">
-                            {{ option.name }}
-                        </label>
-                    </div>
-                </div>
-            </div>
-        </li>
-        <div v-if="errorMessage" class="message">{{ errorMessage }}</div>
-    </ul>
+    <div>
+        <h3>{{ title }}</h3>
+        <ul>
+            <li v-for="(option, index) in options" :key="index">
+                <input type="radio" :id="'radio-' + index" :value="option.value" v-model="selectedValue" @change="emitSelectedOption" />
+                <label :for="'radio-' + index">{{ option.title }}</label>
+            </li>
+        </ul>
+    </div>
 </template>
 
-<script lang='ts' setup>
+<script setup lang="ts">
+import {ref} from 'vue';
 
-import {useField} from 'vee-validate';
-
-type optionsType = {
-    name: string,
-    value: string
-}
-
-interface Props {
-    title: string;
-    name: string;
-    options: optionsType[];
-}
-
-const props = withDefaults(defineProps<Props>(), {
-    title: 'Select an option',
+const props = defineProps({
+    title: String,
+    options: Array,
+    name: String, // Ensure this is passed and used correctly if needed
 });
-const {errorMessage, value} = useField(props.name);
 
+const selectedValue = ref('');
+
+const emitSelectedOption = () => {
+    // Emit selectedValue back to parent component
+    emit('update:modelValue', selectedValue.value);
+};
 </script>
 
 <style scoped>
-
-
+/* Add your styles here */
 </style>
+
+function emit(arg0: string, value: string) {
+  throw new Error('Function not implemented.');
+

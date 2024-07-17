@@ -23,7 +23,7 @@ class Vote extends BaseModel
     protected $fillable = [
         'option_id',
         'poll_id',
-        'assginee_poll_id',
+        'assignee_poll_id',
         'date',
         'status',
     ];
@@ -38,7 +38,7 @@ class Vote extends BaseModel
     }
     public function assignee()
     {
-        return $this->belongsTo(AssigneePoll::class, 'assginee_poll_id');
+        return $this->belongsTo(AssigneePoll::class, 'assignee_poll_id');
     }
     // public function member()
     // {

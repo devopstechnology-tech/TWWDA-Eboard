@@ -11,6 +11,18 @@ export async function useGetPollsRequest(options?: object):Promise<nonPaginateRe
     const cn = Qs.stringify(options, {arrayFormat: 'brackets'});
     return await client.get(pollRoute() + '?' + cn).json();
 }
+export async function useVotePollRequest(
+    payload: PollRequestPayload, 
+    poll_id:string,
+):Promise<nonPaginateResponse>{
+    const client = useClient();
+
+    // const cn = Qs.stringify(options, {arrayFormat: 'brackets'});
+    const response = await client.post(pollRoute()+ '/vote/'+ poll_id,{
+        json: payload,
+    });
+    return response.json();
+}
 //board polls
 export async function useGetBoardPollsRequest(board_id:string, options?: object):Promise<nonPaginateResponse>{
     const client = useClient();

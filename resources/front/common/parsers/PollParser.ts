@@ -18,6 +18,14 @@ export const pollParser = object({
     assigneestatus:string(),
     pollassignees:array(pollassigneeParser),
     status:string(),
+    votes:array(object({
+        id:string(),
+        assignee_poll_id:string(),
+        created_at:string(),
+        option_id:string(),
+        status:string(),
+        date:string(),
+    })),
 });
 
 export interface PollRequestPayload{ //to db
@@ -34,6 +42,11 @@ export interface PollRequestPayload{ //to db
     assigneestatus:string,
     pollassignees:PollAssignee[],
     status:string,
+}
+export interface PollVoteRequestPayload{ //to db
+    poll_id:string,
+    poll_assignee_id:string,
+    selectedOption:string,
 }
 
 

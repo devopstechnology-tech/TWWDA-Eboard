@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('closestatus')->default(CloseEnum::Default->value);
             $table->string('archivestatus')->default(ArchiveEnum::Default->value);
             $table->string('user_id')->nullable(); // User who created the discussion
+            $table->json('dassignees')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });

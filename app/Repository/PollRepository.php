@@ -7,10 +7,12 @@ namespace App\Repository;
 use Illuminate\Http\Request;
 use App\Models\Module\Poll\Poll;
 use App\Models\Module\Board\Board;
+use App\Repository\BaseRepository;
 use App\Http\Resources\PollResource;
 use App\Models\Module\Meeting\Meeting;
 use App\Models\Module\Committe\Committee;
 use App\Repository\Contracts\PollInterface;
+use App\Repository\Contracts\VoteInterface;
 use App\Repository\Contracts\OptionInterface;
 use App\Repository\Contracts\AssigneePollInterface;
 
@@ -18,6 +20,15 @@ class PollRepository extends BaseRepository implements PollInterface
 {
     private $optionRepository;
     private $assigneepollRepository;
+    private $voteRepository;
+
+    public function getVoteRepository(): VoteInterface
+    {
+        // Lazily load the VotePollRepository when needed
+        return $this->voteRepository ??= resolve(VoteInterface::class);
+    }
+
+
 
     public function getAssigneePollRepository(): AssigneePollInterface
     {
@@ -233,5 +244,15 @@ class PollRepository extends BaseRepository implements PollInterface
             $this->getOptionRepository()->update($poll, $payload);
         }
         return $poll;
+    }
+    public function votePoll(Poll $poll, array $payload)
+    {
+        if (!($poll instanceof Poll)) {
+            $poll = Poll::findOrFail($poll);
+        }
+
+        $vote = $this->getVoteRepository()->vote($poll, $payload);
+
+        
     }
 }

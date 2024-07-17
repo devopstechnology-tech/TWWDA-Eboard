@@ -11,6 +11,7 @@ use App\Models\Module\Board\Board;
 use App\Models\Module\Member\Position;
 use App\Models\Module\Poll\AssigneePoll;
 use App\Models\Module\Committe\Committee;
+use App\Models\Module\Discussions\Sub\DiscussionAssignee;
 use App\Models\Module\Task\Sub\AssigneeTask;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -23,6 +24,8 @@ class Member extends BaseModel
 
     protected $dates = ['deleted_at'];
     protected $fillable = [
+        'memberable_id',
+        'memberable_type',
         'board_id',
         'committee_id',
         'guest_id',
@@ -32,7 +35,8 @@ class Member extends BaseModel
 
     public function memberable()
     {
-        return $this->morphTo();
+        return $this->morphTo()
+                    ->with('committee');
     }
 
     public function memberships()
@@ -67,5 +71,9 @@ class Member extends BaseModel
     public function assigneePolls()
     {
         return $this->morphMany(AssigneePoll::class, 'assignable');
+    }
+    public function assigneeDiscussions()
+    {
+        return $this->morphMany(DiscussionAssignee::class, 'assignable');
     }
 }

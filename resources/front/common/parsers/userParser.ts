@@ -101,6 +101,18 @@ export const userparser = object({//can be used from profile side import
     roles: array(roleParser),
     type: string(),
 });
+export const simpleuserparser = object({//can be used from profile side import
+    email: string(),
+    first: string(),
+    full_name: string(),
+    id: string(),
+    last: string(),
+    other_names: string().nullable(),
+    profile: object({//can be used from user side import
+        id: string(),
+        avatar: string(),
+    }),
+});
 
 export interface UserRequestPayload{
     id: string,

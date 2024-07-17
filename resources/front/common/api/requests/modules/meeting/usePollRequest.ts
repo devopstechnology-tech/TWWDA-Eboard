@@ -101,6 +101,15 @@ export async function useDeletePollRequest(id: string): Promise<singleresponse> 
     // loading.setLoading(false);
     return data;
 }
+export async function useVotePollRequest(id: string): Promise<singleresponse> {
+    // loading.setLoading(true);
+    const client = useClient();
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    const data: singleresponse = await client.delete(pollRoute() + '/' + id).json();
+    // loading.setLoading(false);
+    return data;
+}
 
 
 

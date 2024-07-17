@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {onMounted, ref} from 'vue';
+import {computed, onMounted, ref, watchEffect} from 'vue';
 import {useRoute, useRouter} from 'vue-router';
 import {useGetSingleBoardRequest} from '@/common/api/requests/modules/board/useBoardRequest'; // Import your API function
 import {
@@ -8,10 +8,11 @@ import {
 import {loadCover, loadIcon, truncateDescription} from '@/common/customisation/Breadcrumb';
 import {Board} from '@/common/parsers/boardParser';
 import useAuthStore from '@/common/stores/auth.store';
-import Discussion from './includes/Discussion.vue';
+import Committees from './includes/Committees.vue';
+// import Discussion from './includes/Discussion.vue';
 import Documents from './includes/Documents.vue';
 import Goals from './includes/Goals.vue';
-import HomeDashboard from './includes/HomeDashboard.vue';
+import HomeDashBoard from './includes/HomeDashboard.vue';
 import Members from './includes/Members.vue';
 import TaskPolls from './includes/TaskPolls.vue';
 const authStore = useAuthStore();
@@ -24,11 +25,52 @@ const board = ref<Board>();
 const route = useRoute();
 const router = useRouter();
 
+const currentTab = ref('home');
+const previousTab = ref('');
+
+const tabs = [
+    {id: 'home', name: 'Meeting Details', component: HomeDashBoard,permissions: ['view meeting']},
+    {id: 'documents', name: 'Documents', component: Documents, permissions: ['view documents']},
+    {id: 'tasks', name: 'Task & Polls', component: TaskPolls, permissions: ['view task', 'view poll']},
+    {id: 'members', name: 'Members', component: Members, permissions: ['view meeting memberships']},
+    {id: 'committees', name: 'Committees', component: Committees, permissions: ['view committee']},
+];
+
+const filteredTabs = computed(() => {
+    return tabs.filter(tab => {
+        if (tab.permissions) {
+            return tab.permissions.every(permission => authStore.hasPermission([permission]));
+        }
+        return true;
+    });
+});
+
+const setActiveTab = (tabId: string) => {
+    previousTab.value = currentTab.value;
+    currentTab.value = tabId;
+};
+
+const handleMembershipsUpdated = () => {
+    if (previousTab.value === 'agenda') {
+        setActiveTab('agenda');
+        window.dispatchEvent(new CustomEvent('refetchMemberships'));
+    }
+};
+
+watchEffect(() => {
+    if (route.query.previousTab) {
+        previousTab.value = route.query.previousTab as string;
+    }
+    if (route.query.currentTab) {
+        currentTab.value = route.query.currentTab as string;
+    }
+});
 
 function goBack() {
     router.push({
         name: BOARDS,
     });
+    
 }
 // Extract the id parameter from the route
 const boardId = route.params.boardId as string;
@@ -87,77 +129,29 @@ onMounted(async () => {
                         <div class="card-outline card-outline-tabs">
                             <div class="card-header p-0 border-bottom-0">
                                 <ul class="nav nav-tabs" id="custom-tabs-four-tab" role="tablist">
-                                    <li class="nav-item">
-                                        <a class="nav-link active" id="custom-tabs-four-home-tab" data-toggle="pill"
-                                           href="#custom-tabs-four-home" role="tab"
-                                           aria-controls="custom-tabs-four-home" aria-selected="true">Meetings</a>
-                                    </li>
-                                    <li class="nav-item" v-if="authStore.hasPermission(['view folders'])">
-                                        <a class="nav-link" id="custom-tabs-four-documents-tab" data-toggle="pill"
-                                           href="#custom-tabs-four-documents" role="tab"
-                                           aria-controls="custom-tabs-four-documents" aria-selected="false">
-                                            Documents
-                                        </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link" id="custom-tabs-four-discussions-tab" data-toggle="pill"
-                                           href="#custom-tabs-four-discussions" role="tab"
-                                           aria-controls="custom-tabs-four-discussions" aria-selected="false">
-                                            Discussions
-                                        </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link" id="custom-tabs-four-tasks-tab" data-toggle="pill"
-                                           href="#custom-tabs-four-tasks" role="tab"
-                                           aria-controls="custom-tabs-four-tasks" aria-selected="false">
-                                            Task & Polls
-                                        </a>
-                                    </li>
-                                    <!-- <li class="nav-item">
-                                        <a class="nav-link" id="custom-tabs-four-goals-tab" data-toggle="pill"
-                                           href="#custom-tabs-four-goals" role="tab"
-                                           aria-controls="custom-tabs-four-goals" aria-selected="false">
-                                            Goals
-                                        </a>
-                                    </li> -->
-                                    <li class="nav-item">
-                                        <a class="nav-link" id="custom-tabs-four-members-tab" data-toggle="pill"
-                                           href="#custom-tabs-four-members" role="tab"
-                                           aria-controls="custom-tabs-four-members" aria-selected="false">
-                                            Members
+                                    <li class="nav-item" v-for="tab in filteredTabs" :key="tab.id">
+                                        <a class="nav-link" 
+                                           :class="{ 'active': currentTab === tab.id }" 
+                                           @click="setActiveTab(tab.id)">
+                                            {{ tab.name }}
                                         </a>
                                     </li>
                                 </ul>
                             </div>
                             <div class="card-body">
                                 <div class="tab-content" id="custom-tabs-four-tabContent">
-                                    <div class="tab-pane fade active show" id="custom-tabs-four-home"
-                                         role="tabpanel" aria-labelledby="custom-tabs-four-home-tab">
-                                        <HomeDashboard/>
-                                    </div>
-                                    <div class="tab-pane fade" id="custom-tabs-four-documents"
-                                         role="tabpanel" aria-labelledby="custom-tabs-four-documents-tab">
-                                        <Documents/>
-                                    </div>
-                                    <div class="tab-pane fade" id="custom-tabs-four-discussions"
-                                         role="tabpanel" aria-labelledby="custom-tabs-four-discussions-tab">
-                                         <!-- <Discussion/> -->
-                                    </div>
-                                    <div class="tab-pane fade" id="custom-tabs-four-tasks"
-                                         role="tabpanel" aria-labelledby="custom-tabs-four-tasks-tab">
-                                        <TaskPolls/>
-                                    </div>
-                                    <div class="tab-pane fade" id="custom-tabs-four-goals"
-                                         role="tabpanel" aria-labelledby="custom-tabs-four-goals-tab">
-                                         <!-- <Goals/> -->
-                                    </div>
-                                    <div class="tab-pane fade" id="custom-tabs-four-members"
-                                         role="tabpanel" aria-labelledby="custom-tabs-four-members-tab">
-                                        <Members/>
+                                    <div v-for="tab in filteredTabs" 
+                                         :key="tab.id" class="tab-pane fade" 
+                                         :class="{ 'show active': currentTab === tab.id }" 
+                                         :id="tab.id" role="tabpanel">
+                                        <component 
+                                            :is="tab.component" 
+                                            @change-tab="setActiveTab" 
+                                            @memberships-updated="handleMembershipsUpdated" 
+                                        />
                                     </div>
                                 </div>
                             </div>
-                            <!-- /.card -->
                         </div>
                     </div>
                     <!-- /.info-box-content -->

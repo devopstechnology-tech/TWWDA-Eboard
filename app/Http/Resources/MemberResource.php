@@ -34,7 +34,12 @@ class MemberResource extends BaseResource
     public function short(): array
     {
         return [
-            // Short resource fields here
+            // Base resource fields here
+            'id' => $this->resource->getRouteKey(),            
+            'guest_id' => $this->resource->guest_id,
+            'position_id' => $this->resource->position_id,
+            'user_id' => $this->resource->user,
+            'updated_at' => $this->resource->updated_at,
         ];
     }
 }
