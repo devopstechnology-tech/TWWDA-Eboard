@@ -50,7 +50,15 @@ class MemberRepository extends BaseRepository implements MemberInterface
                      ->where('user_id', Auth::user()->id)->first();
                      return $member;
     }
-    
+    public function getMemberAuth($model)
+    {
+        $modelIDs = Member::where('user_id', Auth::id())
+                              ->where('memberable_type', $model)
+                              ->pluck('memberable_id')
+                              ->toArray();
+    // dd($model,$modelIDs);
+        return $modelIDs;
+    }
     public function getBoardMembers($board)
     {
         $filters = [

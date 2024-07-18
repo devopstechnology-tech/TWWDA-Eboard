@@ -65,6 +65,14 @@ export interface ScheduleRequestPayload{ //to db
     meeting_id:string|null,
 }
 
+export interface NonPaginateLatestResponse {
+    code: number;
+    data: {
+        count: number;
+        schedules: Schedule[];
+    };
+    message: string;
+}
 export interface nonPaginateResponse {
     code: number,
     data: Schedule[],

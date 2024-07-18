@@ -21,11 +21,12 @@ const props = withDefaults(defineProps<Props>(), {
     inline: true,  // Default to inline to match AdminLTE style
     checked: '',
 });
-
+console.log('props', props);
 const {errorMessage, value} = useField(props.name);
 const emit = defineEmits(['update:modelValue']);
 
 const getOptionValue = (option: RadioOption): string | number | boolean => {
+    console.log('testing', option.title !== undefined ? option.title : option.value);
     return option.title !== undefined ? option.title : option.value;
 };
 
@@ -36,6 +37,7 @@ watch(value, (newVal) => {
 onMounted(() => {
     if (props.checked) {
         value.value = props.checked;
+        console.log('value.value', value.value);
     }
 });
 </script>
@@ -50,7 +52,7 @@ onMounted(() => {
                     :name="props.name"
                     v-model="value"
                     :value="getOptionValue(option)"
-                    :checked="props.checked === getOptionValue(option) ? true : false"
+                    :checked="value === getOptionValue(option)"
                     class="mr-2"
                 />
                 <label :for="`${props.name}-${index}`">

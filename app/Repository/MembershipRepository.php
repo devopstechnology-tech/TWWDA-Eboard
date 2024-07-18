@@ -46,6 +46,15 @@ class MembershipRepository extends BaseRepository implements MembershipInterface
         // $filters = ['board_id' => $board];
         return $this->indexResource(Membership::class, MembershipResource::class, $filters);
     }
+    public function getMembershipAuth($model)
+    {
+        $modelIDs = Membership::where('user_id', Auth::id())
+                              ->where('memberable_type', $model)
+                              ->pluck('memberable_id')
+                              ->toArray();
+    
+        return $modelIDs;
+    }
     public function getAuthMembership(): Membership //get loggeid minute writer must be in mbershsip
     {
         return Membership::where('user_id', Auth::user()->id)->first();

@@ -24,15 +24,47 @@ use App\Repository\Contracts\MembershipInterface;
 
 class MeetingRepository extends BaseRepository implements MeetingInterface
 {
-    // Implement the methods
-    public function __construct(
-        private readonly ScheduleInterface $scheduleRepository,
-        private readonly BoardInterface $boardRepository,
-        private readonly MemberInterface $memberRepository,
-        private readonly CommitteeInterface $committeeRepository,
-        private readonly FolderInterface $folderRepository,
-    ) {
+   
+    private $membershipRepository;
+    private $memberRepository;
+    private $boardRepository;
+    private $committeeRepository;
+    private $folderRepository;
+    private $scheduleRepository;
+    public function getMembershipRepository(): MembershipInterface
+    {
+        // Lazily load the AssigneeTaskRepository when needed
+        return $this->membershipRepository ??= resolve(MembershipInterface::class);
     }
+    public function getMemberRepository(): MemberInterface
+    {
+        // Lazily load the AssigneeTaskRepository when needed
+        return $this->memberRepository ??= resolve(MemberInterface::class);
+    }
+    public function getBoardRepository(): BoardInterface
+    {
+        // Lazily load the AssigneeTaskRepository when needed
+        return $this->boardRepository ??= resolve(BoardInterface::class);
+    }
+    public function getCommitteeRepository(): CommitteeInterface
+    {
+        // Lazily load the AssigneeTaskRepository when needed
+        return $this->committeeRepository ??= resolve(CommitteeInterface::class);
+    }
+    public function getFolderRepository(): FolderInterface
+    {
+        // Lazily load the AssigneeTaskRepository when needed
+        return $this->folderRepository ??= resolve(FolderInterface::class);
+    }
+
+    public function getScheduleRepository(): ScheduleInterface
+    {
+        // Lazily load the AssigneeTaskRepository when needed
+        return $this->scheduleRepository ??= resolve(ScheduleInterface::class);
+    }
+
+
+
     public function relationships()
     {
         return [
@@ -44,6 +76,7 @@ class MeetingRepository extends BaseRepository implements MeetingInterface
             'folders',      // Assuming you want to load agendas associated with the meetings
         ];
     }
+    
     public function getAll()
     {
         // Adjust the implementation based on your actual logic
@@ -57,14 +90,21 @@ class MeetingRepository extends BaseRepository implements MeetingInterface
     }
     public function getLatest()
     {
-        // Adjust the implementation based on your actual logic
-        // For example, using a hypothetical MeetingResource for transformation
-        $filters = [
-           'limit' => 4,
-            'with' => $this->relationships(),
-            'orderBy' => ['field' => 'created_at', 'direction' => 'asc']
-        ];
-        return $this->indexResource(Meeting::class, MeetingResource::class, $filters);
+        $meetingIDs = $this->getMembershipRepository()->getMembershipAuth('meeting');
+        $orderBy = ['field' => 'created_at', 'direction' => 'asc'];
+        // Fetch the data
+        $totalCount = Meeting::whereIn('id', $meetingIDs)->count();
+        $meetings = Meeting::whereIn('id', $meetingIDs)
+            ->with($this->relationships())
+            ->orderBy($orderBy['field'], $orderBy['direction'])
+            ->limit(5)
+            ->get();
+
+            $data =  [
+                'count' => $totalCount,
+                'meetings' => $meetings,
+            ];
+            return $data;
     }
 
     public function get(Meeting|string $meeting): Meeting
@@ -146,7 +186,7 @@ class MeetingRepository extends BaseRepository implements MeetingInterface
 
             $meeting->meetingable_type = Committee::class;
             $meeting->meetingable_id = $payload['committee_id'];
-            $member = $this->memberRepository->fetchCommitteeMember($payload['committee_id']);
+            $member = $this->getMemberRepository()->fetchCommitteeMember($payload['committee_id']);
         } elseif (!empty($payload['board_id'])) {
             $board = Board::find($payload['board_id']);
 
@@ -156,7 +196,7 @@ class MeetingRepository extends BaseRepository implements MeetingInterface
 
             $meeting->meetingable_type = Board::class;
             $meeting->meetingable_id = $payload['board_id'];
-            $member = $this->memberRepository->fetchBoardMember($payload['board_id']);
+            $member = $this->getMemberRepository()->fetchBoardMember($payload['board_id']);
         }
         $meeting->save();
 
@@ -172,8 +212,8 @@ class MeetingRepository extends BaseRepository implements MeetingInterface
                 "Meeting Attendance",
                 "Meeting Archive",
             ];
-            $this->folderRepository->createMeetingInitialFolder($meeting, $boardcommittee, $DefaultfolderNames);
-            $this->scheduleRepository->createSchedule($meeting, $member, $payload);
+            $this->getFolderRepository()->createMeetingInitialFolder($meeting, $boardcommittee, $DefaultfolderNames);
+            $this->getScheduleRepository()->createSchedule($meeting, $member, $payload);
         }
         return $meeting;
     }
@@ -211,7 +251,7 @@ class MeetingRepository extends BaseRepository implements MeetingInterface
         $meeting->save();
         // dd($meeting);
         if ($meeting) {
-            $this->scheduleRepository->updateSchedule($meeting, $payload);
+            $this->getScheduleRepository()->updateSchedule($meeting, $payload);
             // $isUpdate = true;
 
             // Fetch all User instances in a single query using the retrieved IDs

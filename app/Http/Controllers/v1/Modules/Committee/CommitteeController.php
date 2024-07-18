@@ -85,7 +85,7 @@ class CommitteeController extends Controller
      public function updatemembers(UpdateMemberRequest $request, Board $board, Committee $committee): JsonResponse
      {
          // $this->authorize('update', [Committee::class, $committee->id]);
-         $committee = $this->committeeRepository->updateMembers($board, $committee, $request->validated());
+         $committee = $this->committeeRepository->updateMembers($committee, $request->validated());
  
          return $this->response(Response::HTTP_OK, __('messages.record-updated'), $committee);
      }

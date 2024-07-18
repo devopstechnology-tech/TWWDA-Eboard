@@ -12,11 +12,13 @@ trait IndexResourceTrait
     public function indexResource($model, $resource, $filters = [])
     {
         $data = $model::query();
+
         // Apply 'limit' filter for limiting results
         if (isset($filters['limit'])) {
             $data->limit($filters['limit']);
         }
         unset($filters['limit']); 
+
         // Decide whether to include deleted items based on 'includeDeleted' filter
         if (isset($filters['includeDeleted'])) {
             if ($filters['includeDeleted'] === 'only') {
@@ -28,6 +30,7 @@ trait IndexResourceTrait
         } else {
             $data->whereNull('deleted_at'); // Default to excluding trashed items if no 'includeDeleted' is set
         }
+
         // Handling 'whereNot' conditions first
         if (isset($filters['whereNot'])) {
             foreach ($filters['whereNot'] as $field => $value) {
@@ -35,6 +38,15 @@ trait IndexResourceTrait
             }
             unset($filters['whereNot']); // Remove 'whereNot' from filters to avoid misinterpretation
         }
+
+        // Handling 'whereIn' conditions
+        if (isset($filters['whereIn'])) {
+            foreach ($filters['whereIn'] as $field => $values) {
+                $data->whereIn($field, $values);
+            }
+            unset($filters['whereIn']); // Remove 'whereIn' from filters to avoid conflicts
+        }
+
         // Handling 'whereHas' conditions
         if (isset($filters['whereHas'])) {
             foreach ($filters['whereHas'] as $relation => $callback) {
@@ -42,11 +54,13 @@ trait IndexResourceTrait
             }
             unset($filters['whereHas']); // Remove 'whereHas' from filters to avoid conflicts
         }
-        // Handling 'realtionships' conditions
+
+        // Handling 'with' relationships
         if (isset($filters['with'])) {
             $data->with($filters['with']);
             unset($filters['with']);  // Remove 'with' from filters to avoid conflicts
         }
+
         // Apply role-based filters if not a super admin
         if (!Auth::user()->hasRole('Super Admin')) {
             foreach ($filters as $column => $value) {
@@ -55,6 +69,7 @@ trait IndexResourceTrait
                 }
             }
         }
+
         // If an 'orderBy' filter is provided, apply it for sorting
         if (isset($filters['orderBy'])) {
             $data->orderBy($filters['orderBy']['field'], $filters['orderBy']['direction']);
@@ -62,7 +77,6 @@ trait IndexResourceTrait
             // Default sorting by 'created_at' if no 'orderBy' is specified
             $data->orderBy('created_at', 'asc');
         }
-        
 
         $data = $model::appendToQueryFromRequestQueryParameters($data);
 

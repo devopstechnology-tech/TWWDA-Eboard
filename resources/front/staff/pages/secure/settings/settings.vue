@@ -365,28 +365,28 @@ console.log('companySettings', companySettings.value);
                             <h3 class="card-title text-white"><i class="fas fa-info-circle"></i> Contact Information</h3>
                         </div>
                         <div class="card-body p-0">
-                            <div class="info-box mb-3 bg-primary">
+                            <div class="info-box mb-3 ">
                                 <span class="info-box-icon"><i class="fas fa-map-marker-alt"></i></span>
                                 <div class="info-box-content">
                                     <span class="info-box-text">Address</span>
                                     <span class="info-box-number">{{ companySettings.address }}</span>
                                 </div>
                             </div>
-                            <div class="info-box mb-3 bg-success">
+                            <div class="info-box mb-3 ">
                                 <span class="info-box-icon"><i class="fas fa-phone-volume"></i></span>
                                 <div class="info-box-content">
                                     <span class="info-box-text">Phone 1</span>
                                     <span class="info-box-number">{{ companySettings.phone1 }}</span>
                                 </div>
                             </div>
-                            <div class="info-box mb-3 bg-success">
+                            <div class="info-box mb-3 ">
                                 <span class="info-box-icon"><i class="fas fa-phone-alt"></i></span>
                                 <div class="info-box-content">
                                     <span class="info-box-text">Phone 2</span>
                                     <span class="info-box-number">{{ companySettings.phone2 }}</span>
                                 </div>
                             </div>
-                            <div class="info-box mb-3 bg-success">
+                            <div class="info-box mb-3 ">
                                 <span class="info-box-icon"><i class="fas fa-globe-americas"></i></span>
                                 <div class="info-box-content">
                                     <span class="info-box-text">City/State</span>
@@ -395,14 +395,14 @@ console.log('companySettings', companySettings.value);
                                     </span>
                                 </div>
                             </div>
-                            <div class="info-box mb-3 bg-success">
+                            <div class="info-box mb-3 ">
                                 <span class="info-box-icon"><i class="fas fa-flag"></i></span>
                                 <div class="info-box-content">
                                     <span class="info-box-text">County</span>
                                     <span class="info-box-number">{{ companySettings.county }}</span>
                                 </div>
                             </div>
-                            <div class="info-box mb-3 bg-success">
+                            <div class="info-box mb-3 ">
                                 <span class="info-box-icon"><i class="fas fa-globe"></i></span>
                                 <div class="info-box-content">
                                     <span class="info-box-text">Website</span>
@@ -688,7 +688,7 @@ console.log('companySettings', companySettings.value);
                             <div class="row">
                                 <div class="col-sm-6" 
                                      v-for="(value, index) in companySettings.mailtype.values" :key="index">
-                                    <div class="info-box" :class="getIconAndColor(value.nameField).color">
+                                    <div class="info-box">
                                         <span class="info-box-icon">
                                             <i :class="getIconAndColor(value.nameField).icon"></i>
                                         </span>
@@ -703,7 +703,7 @@ console.log('companySettings', companySettings.value);
                             <div class="text-center">
                                 <strong class="d-block mb-2">
                                     <i class="fas fa-certificate mr-2"></i>PSPDFKit Licence Key</strong>
-                                <p class="badge badge-primary p-2 d-inline-block text-wrap" style="max-width: 100%;">
+                                <p class=" p-2 d-inline-block text-wrap" style="max-width: 100%;">
                                     {{ companySettings.pspdkitlicencekey }}
                                 </p>
                             </div>

@@ -58,7 +58,7 @@ const renderedIcon = computed<IconDefinition|undefined>(() => {
 
         &.error {
             @apply bg-red-200;
-            @apply text-red-600;
+            /* @apply text-red-600; */
         }
         &.success {
             @apply bg-green-200;

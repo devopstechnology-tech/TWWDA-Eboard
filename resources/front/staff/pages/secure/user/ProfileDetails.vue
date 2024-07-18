@@ -295,7 +295,7 @@ const {isLoading, data: fetchedProfile, refetch: fetchProfile} = getProfile();
             <div class="col-md-4" v-if="fetchedProfile">
                 <!-- Main User Profile Widget -->
                 <div class="card card-widget widget-user">
-                    <div class="widget-user-header bg-info">
+                    <div class="widget-user-header bg-primary">
                         <h3 class="widget-user-username">{{ fetchedProfile.user.full_name }}</h3>
                         <h5 class="widget-user-desc">{{ fetchedProfile.title }}</h5>
                     </div>
@@ -327,7 +327,7 @@ const {isLoading, data: fetchedProfile, refetch: fetchProfile} = getProfile();
                 </div>
 
                 <!-- Detailed Info Boxes -->
-                <div class="info-box bg-success">
+                <div class="info-box ">
                     <span class="info-box-icon"><i class="far fa-envelope"></i></span>
                     <div class="info-box-content">
                         <span class="info-box-text">Email</span>
@@ -335,7 +335,7 @@ const {isLoading, data: fetchedProfile, refetch: fetchProfile} = getProfile();
                     </div>
                 </div>
 
-                <div class="info-box bg-warning">
+                <div class="info-box ">
                     <span class="info-box-icon"><i class="fas fa-phone"></i></span>
                     <div class="info-box-content">
                         <span class="info-box-text">Contact</span>
@@ -344,7 +344,7 @@ const {isLoading, data: fetchedProfile, refetch: fetchProfile} = getProfile();
                 </div>
 
                 <!-- Additional Personal Details -->
-                <div class="info-box bg-primary">
+                <div class="info-box ">
                     <span class="info-box-icon"><i class="fas fa-user-tie"></i></span>
                     <div class="info-box-content">
                         <span class="info-box-text">Position</span>
@@ -352,7 +352,7 @@ const {isLoading, data: fetchedProfile, refetch: fetchProfile} = getProfile();
                     </div>
                 </div>
 
-                <div class="info-box bg-danger">
+                <div class="info-box ">
                     <span class="info-box-icon"><i class="fas fa-gavel"></i></span>
                     <div class="info-box-content">
                         <span class="info-box-text">Appointed by</span>
@@ -361,7 +361,7 @@ const {isLoading, data: fetchedProfile, refetch: fetchProfile} = getProfile();
                 </div>
 
                 <!-- Appointment Dates -->
-                <div class="info-box bg-info">
+                <div class="info-box ">
                     <span class="info-box-icon"><i class="fas fa-calendar-day"></i></span>
                     <div class="info-box-content">
                         <span class="info-box-text">Appointment Start</span>
@@ -760,28 +760,28 @@ const {isLoading, data: fetchedProfile, refetch: fetchProfile} = getProfile();
                     </div>
                 </div>
                 <div class="card card-primary">
-                    <div class="card-header bg-primary">
+                    <div class="card-header ">
                         <h3 class="card-title text-white">Professional Profile Overview</h3>
                     </div>
                     <div class="card-body bg-light">
                         <h4 class="text-center mb-4"><i class="fas fa-user-tie mr-2"></i>Profile Details</h4>
                         <div class="row">
                             <div class="col-sm-6">
-                                <div class="info-box bg-warning">
+                                <div class="info-box ">
                                     <span class="info-box-icon"><i class="fas fa-bookmark"></i></span>
                                     <div class="info-box-content">
                                         <span class="info-box-text">Title</span>
                                         <span class="info-box-number">{{ fetchedProfile.title }}</span>
                                     </div>
                                 </div>
-                                <div class="info-box bg-primary">
+                                <div class="info-box ">
                                     <span class="info-box-icon"><i class="fas fa-user-check"></i></span>
                                     <div class="info-box-content">
                                         <span class="info-box-text">Appointing Authority</span>
                                         <span class="info-box-number">{{ fetchedProfile.appointing_authority }}</span>
                                     </div>
                                 </div>
-                                <div class="info-box bg-secondary clickable" 
+                                <div class="info-box  clickable" 
                                      @click="openDocument(fetchedProfile.appointment_letter)">
                                     <span class="info-box-icon"><i class="fas fa-file-contract"></i></span>
                                     <div class="info-box-content">
@@ -789,7 +789,7 @@ const {isLoading, data: fetchedProfile, refetch: fetchProfile} = getProfile();
                                         <span class="info-box-number">View Document</span>
                                     </div>
                                 </div>
-                                <div class="info-box bg-success">
+                                <div class="info-box ">
                                     <span class="info-box-icon"><i class="fas fa-clock"></i></span>
                                     <div class="info-box-content">
                                         <span class="info-box-text">Serving Term</span>
@@ -798,7 +798,7 @@ const {isLoading, data: fetchedProfile, refetch: fetchProfile} = getProfile();
                                 </div>
                             </div>
                             <div class="col-sm-6">
-                                <div class="info-box bg-info">
+                                <div class="info-box ">
                                     <span class="info-box-icon"><i class="fas fa-calendar-alt"></i></span>
                                     <div class="info-box-content">
                                         <span class="info-box-text">Appointment Start</span>
@@ -809,7 +809,7 @@ const {isLoading, data: fetchedProfile, refetch: fetchProfile} = getProfile();
                                             {{ formatDate(fetchedProfile.appointment_end_date) }}</span>
                                     </div>
                                 </div>
-                                <div class="info-box bg-warning clickable" 
+                                <div class="info-box  clickable" 
                                      @click="openDocument(fetchedProfile.member_cv)">
                                     <span class="info-box-icon"><i class="fas fa-file-alt"></i></span>
                                     <div class="info-box-content">
@@ -817,7 +817,7 @@ const {isLoading, data: fetchedProfile, refetch: fetchProfile} = getProfile();
                                         <span class="info-box-number">View Document</span>
                                     </div>
                                 </div>
-                                <div class="info-box bg-primary clickable" 
+                                <div class="info-box  clickable" 
                                      @click="openDocument(fetchedProfile.kra_pin)">
                                     <span class="info-box-icon"><i class="fas fa-id-card"></i></span>
                                     <div class="info-box-content">
@@ -825,7 +825,7 @@ const {isLoading, data: fetchedProfile, refetch: fetchProfile} = getProfile();
                                         <span class="info-box-number">View Document</span>
                                     </div>
                                 </div>
-                                <div class="info-box bg-warning">
+                                <div class="info-box ">
                                     <span class="info-box-icon"><i class="fas fa-building"></i></span>
                                     <div class="info-box-content">
                                         <span class="info-box-text">Establishment</span>

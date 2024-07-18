@@ -30,7 +30,3 @@ const emitSelectedOption = () => {
 <style scoped>
 /* Add your styles here */
 </style>
-
-function emit(arg0: string, value: string) {
-  throw new Error('Function not implemented.');
-

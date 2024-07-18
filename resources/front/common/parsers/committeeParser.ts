@@ -15,8 +15,27 @@ export const committeeRequestParser = object({ //from db
         full_name: string(),
     })),
     // folders:string(),
-    committeeable:string(),
+    committeeable:object({
+        cover:string(),
+        created_at:string(),
+        deleted_at:string(),
+        description:string(),
+        icon:string(),
+        id:string(),
+        name:string(),
+        owner_id:string(),
+        status:string(),
+        updated_at:string(),
+    }),
 });
+export interface NonPaginateLatestResponse {
+    code: number;
+    data: {
+        count: number;
+        committees: Committee[];
+    };
+    message: string;
+}
 export interface nonPaginateResponse {
     code: number,
     data: Committee[],

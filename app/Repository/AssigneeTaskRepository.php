@@ -6,6 +6,7 @@ use App\Models\Module\Task\Task;
 use App\Models\Module\Board\Board;
 use App\Repository\BaseRepository;
 use App\Models\Module\Member\Member;
+use Illuminate\Support\Facades\Auth;
 use App\Models\Module\Meeting\Meeting;
 use App\Models\Module\Member\Membership;
 use App\Models\Module\Committe\Committee;
@@ -21,7 +22,16 @@ class AssigneeTaskRepository extends BaseRepository implements AssigneeTaskInter
     {
         return $this->taskRepository ??= resolve(TaskInterface::class);
     }
-
+    public function getTasksAuth()
+    {
+        $assigneeTasks = AssigneeTask::with('assignable')->get();
+    
+        $taskIDs = $assigneeTasks->filter(function ($assigneeTask) {
+            return $assigneeTask->assignable?->user_id === Auth::id();
+        })->pluck('task_id')->toArray();
+    
+        return $taskIDs;
+    }
     public function create(Task|string $task, array $payload): AssigneeTask
     {
         $entityType = $payload['entity_type'];

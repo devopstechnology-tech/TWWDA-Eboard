@@ -28,6 +28,15 @@ class UsersController extends Controller
 
         return $this->response(Response::HTTP_OK, __('messages.records-fetched'), $user, User::class);
     }
+    public function latest(): JsonResponse
+    {
+        // $this->authorize('viewAny', User::class);
+        $user = $this->usersRepository->getLatest();
+
+        return $this->response(Response::HTTP_OK, __('messages.records-fetched'), $user, User::class);
+    }
+
+
     public function trashedusers(): JsonResponse
     {
         // $this->authorize('viewAny', User::class);

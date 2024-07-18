@@ -24,6 +24,14 @@ export interface AlmanacRequestPayload{ //to db
     held:string
     fileupload:File|null
 }
+export interface NonPaginateLatestResponse {
+    code: number;
+    data: {
+        count: number;
+        almanacs: Almanac[];
+    };
+    message: string;
+}
 
 export interface nonPaginateResponse {
     code: number,

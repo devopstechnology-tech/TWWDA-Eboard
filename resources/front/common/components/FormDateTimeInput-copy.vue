@@ -105,7 +105,7 @@ color: #212121;
 &.error {
 input {
   @apply border-red-600 border-2;
-  @apply bg-red-500/80;
+  // @apply bg-red-500/80;
 
   &::placeholder {
     @apply italic;

@@ -2,7 +2,7 @@ import {notify} from '@kyvg/vue3-notification';
 import Qs from 'qs';
 import useClient from '@/common/api/client';
 import {boardMeetingRoute, committeeMeetingRoute, meetingMemberRoute,meetingRoute, singleboardMeetingRoute, singlecommitteeMeetingRoute} from '@/common/api/meeting_routes';
-import {MeetingMembersRequestPayload, MeetingRequestPayload, nonPaginateResponse, singleresponse} from '@/common/parsers/meetingParser';
+import {MeetingMembersRequestPayload, MeetingRequestPayload, NonPaginateLatestResponse, nonPaginateResponse, singleresponse} from '@/common/parsers/meetingParser';
 import {response} from '@/common/types/types';
 
 ///board
@@ -14,6 +14,14 @@ export async function useGetBoardMeetingsRequest(
     const cn = Qs.stringify(options, {arrayFormat: 'brackets'});
     return await client.get(boardMeetingRoute()+ '/'+ id +'?' + cn).json();
 }
+
+export async function useGetLatestMeetingsRequest(options?: object): Promise<NonPaginateLatestResponse> {
+    const client = useClient();
+    const cn = Qs.stringify(options, {arrayFormat: 'brackets'});
+    return await client.get(meetingRoute() + '/latest'+ '?' + cn).json();
+}
+
+
 export async function useGetSingleBoardMeetingRequest(id: string): 
 Promise<singleresponse> {
     // console.log('id', id);

@@ -179,6 +179,28 @@ const openEditMeetingModal = (e: Meeting) => {
 };
 const openEditScheduleMeetingModal = (e: Meeting, schedule:Schedule) => {
     reseting();
+    // selectedMeeting.value = e;
+    // // Set field values here
+    // selectedMeeting.value = e;
+    // // Set field values here
+    // setFieldValue('title', e.title);
+    // setFieldValue('conference', e.conference);
+    // setFieldValue('location', e.location);
+    // setFieldValue('description', e.description);
+    // setFieldValue('type', e.type);
+    // setFieldValue('status', e.status);   
+   
+    
+    // setFieldValue('schedules', [sched]);
+    // if (e.conference === 'Custom 3rd party Links') {
+    //     handleConferenceTypeChange(e.conference);
+    //     setFieldValue('link', e.link);
+    // }  
+    // console.log('values', values);
+    // action.value = 'schedule';
+    // showCreate.value = true;
+    // MeetingModal.value?.showModal();
+    reseting();
     selectedMeeting.value = e;
     // Set field values here
     setFieldValue('title', e.title);
@@ -186,8 +208,8 @@ const openEditScheduleMeetingModal = (e: Meeting, schedule:Schedule) => {
     setFieldValue('location', e.location);
     setFieldValue('description', e.description);
     setFieldValue('type', e.type);
-    setFieldValue('status', e.status);       
-   
+    setFieldValue('status', e.status);
+    setFieldValue('schedules',e.schedules);
     const sched = {
         id:schedule.id,
         date:schedule.date,
@@ -201,9 +223,9 @@ const openEditScheduleMeetingModal = (e: Meeting, schedule:Schedule) => {
     if (e.conference === 'Custom 3rd party Links') {
         handleConferenceTypeChange(e.conference);
         setFieldValue('link', e.link);
-    }  
+    }    
     console.log('values', values);
-    action.value = 'schedule';
+    action.value = 'edit';
     showCreate.value = true;
     MeetingModal.value?.showModal();
 };
@@ -239,7 +261,7 @@ const Meetingschedules = computed(() => {
     return meetingschedules;
 });
 // methods/functions
-const getMeetings = (boardId: string) => {
+const getMeetings = () => {
     return useQuery({
         queryKey: ['getBoardMeetingsKey'],
         queryFn: async () => {
@@ -334,7 +356,7 @@ const deleteMeeting = async (e: string) => {
 };
 
 //default loading
-const {isLoading, data, refetch: fetchMeetings} = getMeetings(boardId);
+const {isLoading, data, refetch: fetchMeetings} = getMeetings();
 
 const currentStatus = ref('published');
 

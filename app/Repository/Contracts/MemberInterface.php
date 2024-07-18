@@ -12,6 +12,7 @@ interface MemberInterface
 {
     // Define your methods here
     public function getAll();
+    public function getMemberAuth($model);
     public function getBoardMembers($member);
     public function fetchBoardMember($board);
     public function getBoardCollectionMembers($board);

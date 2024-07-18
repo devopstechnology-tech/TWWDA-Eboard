@@ -96,7 +96,7 @@ const {errorMessage} = useField('members');
 const onSubmitMembers = handleSubmitMembers(async (values) => {
     console.log('Submitting form with values:', values);
     try {
-        if (selectedCommitteeId.value) {
+        if (selectedCommitteeId.value){
             // Pass the whole form values, assuming the backend expects an object
             // with `name`, `description`, `icon`, `cover`, and `members` fields.
             setFieldValueMembers('members', selectedMemberIds.value);

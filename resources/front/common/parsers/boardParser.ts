@@ -15,6 +15,15 @@ export const boardRequestParser = object({ //from db
         full_name: string(),
     })),
 });
+export interface NonPaginateLatestResponse {
+    code: number;
+    data: {
+        count: number;
+        boards: Board[];
+    };
+    message: string;
+}
+
 export interface nonPaginateResponse {
     code: number,
     data: Board[],

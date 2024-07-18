@@ -280,17 +280,12 @@ const enableEditing = (pIndex: number, cIndex: number, agenda:Agenda, detailminu
 // Fetch minutes and initialize minuteId
 const getMinutes = () => {
     return useQuery({
-        queryKey: ['getMinutesKey', scheduleId],
+        queryKey: ['getEditMinutesKey', scheduleId],
         queryFn: async () => {
             const response = await useGetMinutesRequest(scheduleId, {paginate: 'false'});
             minuteId.value = response.data.id; 
+            console.log('response.data', response.data);
             return response.data;
-        },
-        onSuccess: (data) => {
-            // Additional logic if needed when fetch is successful
-        },
-        onError: (error) => {
-            console.error('Failed to fetch minutes:', error);
         },
     });
 };
@@ -420,9 +415,10 @@ const onGetPublishMinutes = async (id: string) => {
     await useGetPublishMinutesRequest(id);
     await fetchMinutes();
 };
-const onCloseMeeting = async (id: string) => {
-    await useGetCloseMeetingRequest(id);
-    await fetchMinutes();
+const onCloseMeeting = async (Minutes) => {
+    console.log('Minutes?.schedule?.id', Minutes);
+    // await useGetCloseMeetingRequest(id);
+    // await fetchMinutes();
 };
 </script>
 <template>
@@ -441,7 +437,7 @@ const onCloseMeeting = async (id: string) => {
                             <i class="fas fa-door-closed mr-1"></i> Meeting Closed
                         </button>
                         <button v-else type="button" class="btn btn-sm mr-1 btn-success btn-lg"
-                                @click.prevent="onCloseMeeting(Minutes?.schedule.id)">
+                                @click.prevent="onCloseMeeting(Minutes)">
                             <i class="fas fa-door-closed mr-1"></i> Close Meeting
                         </button>                    
                         <button v-if="Minutes?.approvalstatus ==='approved'" 

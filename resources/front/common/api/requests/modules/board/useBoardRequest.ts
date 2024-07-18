@@ -5,11 +5,12 @@ import useClient from '@/common/api/client';
 import {
     BoardMembersRequestPayload, 
     BoardRequestPayload, 
+    NonPaginateLatestResponse, 
     nonPaginateResponse, 
     singleBoardResponse,
 } from '@/common/parsers/boardParser';
 
-export async function useGetLatestBoardsRequest(options?: object): Promise<nonPaginateResponse> {
+export async function useGetLatestBoardsRequest(options?: object): Promise<NonPaginateLatestResponse> {
     const client = useClient();
     const cn = Qs.stringify(options, {arrayFormat: 'brackets'});
     return await client.get(boardRoute() + '/latest' + '?' + cn).json();

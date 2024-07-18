@@ -15,14 +15,21 @@ use App\Models\Module\Member\Position;
 use App\Repository\Actions\ImageAction;
 use App\Repository\Contracts\BoardInterface;
 use App\Repository\Contracts\FolderInterface;
+use App\Repository\Contracts\MemberInterface;
 use App\Notifications\BoardUpdateNotification;
 use App\Notifications\BoardNewMemberNotification;
 
 class BoardRepository extends BaseRepository implements BoardInterface
 {
     // Implement the methods
+    private $memberRepository;
     public function __construct(private readonly FolderInterface $folderRepository)
     {
+    }
+    public function getMemberRepository(): MemberInterface
+    {
+        // Lazily load the AssigneeTaskRepository when needed
+        return $this->memberRepository ??= resolve(MemberInterface::class);
     }
     public function relationships()
     {
@@ -46,16 +53,25 @@ class BoardRepository extends BaseRepository implements BoardInterface
     }
     public function getLatest()
     {
-        // Adjust the implementation based on your actual logic
-        // For example, using a hypothetical BoardResource for transformation
-        $filters = [
-            // 'owner_id' => Auth::user()->id,
-            'limit' => 4,  // Limit to 4 records
-            'with' => $this->relationships(),
-            'orderBy' => ['field' => 'created_at', 'direction' => 'asc']
-        ];
-        return $this->indexResource(Board::class, BoardResource::class, $filters);
+        $boardIDs = $this->getMemberRepository()->getMemberAuth('board');
+        // dd($boardIDs);
+        $orderBy = ['field' => 'created_at', 'direction' => 'asc'];
+        // Fetch the data
+        $totalCount = Board::whereIn('id', $boardIDs)->count();
+        $boards = Board::whereIn('id', $boardIDs)
+            ->with($this->relationships())
+            ->orderBy($orderBy['field'], $orderBy['direction'])
+            ->limit(5)
+            ->get();
+
+            $data =  [
+                'count' => $totalCount,
+                'boards' => $boards,
+            ];
+            return $data;
     }
+
+
 
     public function get(Board|string $board): Board
     {

@@ -66,7 +66,14 @@ export interface PollMemberEditParams {
 user: any; id: string; full_name: string;
 }[];
 }
-
+export interface NonPaginateLatestResponse {
+    code: number;
+    data: {
+        count: number;
+        polls: Poll[];
+    };
+    message: string;
+}
 export interface nonPaginateResponse {
     code: number,
     data: Poll[],

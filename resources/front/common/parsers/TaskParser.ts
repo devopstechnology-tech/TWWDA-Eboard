@@ -13,6 +13,13 @@ export const taskParser = object({
     status:string(),
     assigneetype:string(),
     assigneestatus:string(),
+    taskstatuses:array(object({
+        id:string(),
+        task_id:string(),
+        assignee_task_id:string(),
+        date:string(),
+        status:string(),
+    })),
     taskassignees:array(taskassigneeParser),
 });
 
@@ -27,6 +34,12 @@ export interface TaskRequestPayload{ //to db
     assigneetype:string,
     assigneestatus:string,
     taskassignees:TaskAssignee[],
+}
+export interface TaskWorkRequestPayload{ //to db
+    taskstatus_id:string|null,
+    task_id:string,
+    task_assignee_id:string,
+    selectedOption:string,
 }
 
 
@@ -50,6 +63,14 @@ user: any; id: string; full_name: string;
 }[];
 }
 
+export interface NonPaginateLatestResponse {
+    code: number;
+    data: {
+        count: number;
+        tasks: Task[];
+    };
+    message: string;
+}
 
 export interface nonPaginateResponse {
     code: number,

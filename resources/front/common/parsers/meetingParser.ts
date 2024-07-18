@@ -48,7 +48,14 @@ export interface singleresponse {
     message: string
 }
 
-
+export interface NonPaginateLatestResponse {
+    code: number;
+    data: {
+        count: number;
+        meetings: Meeting[];
+    };
+    message: string;
+}
 export interface nonPaginateResponse {
     code: number,
     data: Meeting[],

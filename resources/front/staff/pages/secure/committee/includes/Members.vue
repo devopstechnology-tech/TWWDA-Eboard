@@ -296,7 +296,7 @@ const roleIcon = ((roleType:string) => {
                 </div>
             </div>
         </div>
-    </div>>
+    </div>
 
     <div class="flex justify-center col-md-6">
         <dialog id="membersmodal" class="modal" ref="membersmodal">

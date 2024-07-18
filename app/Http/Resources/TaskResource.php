@@ -23,6 +23,7 @@ class TaskResource extends BaseResource
         'duedate' => $this->resource->duedate,
         'description' => $this->resource->description,
         'status' => $this->resource->status,
+        'taskstatuses' => $this->resource->taskstatuses,
 
         'assigneetype' => $this->resource->assigneetype,
         'assigneestatus' => $this->resource->assigneestatus,

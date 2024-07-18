@@ -4,7 +4,7 @@ import useClient from '@/common/api/client';
 import {userRoute} from '@/common/api/user_routes';
 import {LOCAL_TOKEN} from '@/common/constants/localStorageKeys';
 import unwrap from '@/common/parsers/unwrap';
-import {AcceptInviteRequestPayload, AuthenticatedUser, authenticatedUserParser, nonPaginateResponse,singleresponse,UserRequestPayload} from '@/common/parsers/userParser';
+import {AcceptInviteRequestPayload, AuthenticatedUser, authenticatedUserParser, NonPaginateLatestResponse, nonPaginateResponse,singleresponse,UserRequestPayload} from '@/common/parsers/userParser';
 import {Meta} from '@/common/types/types';
 
 // SUPERADMIN
@@ -13,6 +13,14 @@ export async function useGetUsersRequest(options?: object):Promise<nonPaginateRe
     const cn = Qs.stringify(options, {arrayFormat: 'brackets'});
     return await client.get(userRoute() + '?' + cn).json();
 }
+export async function useGetLatestUsersRequest(options?: object): Promise<NonPaginateLatestResponse> {
+    const client = useClient();
+    const cn = Qs.stringify(options, {arrayFormat: 'brackets'});
+    return await client.get(userRoute() + '/latest'+ '?' + cn).json();
+}
+
+
+
 export async function useGetTrashedUsersRequest(options?: object):Promise<nonPaginateResponse>{
     const client = useClient();
     const cn = Qs.stringify(options, {arrayFormat: 'brackets'});

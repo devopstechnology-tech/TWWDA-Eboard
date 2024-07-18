@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {useQuery} from '@tanstack/vue-query';
-import {FieldArrayContext, useField, useFieldArray, useForm} from 'vee-validate';
+import {useForm} from 'vee-validate';
 import {computed, onMounted, ref} from 'vue';
 import {useRoute, useRouter} from 'vue-router';
 import * as yup from 'yup';
@@ -8,21 +8,20 @@ import {
     useCreateUserRequest,
     useDeleteUserRequest,
     useGetUsersRequest,
-    useUpdateUserRequest,
     useUpdateUserRoleRequest,
 } from '@/common/api/requests/modules/user/useUserRequest';
 import {useGetRolesRequest} from '@/common/api/requests/roleperm/useRolesRequest';
-import FormEmailsInput from '@/common/components/FormEmailsInput.vue';
 import FormInput from '@/common/components/FormInput.vue';
-import LoadingComponent from '@/common/components/LoadingComponent.vue';
-import RadioButton from '@/common/components/RadioButton.vue';
+import FormRadioInput from '@/common/components/FormRadioInput.vue';
 import useUnexpectedErrorHandler from '@/common/composables/useUnexpectedErrorHandler';
-import {formattedDateTime, loadAvatar} from '@/common/customisation/Breadcrumb';
+import {
+    formattedDateTime,
+    loadAvatar,
+} from '@/common/customisation/Breadcrumb';
 import ValidationError from '@/common/errors/ValidationError';
 import {Role} from '@/common/parsers/roleParser';
-import {AcceptInviteRequestPayload, User, UserRequestPayload} from '@/common/parsers/userParser';
+import {User, UserRequestPayload} from '@/common/parsers/userParser';
 import useAuthStore from '@/common/stores/auth.store';
-import UserRole from '@/staff/pages/secure/user/includes/UserRole.vue';
 
 // v-if="authStore.hasPermission(['view meeting'])"
 const authStore = useAuthStore();
@@ -40,24 +39,35 @@ const createUserSchema = yup.object({
     id: yup.string().nullable(),
     email: yup.string().required('Email is required'),
     role: yup.string().required('Role is required'),
+    first:yup.string().required('First Name is required'),
+    last:yup.string().required('Last Name is required'),
+    id_number:yup.string().required('Id Number is required'),
+    phone:yup.string().required('Phone Number is required'),
 });
 const {
     handleSubmit,
     setErrors,
     setFieldValue,
     values,
-    errors,
 } = useForm<{
-    id: string;
+    id: string|null;
     role: string;
     email: string;
+    first: string;
+    last: string;
+    id_number: string;
+    phone: string;
 
 }>({
     validationSchema: createUserSchema,
     initialValues: {
-        id: '',
+        id: null,
         email: '',
         role: '',
+        first: '',
+        last: '',
+        id_number: '',
+        phone: '',
     },
 });
 
@@ -68,21 +78,25 @@ const openCreateUserModal = () => {
     UserModal.value?.showModal();
 };
 
-const onSubmit = handleSubmit(async (values, {resetForm}) => {
+const onSubmit = handleSubmit(async (values) => {
     try {
         const payload: UserRequestPayload = {
             id: values.id,
             email: values.email,
             role: values.role,
+            first: values.first,
+            last: values.last,
+            id_number: values.id_number,
+            phone: values.phone,
         };
         if (action.value === 'create') {
             await useCreateUserRequest(payload);
         } else if (action.value === 'role') {
             await useUpdateUserRoleRequest(payload, payload.id);
         }
+        UserModal.value?.close();
         await fetchUsers();
         resetCreateForm();
-        UserModal.value?.close();
     } catch (err) {
         if (err instanceof ValidationError) {
             setErrors(err.messages);
@@ -110,9 +124,9 @@ const resetCreateForm = () => {
 };
 
 const customroles = [
-    {name: 'Member', value: 'default'},
-    {name: 'Admin', value: 'admin'},
-    {name: 'Observer', value: 'observer'},
+    {id:'default', name: 'Member', value: 'default'},
+    {id:'admin', name: 'Admin', value: 'admin'},
+    {id:'observer', name: 'Observer', value: 'observer'},
 ];
 
 const Customroles = computed(() => {
@@ -255,19 +269,69 @@ window.addEventListener('fetchUsersData', () => {
                     <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
                     <div class="w-full mt-6 p-2">
                         <div class="font-thin text-sm flex flex-col items-center gap-6">
-                            <form novalidate @submit.prevent="onSubmitCreate"
-                                  class="w-full rounded-xl mx-auto p-1 custom-modal">
+                            <form novalidate @submit.prevent="onSubmit">
+                                <div class="flex flex-wrap -mx-2">
+                                    <div class="w-full md:w-1/2 px-1 md:px-2 mb-4">
+                                        <FormInput
+                                            :labeled="true"
+                                            direction="up"
+                                            label="Your First Name"
+                                            name="first"
+                                            class="w-full text-sm  tracking-wide"
+                                            placeholder="Enter your First Name"
+                                            type="text"
+                                        />
+                                    </div>
+                                    <div class="w-full md:w-1/2 px-1 md:px-2 mb-4">
+                                        <FormInput
+                                            :labeled="true"
+                                            direction="up"
+                                            label="Your Last Name"
+                                            name="last"
+                                            class="w-full text-sm  tracking-wide mb-2"
+                                            placeholder="Enter your Last Name"
+                                            type="text"
+                                        />
+                                    </div>
+                                </div>
+                                <div class="flex flex-wrap -mx-2">
+                                    <div class="w-full md:w-1/2 px-1 md:px-2 mb-4">
+                                        <FormInput
+                                            :labeled="true"
+                                            direction="up"
+                                            label="ID Number"
+                                            name="id_number"
+                                            class="w-full text-sm  tracking-wide mb-2"
+                                            placeholder="Enter your ID Number"
+                                            type="number"
+                                        />
+                                    </div>
+                                    <div class="w-full md:w-1/2 px-1 md:px-2 mb-4">
+                                        <FormInput
+                                            :labeled="true"
+                                            direction="up"
+                                            label="Phone"
+                                            name="phone"
+                                            class="w-full text-sm  tracking-wide mb-2"
+                                            placeholder="Enter your Phone"
+                                            type="number"
+                                        />
+                                    </div>
+                                </div>
                                 <FormInput
                                     :labeled="true"
                                     label="Email"
                                     name="email"
-                                    class="w-full text-sm tracking-wide"
+                                    class="w-full text-sm tracking-wide mb-2"
                                     placeholder="Enter User Email"
                                     type="email" />
-                                <RadioButton
-                                    :title="'Roles'"
+                                <FormRadioInput
+                                    label="Role Options"
                                     name="role"
-                                    :options="Customroles" />
+                                    :options="Customroles"
+                                    :checked="Customroles[values.role]"
+                                    :inline="true"
+                                />
                                 <button type="submit" class="btn btn-md  mb-1 w-full pt-1 text-red-600 mt-6 bg-primary">
                                     {{'Add User'}}
                                 </button>

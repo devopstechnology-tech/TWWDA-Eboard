@@ -2,7 +2,7 @@ import {notify} from '@kyvg/vue3-notification';
 import Qs from 'qs';
 import useClient from '@/common/api/client';
 import {taskRoute} from '@/common/api/task_routes';
-import {nonPaginateResponse,TaskRequestPayload} from '@/common/parsers/TaskParser';
+import {NonPaginateLatestResponse, nonPaginateResponse,TaskRequestPayload, TaskWorkRequestPayload} from '@/common/parsers/TaskParser';
 
 
 //all tasks
@@ -12,6 +12,44 @@ export async function useGetTasksRequest(options?: object):Promise<nonPaginateRe
     const cn = Qs.stringify(options, {arrayFormat: 'brackets'});
     return await client.get(taskRoute() + '?' + cn).json();
 }
+export async function useGetLatestTasksRequest(options?: object): Promise<NonPaginateLatestResponse> {
+    const client = useClient();
+    const cn = Qs.stringify(options, {arrayFormat: 'brackets'});
+    return await client.get(taskRoute() + '/latest'+ '?' + cn).json();
+}
+export async function useGetAssignedTasksRequest(options?: object): Promise<NonPaginateLatestResponse> {
+    const client = useClient();
+    const cn = Qs.stringify(options, {arrayFormat: 'brackets'});
+    return await client.get(taskRoute() + '/user'+ '?' + cn).json();
+}
+
+
+
+export async function useWorkTaskRequest(
+    payload: TaskWorkRequestPayload, 
+    task_id:string,
+):Promise<nonPaginateResponse>{
+    const client = useClient();
+
+    // const cn = Qs.stringify(options, {arrayFormat: 'brackets'});
+    const response = await client.post(taskRoute()+ '/work/'+ task_id,{
+        json: payload,
+    });
+    return response.json();
+}
+
+export async function useUpdateWorkTaskRequest(
+    payload: TaskWorkRequestPayload, 
+    taskstatus_id:string,
+):Promise<nonPaginateResponse>{
+    const client = useClient();
+    // const cn = Qs.stringify(options, {arrayFormat: 'brackets'});
+    const response = await client.post(taskRoute()+ '/work/update/'+ taskstatus_id,{
+        json: payload,
+    });
+    return response.json();
+}
+
 //board tasks
 export async function useGetBoardTasksRequest(board_id:string, options?: object):Promise<nonPaginateResponse>{
     const client = useClient();

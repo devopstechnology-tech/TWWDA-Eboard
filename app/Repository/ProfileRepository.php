@@ -31,12 +31,12 @@ class ProfileRepository extends BaseRepository implements ProfileInterface
         return ProfileResource::make($profile);
     }
 
-    public function create($user): Profile
+    public function create($user, array $payload): Profile
     {
         $profile = Profile::firstOrCreate([
             'user_id'            => $user->id,
-            'phone'              => '07' . rand(10000000, 99999999),
-            'idpassportnumber'   => rand(100000, 999999),
+            'phone'              => $payload['phone'],
+            'idpassportnumber'   => $payload['id_number'],
         ]);
         return $profile;
     }

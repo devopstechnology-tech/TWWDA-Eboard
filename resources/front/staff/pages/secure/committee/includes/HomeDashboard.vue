@@ -196,7 +196,7 @@ const openEditScheduleMeetingModal = (e: Meeting, schedule:Schedule) => {
     };  
     setFieldValue('schedules', [sched]);
     console.log('values', values);
-    action.value = 'schedule';
+    action.value = 'edit';
     showCreate.value = true;
     MeetingModal.value?.showModal();
 };

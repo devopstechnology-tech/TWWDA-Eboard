@@ -876,7 +876,7 @@ const enableEditing = (chatIndex: number, chat:Chat) => {
                                                              class="message">{{ discussionassigneeserrorMessage }}</div>
                                                     </div>
                                                 </div>
-                                                <div v-if="selectedGroupMembers && selectedGroupMembers.length">
+                                                <div >
                                                     <button type="submit" class="btn btn-primary 
                                                         btn-md w-full mt-6">{{ action == 'create' ? 
                                                         'Create Discussion' : 'Edit Discussion' }}

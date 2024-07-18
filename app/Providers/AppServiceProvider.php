@@ -77,9 +77,11 @@ use App\Models\Module\Poll\AssigneePoll;
 use App\Repository\AttendanceRepository;
 use App\Repository\DiscussionRepository;
 use App\Repository\MembershipRepository;
+use App\Repository\TaskstatusRepository;
 use App\Services\Contracts\SmsInterface;
 use App\Models\Module\Committe\Committee;
 use App\Repository\ActivityLogRepository;
+use App\Models\Module\Task\Sub\Taskstatus;
 use App\Repository\AssigneePollRepository;
 use App\Repository\AssigneeTaskRepository;
 use App\Repository\DetailMinuteRepository;
@@ -125,6 +127,7 @@ use App\Repository\DiscussionAssigneeRepository;
 use App\Repository\Contracts\AttendanceInterface;
 use App\Repository\Contracts\DiscussionInterface;
 use App\Repository\Contracts\MembershipInterface;
+use App\Repository\Contracts\TaskstatusInterface;
 use App\Models\Module\Meeting\Minute\DetailMinute;
 use App\Models\Module\Meeting\Minute\MinuteReview;
 use App\Repository\Contracts\ActivityLogInterface;
@@ -197,6 +200,7 @@ class AppServiceProvider extends ServiceProvider
             'schedule' => Schedule::class,
             'task' => Task::class,
             'assigneetask' => AssigneeTask::class,
+            'taskstatus' => Taskstatus::class,
             'modification' => Modification::class,
             'almanac' => Almanac::class,
             'notification' => Notification::class,
@@ -257,6 +261,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(ScheduleInterface::class, ScheduleRepository::class);
         $this->app->singleton(TaskInterface::class, TaskRepository::class);
         $this->app->singleton(AssigneeTaskInterface::class, AssigneeTaskRepository::class);
+        $this->app->singleton(TaskstatusInterface::class, TaskstatusRepository::class);
         $this->app->singleton(AlmanacInterface::class, AlmanacRepository::class);
         $this->app->singleton(AttendanceInterface::class, AttendanceRepository::class);
 

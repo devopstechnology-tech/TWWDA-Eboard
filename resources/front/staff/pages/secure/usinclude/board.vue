@@ -105,7 +105,8 @@ const {isLoading:committeeloading, data: Committees, refetch: fetchCommittees} =
                                                 <router-link :to="{ 
                                                     name: 'CommitteeDetails', 
                                                     params: { 
-                                                        committeeId: committee.id 
+                                                        committeeId: committee.id, 
+                                                        boardId: committee.committeeable.details.id
                                                     } 
                                                 }" class="text-primary">
                                                     {{ committee.name }}
@@ -132,7 +133,9 @@ const {isLoading:committeeloading, data: Committees, refetch: fetchCommittees} =
                                                          :to="{ 
                                                              name: 'CommitteeDetails', 
                                                              params: { 
-                                                                 committeeId: committee.id 
+                                                                 committeeId: committee.id,
+                                                                 boardId: committee.committeeable.details.id 
+                                                                 
                                                              } 
                                                          }" class="text-green-500 hover:text-green-700 
                                                     transition duration-150 ease-in-out">

@@ -89,6 +89,24 @@ class UsersRepository extends BaseRepository implements UsersInterface
         ];
         return $this->indexResource(User::class, UsersResource::class, $filters);
     }
+    public function getLatest()
+    {
+        $orderBy = ['field' => 'created_at', 'direction' => 'asc'];
+        // Fetch the data
+        $totalCount = User::count();
+        $users = User::with($this->relationships())
+            ->orderBy($orderBy['field'], $orderBy['direction'])
+            ->limit(9)
+            ->get();
+
+            $data =  [
+                'count' => $totalCount,
+                'users' => $users,
+            ];
+            return $data;
+    }
+
+
     public function getTrashedUsers()
     {
         // $baseUrl = config('app.url');
@@ -125,11 +143,13 @@ class UsersRepository extends BaseRepository implements UsersInterface
         $user = User::withoutApproval()->firstOrCreate([
             'email' => $payload['email'],
             'role'  => $payload['role'],
+            'first'  => $payload['first'],
+            'last'  => $payload['last'],            
             'status' => 'invited',
             'password' => '123456789',
         ]);
         $user->markEmailAsVerified();
-        $profile = $this->getProfileRepository()->create($user);
+        $profile = $this->getProfileRepository()->create($user, $payload);
         $defaultRoles = Role::where('type', Role::$type_default)->pluck('id');
         $user->roles()->syncWithoutDetaching($defaultRoles);
         return $user;

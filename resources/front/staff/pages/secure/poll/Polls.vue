@@ -9,6 +9,7 @@ import {useCreatePollRequest} from '@/common/api/requests/modules/meeting/usePol
 import {useGetMembershipsRequest} from '@/common/api/requests/modules/membership/useMembershipRequest';
 import {
     useCreateMeetingPollRequest,
+    useGetAssignedPollsRequest,
     useGetMeetingPollsRequest,
     useGetPollsRequest,
     useUpdateMeetingPollRequest,
@@ -120,7 +121,7 @@ const getPolls = () => {
     return useQuery({
         queryKey: ['getOwnPollsKey'],
         queryFn: async () => {
-            const response = await useGetPollsRequest({paginate: 'false'});
+            const response = await useGetAssignedPollsRequest({paginate: 'false'});
             return response.data;
         },
     });
@@ -269,6 +270,7 @@ function checkIfVoted(poll: Poll, currentUserId: string): boolean {
     // Check if there's a vote in poll.votes that matches the poll_id and assignee_id
     const hasVoted = poll.votes.some(vote => vote.poll_id === poll.id && vote.assignee_poll_id === user.assignee_id);
 
+    console.log('hasVoted', hasVoted);
     return hasVoted;
 }
 
@@ -341,17 +343,17 @@ const viewPoll = (poll:Poll) => {
                             <div class="font-weight-bold">{{ poll.question }}</div>
                             <div v-html="poll.description"></div>
                         </td>
-                        <td :class="dateBadgeClass(poll.duedate)">
+                        <td >
                             {{ formattedDateTime(poll.duedate) }}
-                            <button v-if="isDueSoon(poll.duedate)" class="btn btn-warning btn-sm" @click="sendReminder">
+                            <!-- <button v-if="isDueSoon(poll.duedate)" class="btn btn-warning btn-sm" @click="sendReminder">
                                 Send Reminder
-                            </button>
+                            </button> -->
                         </td>
                         <td>
                             <span :class="statusClass(poll.status)">{{ poll.status }}</span>
                         </td>
                         <td v-html="calculateVoteStats(poll)"></td>
-                        <td class="text-center" v-if="checkIfVoted(poll)">
+                        <td class="text-center" >
                             <div v-if="checkIfVoted(poll)">
                                 <button type="button" @click.prevent="viewPoll(poll)"
                                         title="" class="mx-2 btn btn-sm btn-primary">
@@ -359,10 +361,7 @@ const viewPoll = (poll:Poll) => {
                                 </button>
                             </div>
                             <div v-else>
-                                <button type="button" @click.prevent="viewPoll(poll)"
-                                        title="" class="mx-2 btn btn-sm btn-primary">
-                                    <i class="far fa-eye"></i>
-                                </button>
+                                You Have Voted
                             </div>                            
                         </td>
                     </tr>

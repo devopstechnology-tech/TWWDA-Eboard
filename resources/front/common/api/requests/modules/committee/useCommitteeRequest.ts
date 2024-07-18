@@ -5,11 +5,12 @@ import {committeeMemberRoute,committeeRoute} from '@/common/api/committee_routes
 import {
     CommitteeMembersRequestPayload, 
     CommitteeRequestPayload, 
+    NonPaginateLatestResponse, 
     nonPaginateResponse,
     singleCommitteeResponse, 
 } from '@/common/parsers/committeeParser';
 
-export async function useGetLatestCommitteesRequest(options?: object): Promise<nonPaginateResponse> {
+export async function useGetLatestCommitteesRequest(options?: object): Promise<NonPaginateLatestResponse> {
     const client = useClient();
     const cn = Qs.stringify(options, {arrayFormat: 'brackets'});
     return await client.get(committeeRoute() + '/latest'+ '?' + cn).json();

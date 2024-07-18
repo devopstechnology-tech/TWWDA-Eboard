@@ -53,7 +53,6 @@ const router = useRouter();
 // Constants
 const showCreate = ref(false);
 const action = ref('create');
-const vaction = ref('board');
 const boardId = route.params.boardId as string;
 const selectedCommitteeId = ref(''); // for use when adding members
 const selectedMemberIds = ref<string[]>([]);
@@ -104,23 +103,18 @@ const onSubmit = handleSubmit(async (values) => {
             icon: values.icon,
             cover: values.cover,
         };
-        if(vaction.value === 'committee'){
-            if(action.value === 'create'){
-                
-                await useCreateCommitteeRequest(payload, boardId);
-            }else if(action.value === 'edit'){      
-                await useUpdateCommitteeRequest(payload, selectedCommitteeId.value);
-            }
+        if(action.value === 'create'){
+            
+            await useCreateCommitteeRequest(payload, boardId);
+        }else if(action.value === 'edit'){      
+            await useUpdateCommitteeRequest(payload, selectedCommitteeId.value);
         }
         CommitteeModal.value?.close(); 
         membersmodal.value?.close();
-        if(vaction.value === 'committee'){
-            await fetchCommittees();
-        }
+        await fetchCommittees();
         resetIconImage();
         resetCoverImage();
-        resetBoardForm();
-        selectedMemberIds.value = [];
+        resetForm();
         showCreate.value = false;  
     } catch (err) {
         if (err instanceof ValidationError) {
@@ -132,18 +126,13 @@ const onSubmit = handleSubmit(async (values) => {
 });
 const onSubmitMembers = (async () => {
     try {
-        if(vaction.value === 'committee'){
-            const payload: CommitteeMembersRequestPayload = {
-                members: selectedMemberIds.value,
-            };
-            await useUpdateCommitteeMembersRequest(payload, boardId, selectedCommitteeId.value); 
-        }
+        const payload: CommitteeMembersRequestPayload = {
+            members: selectedMemberIds.value,
+        };
+        await useUpdateCommitteeMembersRequest(payload, boardId, selectedCommitteeId.value); 
         membersmodal.value?.close();
-        if(vaction.value === 'committee'){
-            await fetchCommittees();
-        }
-        resetBoardForm();
-        selectedMemberIds.value = [];
+        await fetchCommittees();
+        resetForm();       
         showCreate.value = false;  
     } catch (err) {
         if (err instanceof ValidationError) {
@@ -155,15 +144,12 @@ const onSubmitMembers = (async () => {
 });
 const {errorMessage} = useField('members');
 
-const openCreateModal = (boardid:string, value:string) => {
-    if(value === 'committee'){
-        vaction.value = 'committee';
-    } 
+const openCreateModal = (value:string) => {
     action.value = 'create';       
     showCreate.value = true;
     CommitteeModal.value?.showModal();
 };
-const openEditModal = (e: Board, value:string) => {
+const openEditModal = (e: Committee) => {
     // Set field values here
     setFieldValue('name', e.name);
     setFieldValue('description', e.description);
@@ -171,22 +157,18 @@ const openEditModal = (e: Board, value:string) => {
     setFieldValue('cover', e.cover);
     updateCoverImage(e.cover);
     updateIconImage(e.icon);
-    if(value === 'committee'){
-        selectedCommitteeId.value = e.id as string;
-        vaction.value = 'committee';
-    } 
+    selectedCommitteeId.value = e.id as string;
     action.value = 'edit';
     showCreate.value = true;
     CommitteeModal.value?.showModal();
 };
-const resetBoardForm = () => {
+const resetForm = () => {
     // Set field values here
     setFieldValue('name', '');
     setFieldValue('description','');
     setFieldValue('icon', '');
     setFieldValue('cover', '');
     action.value = 'create';
-    vaction.value = 'board';
     showCreate.value = true;
     selectedCommitteeId.value ='';
 };
@@ -195,11 +177,7 @@ const openEditMembersModal = (params: BoardMemberEditParams, value:string) => {
     const memberIds = params.members.map(member => member.user.id.toString());
     selectedMemberIds.value = memberIds; 
     action.value = 'members';
-    if(value === 'committee'){
-        selectedCommitteeId.value = params.id as string;
-        selectedBoardId.value = params.committeeable.details.id as string;
-        vaction.value = 'committee';
-    } 
+    selectedCommitteeId.value = params.id as string;
     // console.log('mm', selectedCommitteeId.value, selectedBoardId.value);
     showCreate.value = true;
     membersmodal.value?.showModal();
@@ -250,10 +228,8 @@ const getCommittees = () => {
 };
 const {isLoading:committeeloading, data: Committees, refetch: fetchCommittees} = getCommittees();
 const actionLabel = computed(() => {
-    if (action.value === 'create' && vaction.value === 'board') return 'Create Board';
-    if (action.value === 'edit' && vaction.value === 'board') return 'Edit Board';
-    if (action.value === 'create' && vaction.value === 'committee') return 'Create Committee';
-    if (action.value === 'edit' && vaction.value === 'committee') return 'Edit Committee';
+    if (action.value === 'create') return 'Create Committee';
+    if (action.value === 'edit') return 'Edit Committee';
     return '';
 });
 
@@ -284,19 +260,20 @@ const actionLabel = computed(() => {
                                              :src="loadIcon(committee.icon)" 
                                              alt="User Avatar" 
                                              style="width:128px; height: 128px">
-                                        <div class="ml-3 flex-1 w-100">
+                                        <div class="ml-3 flex-1 w-100" v-if="committee.committeeable">
                                             <h3 class="h2 mb-2">
                                                 <router-link 
                                                     :to="{ 
                                                         name: 'CommitteeDetails', 
                                                         params: { 
-                                                            committeeId: committee.id 
+                                                            committeeId: committee.id, 
+                                                            boardId: committee.committeeable.details.id
                                                         }
                                                     }" class="badge badge-soft bg-primary text-wrap">
                                                     {{ committee.name }}
                                                 </router-link>
                                             </h3>
-                                            <h3 class="mb-1">
+                                            <h3 class="mb-1"  v-if="committee.committeeable">
                                                 Board: <router-link 
                                                     :to="{ 
                                                         name: 'BoardDetails', 
@@ -318,7 +295,7 @@ const actionLabel = computed(() => {
                                                 <br>
                                                 <a v-if="authStore.hasPermission(['add member to committee'])"
                                                    href=""
-                                                   @click.prevent="openEditMembersModal(committee, 'committee')"
+                                                   @click.prevent="openEditMembersModal(committee)"
                                                    class="text-blue-500 hover:text-blue-700 
                                transition duration-150 ease-in-out">
                                                     <i class="fa fa-plus mr-2"></i> Members
@@ -330,7 +307,7 @@ const actionLabel = computed(() => {
                                     <div class="d-flex justify-content-end mt-2 w-100">
                                         <a v-if="authStore.hasPermission(['edit committee'])"
                                            href=""
-                                           @click.prevent="openEditModal(committee, 'committee')"
+                                           @click.prevent="openEditModal(committee)"
                                            class="text-blue-500 hover:text-blue-700 
                        transition duration-150 ease-in-out mr-2">
                                             <i class="fa fa-edit"></i>
@@ -342,11 +319,12 @@ const actionLabel = computed(() => {
                        transition duration-150 ease-in-out mr-2">
                                             <i class="fa fa-trash-alt"></i>
                                         </a>
-                                        <router-link v-if="authStore.hasPermission(['view committee'])"
+                                        <router-link v-if="authStore.hasPermission(['view committee']) && committee.committeeable"
                                                      :to="{ 
                                                          name: 'CommitteeDetails', 
                                                          params: { 
-                                                             committeeId: committee.id 
+                                                             committeeId: committee.id,
+                                                             boardId: committee.committeeable.details.id 
                                                          } 
                                                      }"
                                                      class="text-green-500 hover:text-green-700

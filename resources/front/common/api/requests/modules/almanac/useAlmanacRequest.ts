@@ -2,7 +2,7 @@ import {notify} from '@kyvg/vue3-notification';
 import Qs from 'qs';
 import {almanacRoute} from '@/common/api/almanac_routes';
 import useClient from '@/common/api/client';
-import {AlmanacRequestPayload,nonPaginateResponse} from '@/common/parsers/AlmanacParser';
+import {AlmanacRequestPayload,NonPaginateLatestResponse,nonPaginateResponse} from '@/common/parsers/AlmanacParser';
 
 // SUPERADMIN
 export async function useGetAlmanacsRequest(options?: object):Promise<nonPaginateResponse>{
@@ -10,6 +10,14 @@ export async function useGetAlmanacsRequest(options?: object):Promise<nonPaginat
     const cn = Qs.stringify(options, {arrayFormat: 'brackets'});
     return await client.get(almanacRoute() + '?' + cn).json();
 }
+export async function useGetLatestAlmanacsRequest(options?: object): Promise<NonPaginateLatestResponse> {
+    const client = useClient();
+    const cn = Qs.stringify(options, {arrayFormat: 'brackets'});
+    return await client.get(almanacRoute() + '/latest'+ '?' + cn).json();
+}
+
+
+
 
 //update via almanac 
 export async function useCreateAlmanacRequest(payload: AlmanacRequestPayload){

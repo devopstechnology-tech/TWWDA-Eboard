@@ -68,7 +68,7 @@ input:focus {
 }
 
 .message {
-    color: red;
+    /* color: red; */
     font-size: 0.875rem;
 }
 </style>

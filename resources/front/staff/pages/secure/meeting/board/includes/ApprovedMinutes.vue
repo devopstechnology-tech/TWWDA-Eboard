@@ -260,6 +260,7 @@ const getMinutes = () => {
         queryFn: async () => {
             const response = await useGetMinuteRequest(scheduleId, {paginate: 'false'});
             minuteId.value = response.data.id;
+            console.log('response.data', response.data);
             return response.data;
         },
         onSuccess: (data) => {

@@ -13,7 +13,9 @@ use App\Models\Module\Meeting\Meeting;
 use App\Http\Requests\CreateTaskRequest;
 use App\Http\Requests\UpdateTaskRequest;
 use App\Models\Module\Committe\Committee;
+use App\Models\Module\Task\Sub\Taskstatus;
 use App\Repository\Contracts\TaskInterface;
+use App\Http\Requests\CreateWorkTaskRequest;
 
 class TaskController extends Controller
 {
@@ -26,9 +28,21 @@ class TaskController extends Controller
 
         return $this->response(Response::HTTP_OK, __('messages.records-fetched'), $tasks, Task::class);
     }
+    public function user(): JsonResponse
+    {
+        $tasks = $this->taskRepository->getUserTasks();
+
+        return $this->response(Response::HTTP_OK, __('messages.records-fetched'), $tasks, Task::class);
+    }
     public function latest(): JsonResponse
     {
         $tasks = $this->taskRepository->getLatest();
+
+        return $this->response(Response::HTTP_OK, __('messages.records-fetched'), $tasks, Task::class);
+    }
+    public function usertasks(): JsonResponse
+    {
+        $tasks = $this->taskRepository->getUserTasks();
 
         return $this->response(Response::HTTP_OK, __('messages.records-fetched'), $tasks, Task::class);
     }
@@ -94,6 +108,19 @@ class TaskController extends Controller
     public function updatecommitteetask(UpdateTaskRequest $request, Task $task): JsonResponse
     {
         $task = $this->taskRepository->updateCommitteeTask($task, $request->validated());
+
+        return $this->response(Response::HTTP_OK, __('messages.records-fetched'), $task, Task::class);
+    }
+
+    public function worktask(CreateWorkTaskRequest $request, Task $task): JsonResponse
+    {
+        $task = $this->taskRepository->WorkTask($task, $request->validated());
+
+        return $this->response(Response::HTTP_OK, __('messages.records-fetched'), $task, Task::class);
+    }
+    public function updateworktask(CreateWorkTaskRequest $request, $taskstatus): JsonResponse
+    {
+        $task = $this->taskRepository->updateWorkTask($taskstatus, $request->validated());
 
         return $this->response(Response::HTTP_OK, __('messages.records-fetched'), $task, Task::class);
     }

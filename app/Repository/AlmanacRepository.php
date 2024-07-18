@@ -25,15 +25,21 @@ class AlmanacRepository extends BaseRepository implements AlmanacInterface
     }
     public function getLatest()
     {
-        $filters = [
-            'limit' => 4,
-            // 'with' => $this->relationships(),
-            'whereNot' => ['type' => 'sample'],
-            'orderBy' => ['field' => 'start', 'direction' => 'asc'],
-            // 'includeDeleted' => ''
-        ];
-        return $this->indexResource(Almanac::class, AlmanacResource::class, $filters);
+        $orderBy = ['field' => 'created_at', 'direction' => 'asc'];
+        // Fetch the data
+        $totalCount = Almanac::count();
+        $almanacs = Almanac::orderBy($orderBy['field'], $orderBy['direction'])
+            ->limit(5)
+            ->get();
+
+            $data =  [
+                'count' => $totalCount,
+                'almanacs' => $almanacs,
+            ];
+            return $data;
     }
+
+
 
     public function importAlmanac(array $payload)
     {
@@ -50,7 +56,7 @@ class AlmanacRepository extends BaseRepository implements AlmanacInterface
         $almanac->end           = $payload['end'];
         $almanac->budget        = $payload['budget'];
         $almanac->status        = ApprovalEnum::Default->value;
-        $almanac->held    = HeldEnum::Default->value;
+        $almanac->held          = HeldEnum::Default->value;
         $almanac->save();
         return $almanac;
     }

@@ -118,6 +118,10 @@ export interface UserRequestPayload{
     id: string,
     email: string,
     role: string,
+    first: string,
+    last: string,
+    id_number: string,
+    phone: string,
 }
 export interface AcceptInviteRequestPayload{ //to db
     id:string | null,
@@ -139,7 +143,14 @@ export interface AuthenticatedLoginUser  {
     };
     message: string
 }
-
+export interface NonPaginateLatestResponse {
+    code: number;
+    data: {
+        count: number;
+        users: User[];
+    };
+    message: string;
+}
 export interface nonPaginateResponse {
     code: number,
     data: User[],

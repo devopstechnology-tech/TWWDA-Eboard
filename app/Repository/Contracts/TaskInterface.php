@@ -8,11 +8,13 @@ use App\Models\Module\Task\Task;
 use App\Models\Module\Board\Board;
 use App\Models\Module\Meeting\Meeting;
 use App\Models\Module\Committe\Committee;
+use App\Models\Module\Task\Sub\Taskstatus;
 
 interface TaskInterface
 {
     // Define your methods here
     public function getAll();
+    public function getUserTasks();
     public function getLatest();
     public function getTask(Task |string $poll);
     public function updateTask(Meeting|string $meeting, array $payload): Task;
@@ -33,6 +35,9 @@ interface TaskInterface
     public function createCommitteeTask(Committee $committee, array $payload): Task;
     public function updateCommitteeTask(Task $task, array $payload): Task;
 
-
+    //work task
+     //vote
+     public function WorkTask(Task $task, array $payload);
+     public function updateWorkTask($taskstatus, array $payload);
 
 }

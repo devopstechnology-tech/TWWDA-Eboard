@@ -9,6 +9,7 @@ use App\Models\Module\Task\Sub\AssigneeTask;
 interface AssigneeTaskInterface
 {
     // Define your methods here
+    public function getTasksAuth();
     public function create(Task|string $task, array $payload): AssigneeTask;
     public function update(Task|string $task, array $payload): AssigneeTask;
 }

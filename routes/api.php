@@ -70,6 +70,7 @@ Route::group(['prefix' => 'v1'], function () {
             Route::post('settings/update/{setting}', [SettingController::class, 'update']);
             // api/v1/users
             Route::get('users', [UsersController::class, 'index']);
+            Route::get('users/latest', [UsersController::class, 'latest']);
             Route::get('users/trashedusers', [UsersController::class, 'trashedusers']);
             Route::get('users/{user}', [UsersController::class, 'show']);
             Route::post('users/create', [UsersController::class, 'store']);
@@ -150,19 +151,22 @@ Route::group(['prefix' => 'v1'], function () {
             Route::apiResource('meetingGuests', MeetingGuestController::class);
             Route::apiResource('meetingMembers', MeetingMemberController::class);
 
-            Route::apiResource('meetings', MeetingController::class);
+            // Route::apiResource('meetings', MeetingController::class);
+            Route::post('meetings', [MeetingController::class, 'store']);
+            Route::patch('meetings/{meeting}', [MeetingController::class, 'update']);
+            Route::patch('meetings/publish/{meeting}', [MeetingController::class, 'publish']);
+
             Route::get('meeting', [MeetingController::class, 'index']);
-            Route::get('meeting/latest', [MeetingController::class, 'latest']);
+            Route::get('meetings/latest', [MeetingController::class, 'latest']);
             Route::get('meeting/board/{board}', [MeetingController::class, 'boardmeeting']);
             Route::get('meetings/board/{board}', [MeetingController::class, 'boardmeetings']);            
-            Route::post('meetings/board', [MeetingController::class, 'store']);
             Route::patch('meetings/board/meeting/{board}', [MeetingController::class, 'update']);
             //committee
             Route::get('meeting/committee/{committee}', [MeetingController::class, 'committeemeeting']);
             Route::get('meetings/committee/{committee}', [MeetingController::class, 'committeemeetings']);
             Route::post('meetings/committee', [MeetingController::class, 'store']);
             Route::patch('meetings/committee/meeting/{committee}', [MeetingController::class, 'update']);
-            Route::patch('meetings/publish/{meeting}', [MeetingController::class, 'publish']);
+            
 
             //////////////////////////// scdeulesh/////////////////
             Route::get('schedules', [ScheduleController::class, 'index']);
@@ -193,9 +197,13 @@ Route::group(['prefix' => 'v1'], function () {
             Route::post('attendances/updatersvp/{attendance}', [AttendanceController::class, 'updatersvp']);
             Route::post('attendances/signattendance/{attendance}', [AttendanceController::class, 'signattendance']);
 
-            Route::apiResource('tasks', TaskController::class);
+            // Route::apiResource('tasks', TaskController::class);
             Route::get('tasks/latest', [TaskController::class, 'latest']);
+            Route::get('tasks/user', [TaskController::class, 'usertasks']);
             Route::get('tasks/meeting/{meeting}', [TaskController::class, 'getmeetingtasks']);
+            Route::post('tasks/work/{task}', [TaskController::class, 'worktask']);
+            Route::post('tasks/work/update/{task}', [TaskController::class, 'updateworktask']);
+            
             Route::post('tasks/meeting/create/{meeting}', [TaskController::class, 'createmeetingtask']);
             Route::patch('tasks/meeting/update/{meeting}/{task}', [TaskController::class, 'updatemeetingtask']);
             Route::patch('tasks/meeting/update/{meeting}', [TaskController::class, 'updatetask']);
@@ -213,8 +221,9 @@ Route::group(['prefix' => 'v1'], function () {
             
 
             //////////////////////////// polls/////////////////
-            Route::apiResource('polls', PollController::class);
+            // Route::apiResource('polls', PollController::class);
             Route::get('polls/latest', [PollController::class, 'latest']);
+            Route::get('polls/user', [PollController::class, 'userpolls']);
             Route::post('polls/vote/{poll}', [PollController::class, 'votepoll']);
 
             Route::get('polls/meeting/{meeting}', [PollController::class, 'getmeetingpolls']);            

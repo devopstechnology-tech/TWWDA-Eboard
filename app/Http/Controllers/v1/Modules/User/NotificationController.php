@@ -22,6 +22,12 @@ class NotificationController extends Controller
 
         return $this->response(Response::HTTP_OK, __('messages.records-fetched'), $notifications, Notification::class);
     }
+    public function latest(): JsonResponse
+     {
+         $notifications = $this->notificationRepository->getLatest();
+ 
+         return $this->response(Response::HTTP_OK, __('messages.records-fetched'), $notifications, Notification::class);
+     }
     public function getnotifications(User $user): JsonResponse
     {
         $notifications = $this->notificationRepository->getNotifications($user);

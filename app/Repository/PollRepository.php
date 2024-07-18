@@ -67,14 +67,36 @@ class PollRepository extends BaseRepository implements PollInterface
     }
     public function getLatest()
     {
+        $pollIDs = $this->getAssigneePollRepository()->getPollsAuth();
+        $orderBy = ['field' => 'created_at', 'direction' => 'asc'];
+        // Fetch the data
+        $totalCount = Poll::whereIn('id', $pollIDs)->count();
+        $polls = Poll::whereIn('id', $pollIDs)
+            ->with($this->relationships())
+            ->orderBy($orderBy['field'], $orderBy['direction'])
+            ->limit(5)
+            ->get();
+
+            $data =  [
+                'count' => $totalCount,
+                'polls' => $polls,
+            ];
+            return $data;
+    }
+    public function getUserPolls()
+    {
+        $pollIDs = $this->getAssigneePollRepository()->getPollsAuth();
         $filters = [
-            'limit' => 4,
+            'whereIn' => ['id' => $pollIDs],
             'with' => $this->relationships(),
             'orderBy' => ['field' => 'id', 'direction' => 'asc'],
             'includeDeleted' => 'with' // Options are 'with', 'only', or not set (to exclude)
-        ]; 
-        return $this->indexResource(Poll::class, PollResource::class, $filters);
+        ];
+        
+        return $this->indexResource(Poll::class, PollResource::class, $filters);        
     }
+
+
     public function getPoll(Poll |string $poll)
     {
         if (!($poll instanceof Poll)) {
@@ -251,8 +273,6 @@ class PollRepository extends BaseRepository implements PollInterface
             $poll = Poll::findOrFail($poll);
         }
 
-        $vote = $this->getVoteRepository()->vote($poll, $payload);
-
-        
+        $vote = $this->getVoteRepository()->vote($poll, $payload);       
     }
 }

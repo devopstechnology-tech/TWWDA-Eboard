@@ -142,12 +142,6 @@ const onSubmit = handleSubmit(async (values) => {
 });
 const onSubmitMembers = (async () => {
     try {
-        if (selectedBoardId.value) {
-            const payload: BoardMembersRequestPayload = {
-                members: selectedMemberIds.value,
-            };
-            await useUpdateBoardMembersRequest(payload, selectedBoardId.value);                
-        }
         if(vaction.value === 'board'){            
             const payload: BoardMembersRequestPayload = {
                 members: selectedMemberIds.value,

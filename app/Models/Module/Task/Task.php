@@ -10,6 +10,7 @@ use App\Models\Module\Board\Board;
 use App\Models\Module\Meeting\Meeting;
 use App\Models\Module\Member\Membership;
 use App\Models\Module\Committe\Committee;
+use App\Models\Module\Task\Sub\Taskstatus;
 use App\Models\Module\Task\Sub\AssigneeTask;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -44,6 +45,10 @@ class Task extends BaseModel
     public function committee()
     {
         return $this->belongsTo(Committee::class, 'committee_id');
+    }
+    public function taskstatuses()
+    {
+        return $this->hasMany(Taskstatus::class, 'task_id');
     }
 
     public function taskassignees()

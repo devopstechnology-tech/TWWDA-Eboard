@@ -2,7 +2,7 @@ import {notify} from '@kyvg/vue3-notification';
 import Qs from 'qs';
 import useClient from '@/common/api/client';
 import {pollRoute} from '@/common/api/poll_routes';
-import {nonPaginateResponse,PollRequestPayload} from '@/common/parsers/PollParser';
+import {NonPaginateLatestResponse, nonPaginateResponse,PollRequestPayload} from '@/common/parsers/PollParser';
 
 //all polls
 export async function useGetPollsRequest(options?: object):Promise<nonPaginateResponse>{
@@ -11,6 +11,21 @@ export async function useGetPollsRequest(options?: object):Promise<nonPaginateRe
     const cn = Qs.stringify(options, {arrayFormat: 'brackets'});
     return await client.get(pollRoute() + '?' + cn).json();
 }
+
+export async function useGetLatestPollsRequest(options?: object): Promise<NonPaginateLatestResponse> {
+    const client = useClient();
+    const cn = Qs.stringify(options, {arrayFormat: 'brackets'});
+    return await client.get(pollRoute() + '/latest'+ '?' + cn).json();
+}
+// fetch own assigned polls
+export async function useGetAssignedPollsRequest(options?: object): Promise<NonPaginateLatestResponse> {
+    const client = useClient();
+    const cn = Qs.stringify(options, {arrayFormat: 'brackets'});
+    return await client.get(pollRoute() + '/user'+ '?' + cn).json();
+}
+
+
+
 export async function useVotePollRequest(
     payload: PollRequestPayload, 
     poll_id:string,

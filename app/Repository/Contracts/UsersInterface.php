@@ -12,6 +12,7 @@ interface UsersInterface
 
 
     public function getUsers();
+    public function getLatest();
     public function getTrashedUsers();
     public function get(User|string $user);
     public function getUserFullDetails(User|string $user);

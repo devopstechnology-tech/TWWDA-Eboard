@@ -1,33 +1,31 @@
 <script setup lang="ts">
 import {useQuery} from '@tanstack/vue-query';
 import {useField, useForm} from 'vee-validate';
-import {computed, onMounted, ref} from 'vue';
-import {useRoute, useRouter} from 'vue-router';
+import {computed, nextTick, onMounted, ref} from 'vue';
+import {useRoute} from 'vue-router';
 import * as yup from 'yup';
-import {useGetMembershipsRequest} from '@/common/api/requests/modules/membership/useMembershipRequest';
-import {useCreateMeetingTaskRequest, useGetTasksRequest, useUpdateMeetingTaskRequest, useUpdateTaskRequest} from '@/common/api/requests/modules/task/useTaskRequest';
-import FormDateInput from '@/common/components/FormDateInput.vue';
-import FormDateTimeInput from '@/common/components/FormDateTimeInput.vue';
-import FormInput from '@/common/components/FormInput.vue';
-import FormTextBox from '@/common/components/FormTextBox.vue';
+import {
+    useGetAssignedTasksRequest,
+    useGetTasksRequest, useUpdateWorkTaskRequest, useWorkTaskRequest,
+} from '@/common/api/requests/modules/task/useTaskRequest';
+import FormRadioInput from '@/common/components/FormRadioInput.vue';
 import LoadingComponent from '@/common/components/LoadingComponent.vue';
-import SimpleTable from '@/common/components/Tables/SimpleTable.vue';
 import useUnexpectedErrorHandler from '@/common/composables/useUnexpectedErrorHandler';
 import {
     formattedDateTime} from '@/common/customisation/Breadcrumb';
 import ValidationError from '@/common/errors/ValidationError';
-import {Membership, SelectedResult} from '@/common/parsers/membershipParser';
-import {Task, TaskRequestPayload} from '@/common/parsers/TaskParser';
-import Multiselect from '@@/@vueform/multiselect';
+import {Task, TaskWorkRequestPayload} from '@/common/parsers/TaskParser';
+import useAuthStore from '@/common/stores/auth.store';
 
+const authStore = useAuthStore();
+authStore.initialize(); 
+const currentUserid = authStore.user.id;
+const isCreatingTask = ref(false);
 const route = useRoute();
 const showCreate = ref(false);
 const action = ref('create');
-const boardId = '1234' as string;
-const meetingId = route.params.meetingId as string;
 const taskId = ref<string | null>(null);
-const selectedMembershipIds = ref<string[]>([]);
-const allMemberships = ref<Membership[]>([]);
+const UserAssignee = ref<string | null>(null);
 const selectedTask = ref<Task | null>(null);
 const TaskModal = ref<HTMLDialogElement | null>(null);
 const handleUnexpectedError = useUnexpectedErrorHandler();
@@ -39,15 +37,11 @@ const hasDueDatePassed = (duedate: string): boolean => {
     const dueDate = new Date(duedate);
     return now > dueDate;
 };
-//oneagnda
-const taskschema = yup.object({
-    title: yup.string().required(),
-    duedate: yup.string().required(),
-    description: yup.string().required(),
-    status: yup.string().required(),
-    meeting_id: yup.string().required(),
-    task_id: yup.string().nullable(),
-    taskassignees: yup.array().of(yup.string()).nullable(),
+const taskschema = yup.object({    
+    taskstatus_id: yup.string().nullable(),
+    task_id: yup.string().required(),
+    task_assignee_id: yup.string().required(),
+    selectedOption: yup.string().required(),    
 });
 const {
     handleSubmit,
@@ -55,80 +49,35 @@ const {
     setFieldValue,
     values,
 } = useForm<{
-    title: string;
-    duedate: string;
-    description: string,
-    status: string,
-    meeting_id: string,
-    task_id: string|null,
-    taskassignees: string[],
-
+    taskstatus_id:string|null;
+    task_id:string;
+    task_assignee_id:string;
+    selectedOption:string;
 }>({
     validationSchema: taskschema,
     initialValues: {
-        title: '',
-        duedate: '',
-        description: '',
-        status: 'pending',
-        meeting_id: '',
-        task_id: null,
-        taskassignees: [],
+        taskstatus_id:null,
+        task_id:'',
+        task_assignee_id:'',
+        selectedOption:'',
     },
 });
 
-const openCreateTaskModal = () => {
-    action.value = 'create';
-    showCreate.value = true;
-    TaskModal.value?.showModal();
-};
-const openEditTaskModal = (task:Task) => {
-    getmemberships(task.meeting_id);
-    selectedTask.value = task;
-    taskId.value = task.id;
-    // Set field values here
-    setFieldValue('title', task.title);
-    setFieldValue('duedate', task.duedate);
-    setFieldValue('description', task.description);
-    setFieldValue('status', task.status);
-    setFieldValue('meeting_id', task.meeting_id);
-    if (task.taskassignees){
-        const taskassigneeIds = task.taskassignees.map(taskassignee => taskassignee.id);
-        selectedMembershipIds.value = taskassigneeIds;
-        setFieldValue('taskassignees', taskassigneeIds);
-    } else {
-        setFieldValue('taskassignees', []);
-    }
-    // schedules
-    action.value = 'edit';
-    showCreate.value = true;
-    TaskModal.value?.showModal();
-};
-const selectedUsers = () => {
-    setFieldValue('taskassignees', selectedMembershipIds.value);
-};
-const removeselectedUsers = () => {
-    setFieldValue('taskassignees', selectedMembershipIds.value);
-};
-
-const onSubmit = handleSubmit(async (values, {resetForm}) => {
+const onSubmit = handleSubmit(async (values) => {
     try {
-        setFieldValue('taskassignees', selectedMembershipIds.value);
-        const payload: TaskRequestPayload = {
-            title: values.title,
-            duedate: values.duedate,
-            description: values.description,
-            status: values.status,
-            meeting_id: values.meeting_id,
-            task_id: null,
-            taskassignees: values.taskassignees,
+        // setFieldValue('taskassignees', selectedMembershipIds.value);
+        const payload: TaskWorkRequestPayload = {
+            taskstatus_id: values.taskstatus_id,
+            task_id: values.task_id,
+            task_assignee_id: values.task_assignee_id,
+            selectedOption: values.selectedOption,
         };
-        if (action.value === 'create') {
-            // await useCreateTaskRequest(payload, meetingId);
-        } else {
-            const task_id = taskId.value ? taskId.value.toString() : null;
-            payload.task_id = task_id,
-            await useUpdateTaskRequest(payload, payload.meeting_id);
+        if(action.value === 'create' ){
+            await useWorkTaskRequest(payload, payload.task_id);
+        }else{
+            await useUpdateWorkTaskRequest(payload, payload.taskstatus_id);
         }
+        
         await fetchTasks();
         reset();
         TaskModal.value?.close();
@@ -141,49 +90,94 @@ const onSubmit = handleSubmit(async (values, {resetForm}) => {
     }
 });
 
-
 const reset = () => {
     action.value = 'create';
     showCreate.value = false;
-    taskId.value =null;
-    selectedMembershipIds.value = [];
-    setFieldValue('title', '');
-    setFieldValue('duedate', '');
-    setFieldValue('description', '');
-    setFieldValue('taskassignees', []);
+    selectedTask.value = null;
+    taskId.value = null;
+    setFieldValue('taskstatus_id',null);
+    setFieldValue('task_id','');
+    setFieldValue('task_assignee_id','');
+    setFieldValue('selectedOption','');
 };
-
-const Memberships = computed(() => {
-    const resul:  SelectedResult[] = [];
-    if (allMemberships.value && allMemberships.value?.length > 0) {
-        allMemberships.value.reduce((accumulator, currentMember) => {
-            accumulator.push({
-                id: currentMember.id,
-                name: `${currentMember.user.full_name}`,
-            });
-            return accumulator;
-        }, resul);
+// const viewTask = (task:Task) => {
+//     const currentUserAssignee = task.taskassignees.find(assignee => assignee.user.id === currentUserid);
+//     const currentUserTaskstatus = task.Taskstatuses.find(Taskstatus => Taskstatuse.assignee_task_id === currentUserAssignee.id);
+//     const user = {
+//         assignee_id:currentUserAssignee.id,
+//         user_id:currentUserAssignee.user.id,
+//         full_name:currentUserAssignee.user.full_name,
+//     };
+//     selectedTask.value = task;
+//     UserAssignee.value = user;
+//     setFieldValue('task_id', task.id);
+//     setFieldValue('task_assignee_id', currentUserAssignee.id);
+//     setFieldValue('selectedOption', currentUserAssignee.id);
+//     action.value = 'create';
+//     showCreate.value = true;
+//     TaskModal.value?.showModal();
+//     console.log(UserAssignee.value);
+// };
+const viewTask = async (task: Task) => {
+    reset();
+    const assignee = task.taskassignees.find(assignee => assignee.user.id === currentUserid);
+    if (!assignee) {
+        console.error('Current user is not an assignee of this task');
+        return;
     }
-    return resul;
-});
-const getMemberships = async (meetingId:string) => {
-    return useQuery({
-        queryKey: ['getTasksKey'],
-        queryFn: async () => {
-            const response = await useGetMembershipsRequest(meetingId, boardId, {paginate: 'false'});
-            console.log(response);
-            return response.data;
-        },
-    });
-};
-const {isLoading:isLoadingMemberships, data:MembershipData, refetch: fetchMemberships} = getMemberships();
 
+    const user = {
+        assignee_id: assignee.id,
+        user_id: assignee.user.id,
+        full_name: assignee.user.full_name,
+    };
+
+    selectedTask.value = task;
+    // currentUserAssignee.value = assignee;
+    // Find the taskstatus for the current assignee
+    const currentUserTaskStatus = task.taskstatuses.find(status => status.assignee_task_id === assignee.id);
+    console.log('currentUserTaskStatus', currentUserTaskStatus);
+    // Check if we are creating a new task status or updating an existing one
+    isCreatingTask.value = !currentUserTaskStatus;
+
+    if (!isCreatingTask.value && currentUserTaskStatus) {
+        action.value = 'edit';
+        // If updating, set form values with the current status
+        setFieldValue('taskstatus_id', currentUserTaskStatus.id);
+        setFieldValue('task_id', currentUserTaskStatus.task_id);
+        setFieldValue('task_assignee_id', currentUserTaskStatus.assignee_task_id);
+        setFieldValue('selectedOption', currentUserTaskStatus.status);
+        console.log('action.valueselectedOption', values.selectedOption);
+    } else {
+        // If creating new, set initial form values
+        action.value = 'create';
+        setFieldValue('task_id', task.id);
+        setFieldValue('task_assignee_id', assignee.id);
+        setFieldValue('selectedOption', ''); // Set a default or empty status
+    }
+    await nextTick(); // Wait for the DOM to update
+    TaskModal.value?.showModal();
+    console.log(values);
+    console.log('action.value', action.value);
+};
+const task = computed(() => {    
+    return selectedTask.value;
+});
+const Options = computed(() => { 
+    const options = [
+        {id: 'backlog', value: 'backlog'},
+        {id: 'pending', value: 'pending'},
+        {id: 'onprogress', value: 'onprogress'},
+        {id: 'completed', value: 'completed'},
+    ];   
+    return options;
+});
 
 const getTasks = () => {
     return useQuery({
         queryKey: ['getOwnTasksKey'],
         queryFn: async () => {
-            const response = await useGetTasksRequest({paginate: 'false'});
+            const response = await useGetAssignedTasksRequest({paginate: 'false'});
             console.log(response);
             return response.data;
         },
@@ -194,6 +188,38 @@ onMounted(async () => {
     fetchTasks();
     window.dispatchEvent(new CustomEvent('updateTitle', {detail: 'All Tasks'}));
 });
+const calculateTaskStats = (task: Task) => {
+    if (!task.taskstatuses || task.taskstatuses.length === 0) {
+        return 'No task statuses yet';
+    }
+
+    const totalTaskStatuses = task.taskstatuses.length;
+    const totalAssignees = task.taskassignees.length;
+
+    if (totalTaskStatuses > totalAssignees) {
+        console.error('Total task statuses exceed total assignees, which is unexpected.');
+        return 'Task data error';
+    }
+
+    const statusCounts = task.taskstatuses.reduce((acc, taskStatus) => {
+        acc[taskStatus.status] = (acc[taskStatus.status] || 0) + 1;
+        return acc;
+    }, {} as Record<string, number>);
+
+    const completedCount = statusCounts['completed'] || 0;
+    const remainingCount = totalAssignees - completedCount;
+
+    const completionPercentage = ((completedCount / totalAssignees) * 100).toFixed(1);
+    const remainingPercentage = ((remainingCount / totalAssignees) * 100).toFixed(1);
+
+    const statusPercentages = Object.keys(statusCounts).map(status => {
+        const count = statusCounts[status] || 0;
+        const percentage = ((count / totalAssignees) * 100).toFixed(1);
+        return `${percentage}% ${status}`;
+    }).join('<br>');
+
+    return `${statusPercentages}<br>Completed: ${completionPercentage}%<br>Remaining: ${remainingPercentage}%`;
+};
 </script>
 
 <style scoped>
@@ -252,24 +278,7 @@ onMounted(async () => {
                                 'ok-color': !hasDueDatePassed(task.duedate) || task.status === 'completed'}">
                             {{ formattedDateTime(task.duedate) }}
                         </td>
-                        <td>
-                            <span v-if="task.status === 'backlog'"
-                                  class="badge bg-warning">
-                                Backlog
-                            </span>
-                            <span v-else-if="task.status === 'pending'"
-                                  class="badge bg-info">
-                                Pending
-                            </span>
-                            <span v-else-if="task.status === 'onprogress'"
-                                  class="badge bg-primary">
-                                On Progress
-                            </span>
-                            <span v-else-if="task.status === 'completed'"
-                                  class="badge bg-success">
-                                Completed
-                            </span>
-                        </td>
+                        <td v-html="calculateTaskStats(task)"></td>
                         <td>
                             <ul class="list-none m-0 p-0">
                                 <li v-for="(assignees, idx) in task.taskassignees" :key="assignees.id">
@@ -278,86 +287,74 @@ onMounted(async () => {
                             </ul>
                         </td>
                         <td class="text-center">
-                            <!-- <button class="btn btn-danger btn-sm"
-                                    @click.prevent="openEditTaskModal(task)">
-                                Edit
-                            </button> -->
+                            <button type="button" @click.prevent="viewTask(task)"
+                                    title="" class="mx-2 btn btn-sm btn-primary">
+                                <i class="far fa-eye"></i>
+                            </button>
                         </td>
                     </tr>
                 </tbody>
             </table>
         </div>
     </div>
-    <div class="flex justify-center col-md-6">
-        <dialog id="taskmodal" class="modal" ref="TaskModal">
-            <form method="dialog" class="modal-box rounded-xl">
-                <h3 class="font-bold text-lg justify-center flex">
-                    {{action == 'create' ? 'Create Meeting Task' : 'Edit Meeting Task'}}
-                </h3>
-                <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
-                <div class="w-full mt-6 p-2">
-                    <div class="font-thin text-sm flex flex-col items-center gap-6">
-                        <form novalidate @submit.prevent="onSubmit"
-                              class="w-full rounded-xl mx-auto p-1">
-                            <div class="grid grid-cols-3 gap-2">
-                                <FormInput
-                                    :labeled="true"
-                                    label="Task Title"
-                                    name="title"
-                                    class="col-span-2 w-full text-sm  text-white tracking-wide"
-                                    placeholder="Enter Task Title"
-                                    type="text"
-                                />
-                                <FormDateTimeInput
-                                    label="Task Due Date"
-                                    name="duedate"
-                                    :flow="['day']"
-                                    placeholder="Task Due Date"
-                                />
-                                <FormTextBox
-                                    label="Task Description"
-                                    name="description"
-                                    class="col-span-3"
-                                    placeholder="Enter Task Description"
-                                    :rows="2"
-                                />
+    <div class="flex justify-center items-center min-h-screen">
+        <dialog id="taskModal" class="modal w-full max-w-4xl mx-auto p-0" ref="TaskModal">
+            <form method="dialog" class="modal-box rounded-xl relative bg-white shadow-xl">
+                <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" >✕</button>            
+                <div class="overflow-auto p-4" style="max-height: 80vh;" v-if="task">  
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            {{ action == 'create' ? 'Create Task Status' : 'Edit Task Status' }}
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <dl class="row">
+                            <dt class="col-sm-3">Due</dt>
+                            <dd class="col-sm-9">{{ formattedDateTime(task.duedate) }}</dd>
+                            <!-- <dt class="col-sm-3">Groups</dt>
+                            <dd class="col-sm-9">
+                                <a class="badge badge-primary" href="https://app.boardable.com/fffffffffffffff/groups/cce720-board">Board</a>
+                            </dd>
 
-                                <div class="form-group col-span-3">
-                                    <label class="text-bold font-medium tracking-wide">
-                                        People Responsible
-                                    </label>
-                                    <div :class="[
-                                        'multiselect-container',
-                                        { error: !!errorMessage },
-                                    ]">
-                                        <Multiselect
-                                            id="taskassignees"
-                                            v-model="selectedMembershipIds"
-                                            mode="tags"
-                                            placeholder="Choose your stack"
-                                            :close-on-select="false"
-                                            :filter-results="false"
-                                            :min-chars="1"
-                                            :resolve-on-load="false"
-                                            :delay="0"
-                                            :searchable="true"
-                                            :options="Memberships"
-                                            :valueProp="'id'"
-                                            :trackBy="'id'"
-                                            :label="'name'"
-                                            class="col-span-3"
-                                            :class="[
-                                                'multiselect-container',
-                                                { error: !!errorMessage },
-                                            ]" @select="selectedUsers()" @deselect="removeselectedUsers()" />
-                                        <div v-if="errorMessage" class="message"> {{ errorMessage }} </div>
-                                    </div>
+                            <dt class="col-sm-3">Posted by</dt>
+                            <dd class="col-sm-9 d-flex align-items-center">
+                                <div class="avatar avatar-xs">
+                                    <img src="https://app.boardable.com/img/default_user.svg" class="avatar-img rounded-circle" alt="Nyariki Felix profile image">
                                 </div>
-                            </div>
-                            <button type="submit" class="btn btn-md  mb-1 w-full pt-1 text-red-600 mt-6 bg-primary">
-                                {{action == 'create' ? 'Create Meeting Task' : 'Edit Meeting Task'}}
-                            </button>
-                        </form>
+                                <p class="ml-2 mb-0">
+                                    <a href="#" class="person-card" tabindex="0" >
+                                        Nyariki Felix
+                                    </a>
+                                </p>
+                            </dd> -->
+                        </dl>
+                        <hr>
+                        <div class="user-content text-primary">
+                            <dl>
+                                <dt class="text-muted">Description</dt>
+                                <dd><p > {{task.title}}</p></dd>
+                                <dd><p v-html="task.description"></p></dd>
+                            </dl>
+                        </div>
+                        <div id="form">
+                            <div class="alert alert-danger d-none" id="validation-message"></div>
+                            <form novalidate @submit.prevent="onSubmit">
+                                <div class="form-group">                                    
+                                    <FormRadioInput
+                                        label="Poll Options"
+                                        name="selectedOption"
+                                        :options="Options"
+                                        :checked="Options[values.selectedOption]"
+                                        :inline="true"
+                                    />
+                                </div>
+                                <div class="form-group">
+                                    <button class="btn btn-primary" type="submit">
+                                        {{ action == 'create' ? 'Create Task Status' : 'Edit Task Status' }}
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </form>

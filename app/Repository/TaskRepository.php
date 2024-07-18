@@ -8,20 +8,29 @@ use App\Models\Module\Task\Task;
 use App\Models\Module\Board\Board;
 use App\Repository\BaseRepository;
 use App\Http\Resources\TaskResource;
+use Illuminate\Support\Facades\Auth;
 use App\Models\Module\Meeting\Meeting;
 use App\Models\Module\Committe\Committee;
+use App\Models\Module\Task\Sub\Taskstatus;
 use App\Repository\Contracts\TaskInterface;
+use App\Repository\Contracts\TaskstatusInterface;
 use App\Repository\Contracts\AssigneeTaskInterface;
 
 class TaskRepository extends BaseRepository implements TaskInterface
 {
     // Implement the methods
     private $assigneetaskRepository;
+    private $taskstatusRepository;
 
     public function getAssigneeTaskRepository(): AssigneeTaskInterface
     {
         // Lazily load the AssigneeTaskRepository when needed
         return $this->assigneetaskRepository ??= resolve(AssigneeTaskInterface::class);
+    }
+    public function getTaskstatusRepository(): TaskstatusInterface
+    {
+        // Lazily load the AssigneeTaskRepository when needed
+        return $this->taskstatusRepository ??= resolve(TaskstatusInterface::class);
     }
 
     public function relationships()
@@ -30,6 +39,7 @@ class TaskRepository extends BaseRepository implements TaskInterface
             'meeting',
             'committee',
             'taskassignees',
+            'taskstatuses',
         ];
     }
     public function getAll()
@@ -40,15 +50,41 @@ class TaskRepository extends BaseRepository implements TaskInterface
         ];
         return $this->indexResource(Task::class, TaskResource::class, $filters);
     }
-    public function getLatest()
+    public function getUserTasks()
     {
+        // Get the task IDs for the authenticated user
+        $taskIDs = $this->getAssigneeTaskRepository()->getTasksAuth();
         $filters = [
-            'limit' => 4,
+            'whereIn' => ['id' => $taskIDs],
             'with' => $this->relationships(),
             'orderBy' => ['field' => 'id', 'direction' => 'asc']
         ];
         return $this->indexResource(Task::class, TaskResource::class, $filters);
     }
+    public function getLatest()
+{  
+    // Get the task IDs for the authenticated user
+    $taskIDs = $this->getAssigneeTaskRepository()->getTasksAuth();
+    $orderBy = ['field' => 'created_at', 'direction' => 'asc'];
+
+    // Fetch the total count of tasks
+    $totalCount = Task::whereIn('id', $taskIDs)->count();
+
+    // Fetch the latest tasks with relationships
+    $tasks = Task::whereIn('id', $taskIDs)
+        ->with($this->relationships())
+        ->orderBy($orderBy['field'], $orderBy['direction'])
+        ->limit(5)
+        ->get();
+
+    // Prepare the data to return
+    $data = [
+        'count' => $totalCount,
+        'tasks' => $tasks,
+    ];
+
+    return $data;
+}
     public function getTask(Task |string $task)
     {
         if (!($task instanceof Task)) {
@@ -222,5 +258,18 @@ class TaskRepository extends BaseRepository implements TaskInterface
             $this->getAssigneeTaskRepository()->update($task, $payload);
         }
         return $task;
+    }
+    public function WorkTask(Task $task, array $payload)
+    {
+        if (!($task instanceof Task)) {
+            $task = Task::findOrFail($task);
+        }
+
+        $tasking = $this->getTaskstatusRepository()->tasking($task, $payload);       
+    }
+
+    public function updateWorkTask($taskstatus, array $payload)
+    {
+        $tasking = $this->getTaskstatusRepository()->update($taskstatus, $payload);       
     }
 }

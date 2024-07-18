@@ -5,8 +5,8 @@ import {useField, useForm} from 'vee-validate';
 import {computed, onMounted, ref} from 'vue';
 import {useRoute} from 'vue-router';
 import * as yup from 'yup';
-import {useGetCommitteeMembersRequest, useGetMembersRequest} from '@/common/api/requests/modules/member/useMemberRequest';
-import {useCreateCommitteeTaskRequest, useCreateMeetingTaskRequest, useGetCommitteeTasksRequest, useUpdateCommitteeTaskRequest, useUpdateMeetingTaskRequest} from '@/common/api/requests/modules/task/useTaskRequest';
+import {useGetCommitteeMembersRequest} from '@/common/api/requests/modules/member/useMemberRequest';
+import {useCreateCommitteeTaskRequest, useGetCommitteeTasksRequest, useUpdateCommitteeTaskRequest} from '@/common/api/requests/modules/task/useTaskRequest';
 import FormDateTimeInput from '@/common/components/FormDateTimeInput.vue';
 import FormInput from '@/common/components/FormInput.vue';
 import FormQuillEditor from '@/common/components/FormQuillEditor.vue';
@@ -200,7 +200,7 @@ const handleAssigneeTypeChange = (selectedAssignee: string) => {
 
 const assigneeTypes = [
     {name: 'Individuals', value: 'individuals'},
-    {name: 'Assign All Meeting Members', value: 'all_members'},
+    {name: 'Assign All Committee Members', value: 'all_members'},
 ];
 
 const AssigneeTypes = computed(() => assigneeTypes);
@@ -252,7 +252,7 @@ onMounted(async () => {
         <div class="card h-full">
             <div class="card-header flex items-center">
                 <div class="flex items-center flex-1 w-full">
-                    <h2 class="card-header-title h3">Meeting Tasks</h2>
+                    <h2 class="card-header-title h3">Committee Tasks</h2>
                 </div>
                 <div class="flex items-center space-x-2" v-if="authStore.hasPermission(['create task'])">
                     <button type="button" @click.prevent="openCreateTaskModal" class="btn btn-tool">
@@ -261,7 +261,7 @@ onMounted(async () => {
                 </div>
             </div>
             <div class="card-container">
-                <div v-if="isLoadingCommitteeTasks">Loading Meeting Tasks...</div>
+                <div v-if="isLoadingCommitteeTasks">Loading Committee Tasks...</div>
                 <div v-else>
                     <div class="row overflow-auto p-4" style="max-height: 100vh;">
                         <div class="col-lg-12 col-md-12 col-sm-12 mb-2" v-for="(task, idx) in Tasks" :key="idx">
@@ -328,7 +328,7 @@ onMounted(async () => {
         <div class="flex justify-center col-md-6">
             <dialog id="taskmodal" class="modal" ref="TaskModal">
                 <form method="dialog" class="modal-box rounded-xl">
-                    <h3 class="font-bold text-lg justify-center flex">{{ action == 'create' ? 'Create Meeting Task' : 'Edit Meeting Task' }}</h3>
+                    <h3 class="font-bold text-lg justify-center flex">{{ action == 'create' ? 'Create Committee Task' : 'Edit Committee Task' }}</h3>
                     <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
                     <div class="overflow-auto p-4" style="max-height: 80vh;">
                         <div class="grid grid-cols-3 md:grid-cols-3 gap-2 p-2">

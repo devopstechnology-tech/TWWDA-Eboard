@@ -15,15 +15,22 @@ use App\Repository\Actions\ImageAction;
 use App\Http\Resources\CommitteeResource;
 use App\Models\Module\Committe\Committee;
 use App\Repository\Contracts\FolderInterface;
+use App\Repository\Contracts\MemberInterface;
 use App\Repository\Contracts\CommitteeInterface;
 use App\Repository\Contracts\CommitteeMemberInterface;
 
 class CommitteeRepository extends BaseRepository implements CommitteeInterface
 {
    // Implement the methods
+   private $memberRepository;
    public function __construct(private readonly FolderInterface $folderRepository)
    {
    }
+   public function getMemberRepository(): MemberInterface
+    {
+        // Lazily load the AssigneeTaskRepository when needed
+        return $this->memberRepository ??= resolve(MemberInterface::class);
+    }
    public function relationships()
    {
        return [
@@ -49,16 +56,24 @@ class CommitteeRepository extends BaseRepository implements CommitteeInterface
    }
    public function getLatest()
    {
-       // Adjust the implementation based on your actual logic
-       // For example, using a hypothetical CommitteeResource for transformation
-       $filters = [
-           'limit' => 4,
-           // 'owner_id' => Auth::user()->id,
-           'with' => $this->relationships(),
-           'orderBy' => ['field' => 'created_at', 'direction' => 'asc']
-       ];
-       return $this->indexResource(Committee::class, CommitteeResource::class, $filters);
+       $committeeIDs = $this->getMemberRepository()->getMemberAuth('committee');
+       $orderBy = ['field' => 'created_at', 'direction' => 'asc'];
+       // Fetch the data
+       $totalCount = Committee::whereIn('id', $committeeIDs)->count();
+       $committees = Committee::whereIn('id', $committeeIDs)
+        ->with($this->relationships())
+           ->orderBy($orderBy['field'], $orderBy['direction'])
+           ->limit(5)
+           ->get();
+
+           $data =  [
+               'count' => $totalCount,
+               'committees' => $committees,
+           ];
+           return $data;
    }
+
+
    public function getBoardCommittee($board)
     {
         $filters = [

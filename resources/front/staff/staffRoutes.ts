@@ -94,6 +94,9 @@ const staffRoutes: RouteRecordRaw[] = [
                     name: 'BoardDetails', // A unique name for the route
                     path: '/board/:boardId', // Dynamic segment to capture the board ID
                     meta: {title: 'Board Details'},
+                    props: route => ({
+                        boardId: route.params.boardId,
+                    }),
                 },
                 {
                     beforeEnter: requireStaffAuthentication,
@@ -102,6 +105,11 @@ const staffRoutes: RouteRecordRaw[] = [
                     name: 'BoardMediaDetails', // A unique name for the route
                     path: '/board/:boardId/folder/:folderId/media/:mediaId', // Dynamic segment to capture the board ID
                     meta: {title: 'Board Media Details'},
+                    props: route => ({
+                        boardId: route.params.boardId,
+                        folderId: route.params.folderId,
+                        mediaId: route.params.mediaId,
+                    }),
                 },
                 
                 //board meeting
@@ -112,6 +120,11 @@ const staffRoutes: RouteRecordRaw[] = [
                     name: 'BoardMeetingDetails', // A unique name for the route
                     path: '/board/:boardId/meeting/:meetingId/schedule/:scheduleId', // Dynamic segment to capture the board ID & meting id
                     meta: {title: 'Board Meeting Details'},
+                    props: route => ({
+                        boardId: route.params.boardId,
+                        meetingId: route.params.meetingId,
+                        scheduleId: route.params.scheduleId,
+                    }),
                 },
                 {
                     beforeEnter: requireStaffAuthentication,
@@ -186,6 +199,10 @@ const staffRoutes: RouteRecordRaw[] = [
                     name: 'CommitteeDetails', // A unique name for the route
                     path: '/board/:boardId/committee/:committeeId', // Dynamic segment to capture the board ID
                     meta: {title: 'Committee Details'},
+                    props: route => ({
+                        boardId: route.params.boardId,
+                        committeeId: route.params.committeeId,
+                    }),                    
                 },
                 {
                     beforeEnter: requireStaffAuthentication,
@@ -194,6 +211,11 @@ const staffRoutes: RouteRecordRaw[] = [
                     name: 'CommitteeMediaDetails', // A unique name for the route
                     path: '/board/:boardId/committee/:committeeId/folder/:folderId/media/:mediaId', // Dynamic segment to capture the committee ID
                     meta: {title: 'Committee Media Details'},
+                    props: route => ({
+                        boardId: route.params.boardId,
+                        committeeId: route.params.committeeId,
+                        mediaId: route.params.mediaId,
+                    }), 
                 },
                 {
                     beforeEnter: requireStaffAuthentication,
@@ -218,6 +240,12 @@ const staffRoutes: RouteRecordRaw[] = [
                     name: 'CommitteeMeetingDetails', // A unique name for the route
                     path: '/board/:boardId/committee/:committeeId/meeting/:meetingId/schedule/:scheduleId', // Dynamic segment to capture the committee ID & meting id
                     meta: {title: 'Committee Meeting Details'},
+                    props: route => ({
+                        boardId: route.params.boardId,
+                        committeeId: route.params.committeeId,
+                        meetingId: route.params.meetingId,
+                        scheduleId: route.params.scheduleId,
+                    }), 
                 },
                 {
                     beforeEnter: requireStaffAuthentication,
@@ -273,6 +301,13 @@ const staffRoutes: RouteRecordRaw[] = [
                     name: 'MeetingMediaDetails', // A unique name for the route
                     path: '/board/:boardId/committee/:committeeId/meeting/:meetingId/folder/:folderId/media/:mediaId', // Dynamic segment to capture the committee ID
                     meta: {title: 'Media Details'},
+                    props: route => ({
+                        boardId: route.params.boardId,
+                        committeeId: route.params.committeeId,
+                        meetingId: route.params.meetingId,
+                        folderId: route.params.folderId,
+                        mediaId: route.params.mediaId,
+                    }), 
                 },
 
 

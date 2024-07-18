@@ -8,6 +8,7 @@ use App\Models\Module\Poll\AssigneePoll;
 interface AssigneePollInterface
 {
     // Define your methods here
+    public function getPollsAuth();
     public function create(Poll|string $poll, array $payload): AssigneePoll;
     public function update(Poll|string $poll, array $payload): AssigneePoll;
 
